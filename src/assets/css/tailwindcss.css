@@ -1,0 +1,3 @@
+@tailwind base;    /* 基础样式（如标签重置、全局样式） */
+@tailwind components; /* 组件样式（如自定义按钮、卡片等） */
+@tailwind utilities; /* 工具类（如 flex、text-center 等原子化类） */
