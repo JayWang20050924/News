@@ -1,7 +1,7 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
 // 引入 views 下的组件
-import HomePage from '@/components/HomePage.vue'
+import HomePage from '@/views/HomePage.vue'
 
 // 路由规则：路径 -> 对应组件
 const routes = [
