@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<!-- MyBatis核心配置根节点 -->
+<configuration>
+
+    <!-- 2. 环境配置：配置数据库连接信息（核心） -->
+    <environments default="development"> <!-- default指定默认使用的环境 -->
+        <environment id="development"> <!-- 环境唯一标识，可配置多环境（开发/生产） -->
+            <!-- 事务管理器：MyBatis默认支持JDBC事务（依赖数据库事务） -->
+            <transactionManager type="JDBC"/>
+
+            <!-- 数据源：配置连接池和JDBC参数（核心配置） -->
+            <dataSource type="POOLED"> <!-- type="POOLED"表示使用MyBatis内置连接池 -->
+                <!-- 驱动类：对应JDBC配置的driver=com.mysql.cj.jdbc.Driver -->
+                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+                <!-- 数据库URL：对应JDBC配置的url=jdbc:mysql://localhost:3306/wp，补充时区参数（MySQL 8.x必需） -->
+                <property name="url" value="jdbc:mysql://localhost:3306/wp?useSSL=false&amp;serverTimezone=Asia/Shanghai"/>
+                <!-- 数据库用户名：对应JDBC配置的user=root -->
+                <property name="username" value="root"/>
+                <!-- 数据库密码：对应JDBC配置的password=123456 -->
+                <property name="password" value="123456"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 3. 映射器配置：指定SQL映射文件/接口的位置（必需） -->
+    <mappers>
+        <!-- 方式1：单个SQL映射文件（推荐，适合XML配置SQL） -->
+        <mapper resource="mapper/UserMapper.xml"/>
+
+        <!-- 方式2：扫描整个Mapper接口包（适合注解配置SQL或XML与接口同包） -->
+        <!-- <package name="com.example.mapper"/> -->
+    </mappers>
+</configuration>

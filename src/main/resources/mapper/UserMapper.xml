@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace必须与UserMapper接口全类名一致 -->
+<mapper namespace="com.news.backendproject.mapper.UserMapper">
+
+    <!-- 1. 新增用户（对应addUser） -->
+    <insert id="addUser" parameterType="com.news.backendproject.domain.User">
+        INSERT INTO user(username, password, gender, address, birthday,status)
+        VALUES(#{username}, #{password}, #{gender}, #{address}, #{birthday},1)
+    </insert>
+
+    <!-- 2. 验证用户是否存在（对应verifyUserExistence） -->
+    <select id="verifyUserExistence" parameterType="String" resultType="Integer">
+        SELECT 1 FROM user WHERE username = #{username} AND status = 1
+        <!-- 若存在返回1，否则返回null（MyBatis会自动转为0） -->
+    </select>
+
+    <!-- 3. 验证用户名和密码（对应verifyUserPassword） -->
+    <select id="verifyUserPassword" resultType="Integer">
+        SELECT 1 FROM user WHERE username = #{username} AND password = #{password} AND status = 1
+    </select>
+
+    <!-- 4. 查询用户信息（对应getUserInfor） -->
+    <!-- 结果映射：处理数据库字段与实体属性的映射（如birthday字段类型） -->
+    <resultMap id="UserResultMap" type="com.news.backendproject.domain.User">
+        <result column="username" property="username"/>
+        <result column="gender" property="gender"/>
+        <result column="address" property="address"/>
+        <result column="birthday" property="birthday"/>
+    </resultMap>
+    <select id="getUserInfor" parameterType="String" resultMap="UserResultMap">
+        SELECT username, gender, birthday, address FROM user WHERE username = #{username}  AND status = 1
+    </select>
+
+    <!-- 5. 更新用户信息（对应updateUser） -->
+    <update id="updateBasicInforByUsername" parameterType="com.news.backendproject.domain.User">
+        UPDATE user
+        SET gender = #{gender},
+        birthday = #{birthday},
+        address = #{address}
+        WHERE username = #{username}  AND status = 1
+    </update>
+    <!-- 6. 更新用户密码（updateByUsername） -->
+    <update id="updatePasswordInforByUsername" parameterType="com.news.backendproject.domain.User">
+        UPDATE user
+        SET password = #{password}
+        WHERE username = #{username}  AND status = 1
+    </update>
+</mapper>
