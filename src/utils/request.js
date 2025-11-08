@@ -25,7 +25,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response) => {
     // 假设接口返回格式为 { code, data, msg }
-    const { code,  msgd ,data } = response.data
+    const { code,  msg ,data } = response.data
     if (code === 200) {
       return data // 直接返回业务数据，简化组件逻辑
     }

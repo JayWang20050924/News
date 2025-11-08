@@ -2,8 +2,11 @@
   <!-- <div class="w-full flex justify-center flex-wrap flex-col">
     <p :class="[color,fsize,bg]" @click="showRedBg" class="text-center cursor-pointer">{{mess }},点击切换背景,现在是{{ bgMess }}色背景</p >
   </div> -->
+  <!-- 导航栏组件 -->
   <Navbar></Navbar>
+  <!-- 组件载入位置 -->
   <router-view></router-view>
+  <!-- 页脚组件 -->
   <Footer></Footer>
   <!-- 星空背景组件 -->
   <Starfield></Starfield>

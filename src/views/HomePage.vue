@@ -18,7 +18,7 @@
                     <span class="mx-3">|</span>
                     <span><i class="fa fa-user mr-1"></i> 环球时报记者</span>
                     <span class="mx-3">|</span>
-                    <span><i class="fa fa-comment mr-1"></i> 328评论</span>
+                    <span @click="commentBtn"><i class="fa fa-comment mr-1" ></i> 328评论</span>
                 </div>
             </div>
         </div>
@@ -341,4 +341,7 @@
 
 </template>
 <script setup lang="ts">
+const commentBtn = () => {
+  alert("点击了评论图标，显示评论区（功能待实现）");
+};
 </script>
