@@ -1,8 +1,7 @@
 package com.news.backendproject;
 
 import com.news.backendproject.domain.User;
-import com.news.backendproject.service.Imp.UserServiceImp;
-import org.apache.ibatis.session.SqlSession;
+import com.news.backendproject.dao.Imp.UserDaoImp;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -13,7 +12,7 @@ public class MybatisTest {
     public void findUser() {
         User user = new User();
         user.setUsername("wangpeng");
-        int i = new UserServiceImp().verifyUserExistenceService(user);
+        int i = new UserDaoImp().verifyUserExistenceService(user);
         System.out.println(i);
     }
     @Test
@@ -23,13 +22,13 @@ public class MybatisTest {
          user.setGender("female");
          user.setBirthday(LocalDate.now());
          user.setAddress("woshinibaba");
-        System.out.println(new UserServiceImp().updateBasicInforByUsernameService(user));
+        System.out.println(new UserDaoImp().updateBasicInforByUsernameService(user));
     }
     @Test
     public void updatePassword() {
         User user = new User();
         user.setUsername("wangpeng");
         user.setPassword("wangpeng666.");
-        System.out.println(new UserServiceImp().updatePasswordInforByUsernameService(user));
+        System.out.println(new UserDaoImp().updatePasswordInforByUsernameService(user));
     }
 }

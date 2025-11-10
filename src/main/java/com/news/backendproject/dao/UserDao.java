@@ -1,8 +1,8 @@
-package com.news.backendproject.service;
+package com.news.backendproject.dao;
 
 import com.news.backendproject.domain.User;
 
-public interface UserService {
+public interface UserDao {
     //添加用户
     int addUserService(User user);
     //查找用户是否存在

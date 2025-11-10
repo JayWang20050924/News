@@ -1,12 +1,12 @@
-package com.news.backendproject.service.Imp;
+package com.news.backendproject.dao.Imp;
 
 import com.news.backendproject.domain.User;
 import com.news.backendproject.mapper.UserMapper;
-import com.news.backendproject.service.UserService;
+import com.news.backendproject.dao.UserDao;
 import com.news.backendproject.utils.MyBatisUtils;
 import org.apache.ibatis.session.SqlSession;
 
-public class UserServiceImp implements UserService {
+public class UserDaoImp implements UserDao {
     // 手动通过SqlSession获取Mapper（替代Spring自动注入）
     private UserMapper getUserMapper() {
         SqlSession sqlSession = MyBatisUtils.getSqlSession();
