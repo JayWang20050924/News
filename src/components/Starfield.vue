@@ -131,28 +131,10 @@ const initStarfield = () => {
 
 // 组件生命周期管理
 onMounted(() => {
-  // 检查加载遮罩（如果存在）
-  const loadMask = document.getElementById('load-mask');
-
-  if (loadMask) {
-    // 定时检查遮罩是否隐藏
-    maskCheckInterval = setInterval(() => {
-      const isMaskHidden =
-        loadMask.style.display === 'none' ||
-        getComputedStyle(loadMask).display === 'none';
-
-      if (isMaskHidden) {
-        clearInterval(maskCheckInterval); // 清除检查定时器
-        initStarfield(); // 初始化星空
-      }
-    }, 100); // 每100ms检查一次
-  } else {
-    // 无遮罩时直接初始化
+    //直接初始化
     initStarfield();
-  }
-
-  // 监听窗口 resize 事件（动态调整画布尺寸）
-  window.addEventListener('resize', resizeCanvas);
+    // 监听窗口 resize 事件（动态调整画布尺寸）
+    window.addEventListener('resize', resizeCanvas);
 });
 
 
@@ -167,13 +149,14 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.starfield {
-  /* 固定定位作为背景层 */
+#starfield {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: -1; /* 置于内容下方 */
-  /* 避免干扰鼠标交互 */
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* 确保在所有内容下方 */
+  background-color: #121212; /* 匹配页面dark底色，统一风格 */
   pointer-events: none;
 }
 </style>

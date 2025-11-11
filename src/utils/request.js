@@ -2,7 +2,6 @@ import axios from 'axios'
 
 // 创建Axios实例
 const service = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // 从环境变量读取基础URL（推荐）
   timeout: 5000, // 请求超时时间
 })
 
@@ -38,7 +37,8 @@ service.interceptors.response.use(
       switch (error.response.status) {
         case 401:
           // 未授权，跳转到登录页
-          window.location.href = '/login'
+          // window.location.href = '/login'
+          console.log("未授权，跳转到登录页");
           break
         case 500:
           alert('服务器内部错误，请稍后再试')

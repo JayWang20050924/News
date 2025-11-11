@@ -1,9 +1,6 @@
 <template>
-  <!-- <div class="w-full flex justify-center flex-wrap flex-col">
-    <p :class="[color,fsize,bg]" @click="showRedBg" class="text-center cursor-pointer">{{mess }},点击切换背景,现在是{{ bgMess }}色背景</p >
-  </div> -->
   <!-- 导航栏组件 -->
-  <Navbar></Navbar>
+  <Navbar v-if="showNavbar"></Navbar>
   <!-- 组件载入位置 -->
   <router-view></router-view>
   <!-- 页脚组件 -->
@@ -12,30 +9,27 @@
   <Starfield></Starfield>
 </template>
 <script setup lang="ts">
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router' // 导入路由钩子
 import Navbar from './components/Navbar.vue'
 import Footer from './components/Footer.vue'
 import Starfield from './components/Starfield.vue'
-import { ref } from 'vue'
-// const mess="这里是根组件"
-// const color="text-black-900"
-// const fsize="text-3xl"
-// const bg=ref("bg-blue-500")
-// const bgMess=ref("蓝")
-// //切换背景色
-// const showRedBg=()=>{
-//  bgMess.value=bg.value==="bg-blue-500" ? "红":"蓝"
-//  bg.value = bg.value === "bg-blue-500" ? "bg-red-500" : "bg-blue-500";
 
-// }
+const route = useRoute() // 获取当前路由实例
+// 控制导航栏显示状态：默认显示
+const showNavbar = ref(true)
+
+// 监听路由变化，判断是否需要隐藏导航栏
+watch(
+  () => route.path, // 监听路由路径的变化
+  (newPath) => {
+    // 定义需要隐藏导航栏的路由路径（可添加多个，用数组包含）
+    const hideNavbarPaths = ['/LoginPage']
+    // 如果当前路径在隐藏列表中，隐藏导航栏；否则显示
+    showNavbar.value = !hideNavbarPaths.includes(newPath)
+  },
+  { immediate: true } // 初始加载时就执行一次判断
+)
 </script>
 <style>
-#starfield {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1; /* 确保在所有内容下方（低于导航栏z-40、内容z-1） */
-  background-color: #121212; /* 匹配页面dark底色，统一风格 */
-}
 </style>

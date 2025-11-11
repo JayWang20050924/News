@@ -8,7 +8,7 @@ export const statusMock = () => {
       code: 200,
       msg: 'success',
       data: {
-       isLogin: true
+       isLogin: false
       }
     }
   })
