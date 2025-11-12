@@ -13,9 +13,12 @@ public class KaptchaConfig {
     public DefaultKaptcha kaptcha() {
         DefaultKaptcha kaptcha = new DefaultKaptcha();
         Properties props = new Properties();
-
+        //字体样式
+        props.setProperty("kaptcha.textproducer.font.names", "Arial,Microsoft YaHei,SimHei");
+        //字体间距
+        props.setProperty("kaptcha.textproducer.char.space", "6");
         // 验证码字符集：数字+大小写字母
-        props.setProperty("kaptcha.textproducer.char.string", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+        props.setProperty("kaptcha.textproducer.char.string", "0123456789mnopqrsabcdefghijkltuvwxyz");
         // 验证码长度：4位
         props.setProperty("kaptcha.textproducer.char.length", "4");
         // 图片尺寸：100px * 40px
@@ -26,10 +29,10 @@ public class KaptchaConfig {
         // 文字大小
         props.setProperty("kaptcha.textproducer.font.size", "24");
         // 干扰线颜色
-        props.setProperty("kaptcha.noise.color", "gray");
+        props.setProperty("kaptcha.noise.impl", "com.google.code.kaptcha.impl.NoNoise");
         // 背景渐变（可选）
         props.setProperty("kaptcha.background.clear.from", "white");
-        props.setProperty("kaptcha.background.clear.to", "lightGray");
+        props.setProperty("kaptcha.background.clear.to", "gray");
 
         kaptcha.setConfig(new Config(props));
         return kaptcha;

@@ -5,6 +5,8 @@ import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.LoginStatusResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.imageio.ImageIO;
@@ -14,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.sql.Time;
 
 /**
  * UserController:控制所有用户关联的行为
@@ -36,21 +39,45 @@ public class UserController {
 
         // 生成验证码文本
         String captchaText = kaptchaProducer.createText();
-        // 存入Session（用于后续验证）
+        // 验证码文本存入Session（用于后续验证）
         HttpSession session = request.getSession();
         session.setAttribute("captcha", captchaText);
-
+        // 验证码创建时间存入session
+        session.setAttribute("captchaCreateTime", System.currentTimeMillis());
         // 生成验证码图片
         BufferedImage image = kaptchaProducer.createImage(captchaText);
         ServletOutputStream out = response.getOutputStream();
         ImageIO.write(image, "jpg", out);
         out.flush();
         out.close();
+        //获取到服务器timestamp进行有效性校验
+
     }
 
-    @GetMapping("/requestLogin")
-    public ApiResponse<LoginStatusResponse> requestLogin() {
-        return null;
+
+    @PostMapping("/getLoginResponse")
+    public ApiResponse<LoginStatusResponse> getLoginResponse(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String captcha,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+        //前端返回的参数值测试
+        System.out.println(username+password+captcha);
+        HttpSession session = request.getSession();
+        //session获取验证码的创建时间
+        Long captchaCreateTime = (Long) session.getAttribute("captchaCreateTime");
+
+        System.out.println("captchaCreateTime:"+captchaCreateTime);
+
+        //session获取验证码原文
+        String captchaOriginal=(String) session.getAttribute("captcha");
+
+        System.out.println("captchaOriginal:"+captchaOriginal);
+
+        boolean loginResult=false;
+        LoginStatusResponse data = new LoginStatusResponse(loginResult);
+        return new ApiResponse<>(200,"登录成功",data);
     }
 
 
