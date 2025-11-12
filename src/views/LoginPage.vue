@@ -87,7 +87,8 @@
               <img
                 :src="verifyCodeUrl"
                 alt="图形验证码"
-                class="h-10  rounded cursor-pointer hover:opacity-90 transition-opacity" style="width:100px ;"
+                class="h-10 rounded cursor-pointer hover:opacity-90 transition-opacity"
+                style="width: 100px"
                 @click="refreshVerifyCode"
               />
             </div>
@@ -156,8 +157,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 // 从Element Plus中导入ElMessage（消息提示组件）
 import { ElMessage } from 'element-plus'
-import axios from 'axios'
 import { useRouter } from 'vue-router'
+import request from '../utils/request.js'
 
 // 响应式变量定
 const username = ref('')
@@ -167,7 +168,7 @@ const passwordType = ref('password')
 const isAgree = ref(false)
 const isRemember = ref(false)
 const isLoading = ref(false)
-const verifyCodeUrl =  ref(`http://localhost:8080/captcha?timestamp=${Date.now()}`)
+const verifyCodeUrl = ref(`http://localhost:8080/api/captcha?timestamp=${Date.now()}`)
 //useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
 const router = useRouter()
 // 切换密码可见性
@@ -177,7 +178,7 @@ const togglePassword = () => {
 
 // 刷新验证码
 const refreshVerifyCode = () => {
-  verifyCodeUrl.value =  `http://localhost:8080/captcha?timestamp=${Date.now()}`
+  verifyCodeUrl.value = `http://localhost:8080/api/captcha?timestamp=${Date.now()}`
   verifyCode.value = ''
 }
 
@@ -193,7 +194,7 @@ const handleSubmit = () => {
     return
   }
   if (!isAgree.value) {
-     ElMessage({
+    ElMessage({
       message: '请先同意用户协议和隐私政策',
       type: 'error',
       customClass: 'custom-message',
@@ -212,16 +213,15 @@ const handleSubmit = () => {
   }
 
   isLoading.value = true
-  async function reqLogin() {
+  async function getLoginResponse() {
     try {
-      const response = await axios.post('/api/reqLogin', {
-        username: username.value.trim(),
-        password: password.value.trim(),
-        verifyCode: verifyCode.value.trim(),
-      })
+      const params = new URLSearchParams()
+      params.append('username', username.value.trim())
+      params.append('password', password.value.trim())
+      params.append('captcha', verifyCode.value.trim())
+      const data = await request.post('/getLoginResponse', params)
       //response.data获取响应体response.data.data获取具体数据
-      const data = response.data.data
-      if (data.success) {
+      if (data.login) {
         ElMessage({
           message: '登录成功,即将回到主页',
           type: 'success',
@@ -231,6 +231,8 @@ const handleSubmit = () => {
         // 登录成功后跳转到主页
         router.push('/')
       } else {
+        console.log(data)
+
         ElMessage({
           message: '登录失败，请重试',
           type: 'error',
@@ -247,11 +249,11 @@ const handleSubmit = () => {
         duration: 1500,
       })
       refreshVerifyCode()
-    }finally{
+    } finally {
       isLoading.value = false
     }
   }
-  reqLogin()
+  getLoginResponse()
 }
 
 // 按下回车键登录

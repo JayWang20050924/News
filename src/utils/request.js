@@ -5,6 +5,7 @@ const service = axios.create({
   // 统一的基础 URL（接口前缀）
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
   timeout: 5000, // 请求超时时间
+  withCredentials: true, // 跨域请求时发送Cookie
 })
 
 // 请求拦截器：统一添加请求头、处理加载状态等

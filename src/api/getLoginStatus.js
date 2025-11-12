@@ -2,7 +2,7 @@ import request from '../utils/request.js';
 
 async function getLoginStatus () {
   try {
-    const data=await request.get('http://localhost:8080/api/getLoginStatus');
+    const data=await request.get('/getLoginStatus');
     if (data.login) {
       console.log('已登录');
       return data;
