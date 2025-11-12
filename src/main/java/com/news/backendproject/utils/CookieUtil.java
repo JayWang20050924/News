@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * Cookie 工具类：封装 Cookie 的设置、获取、删除操作
  */
-public class CookieUtils {
+public class CookieUtil {
     public static void setCookie(HttpServletResponse resp, String cookiename, String cookievalue,int days){
         Cookie cookie = new Cookie(cookiename,cookievalue);
         cookie.setMaxAge(days * 24 * 60 * 60);
