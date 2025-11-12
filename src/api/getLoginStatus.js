@@ -1,18 +1,17 @@
-import requestService from '../utils/request.js';
+import request from '../utils/request.js';
 
 async function getLoginStatus () {
   try {
-    const data=await requestService.get('/api/GetUserStatus');
-    if (data) {
-      console.log('登录状态数据获取成功:', data);
+    const data=await request.get('http://localhost:8080/api/getLoginStatus');
+    if (data.login) {
+      console.log('已登录');
       return data;
     }else{
-      console.error('未获取到登录状态数据');
+      console.warn('未登录');
       return false;
-
     }
   } catch (error) {
-    console.error('获取登录状态失败:', error);
+    console.error('获取登录状态失败', error);
     return false;
   }
 }

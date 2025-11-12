@@ -148,7 +148,7 @@
             aria-disabled="true"
             class="bg-gray-900 text-gray-100 px-4 py-2 rounded-lg transition-colors flex items-center border border-2 border-gray-500"
           >
-            &nbsp;<i class="fa fa-edit mr-1"></i>&nbsp;提&nbsp;供&nbsp;建&nbsp;议&nbsp;
+            &nbsp;<i class="fa fa-edit mr-1"></i>&nbsp;您&nbsp;的&nbsp;建&nbsp;议&nbsp;
           </a>
         </div>
       </nav>
@@ -265,10 +265,10 @@ const handleVisibilityChange = () => {
       async function RefreshUserIcon() {
         const data = await getLoginStatus()
         //图标状态
-        userIco.value = data.isLogin === true ? 'fa-user-o' : 'fa-user'
+        userIco.value = data.login === true ? 'fa-user-o' : 'fa-user'
         //下拉菜单项显示状态
-        isLoginShowDropdownItem.value = data.isLogin === true ? 'block' : 'hidden'
-        dontLoginShowDropdownItem.value = data.isLogin === true ? 'hidden' : 'block'
+        isLoginShowDropdownItem.value = data.login === true ? 'block' : 'hidden'
+        dontLoginShowDropdownItem.value = data.login === true ? 'hidden' : 'block'
       }
       RefreshUserIcon()
     }
@@ -281,10 +281,10 @@ onMounted(async () => {
     // 调用接口函数
     const data = await getLoginStatus()
     //图标状态
-    userIco.value = data.isLogin === true ? 'fa-user-o' : 'fa-user'
+    userIco.value = data.login === true ? 'fa-user-o' : 'fa-user'
     //下拉菜单项显示状态
-    isLoginShowDropdownItem.value = data.isLogin === true ? 'block' : 'hidden'
-    dontLoginShowDropdownItem.value = data.isLogin === true ? 'hidden' : 'block'
+    isLoginShowDropdownItem.value = data.login === true ? 'block' : 'hidden'
+    dontLoginShowDropdownItem.value = data.login === true ? 'hidden' : 'block'
   } catch (error) {
     // 处理接口调用失败（如显示错误提示）
     console.log('获取登录状态失败:', error)
@@ -399,6 +399,11 @@ onUnmounted(() => {
 })
 </script>
 <style>
+.custom-message {
+  background-color: #2d2d2d !important; /* 输入框背景色：#2D2D2D */
+  border: 1px solid #4a4a4a !important; /* 灰色边框：与滚动条轨道颜色一致 */
+  color: #e0e0e0 !important; /* 文字色：浅灰色，避免过亮刺眼 */
+}
 .dropdown-item {
   opacity: 0;
   transform: translateY(2px);

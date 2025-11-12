@@ -2,6 +2,8 @@ import axios from 'axios'
 
 // 创建Axios实例
 const service = axios.create({
+  // 统一的基础 URL（接口前缀）
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
   timeout: 5000, // 请求超时时间
 })
 
@@ -29,7 +31,7 @@ service.interceptors.response.use(
       return data // 直接返回业务数据，简化组件逻辑
     }
     // 非200状态码，抛出错误信息
-    return Promise.reject(new Error(msg || '请求失败'))
+    return Promise.reject( '未获取到登录状态=>' + msg )
   },
   (error) => {
     // 处理网络错误、401、500等状态码
@@ -41,13 +43,13 @@ service.interceptors.response.use(
           console.log("未授权，跳转到登录页");
           break
         case 500:
-          alert('服务器内部错误，请稍后再试')
+          console.log('服务器内部错误，请稍后再试')
           break
         default:
-          alert(error.response.data.msg || '请求失败')
+          console.log(error.response.data.msg || '请求失败')
       }
     } else {
-      alert('网络连接失败，请检查网络')
+      console.log('连接失败');
     }
     return Promise.reject(error)
   }
