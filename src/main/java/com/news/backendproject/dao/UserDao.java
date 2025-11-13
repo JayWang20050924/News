@@ -10,7 +10,7 @@ public interface UserDao {
     //登录验证密码
     int verifyUserPasswordService(User user);
     //查找用户信息
-    User getUserInforService(String username);
+    User getUserInforService(User user);
     //更新用户信息
     int updateBasicInforByUsernameService(User user);
     //更新用户密码

@@ -7,7 +7,7 @@ import com.news.backendproject.utils.MyBatisUtil;
 import org.apache.ibatis.session.SqlSession;
 
 public class UserDaoImp implements UserDao {
-    // 手动通过SqlSession获取Mapper（替代Spring自动注入）
+    // 通过SqlSession获取Mapper
     private UserMapper getUserMapper() {
         SqlSession sqlSession = MyBatisUtil.getSqlSession();
         return sqlSession.getMapper(UserMapper.class);
@@ -31,8 +31,8 @@ public class UserDaoImp implements UserDao {
     }
 
     @Override
-    public User getUserInforService(String username) {
-        return getUserMapper().getUserInfor(username);
+    public User getUserInforService(User user) {
+        return getUserMapper().getUserInfor(user.getUsername());
     }
 
     @Override

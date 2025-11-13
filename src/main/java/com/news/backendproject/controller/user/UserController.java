@@ -3,6 +3,7 @@ package com.news.backendproject.controller.user;
 import com.google.code.kaptcha.Producer;
 import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.LoginStatusResponse;
+import com.news.backendproject.service.UserLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,22 +63,7 @@ public class UserController {
             @RequestParam String captcha,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        //前端返回的参数值测试
-        System.out.println(username+password+captcha);
-        HttpSession session = request.getSession();
-        //session获取验证码的创建时间
-        Long captchaCreateTime = (Long) session.getAttribute("captchaCreateTime");
-
-        System.out.println("captchaCreateTime:"+captchaCreateTime);
-
-        //session获取验证码原文
-        String captchaOriginal=(String) session.getAttribute("captcha");
-
-        System.out.println("captchaOriginal:"+captchaOriginal);
-
-        boolean loginResult=false;
-        LoginStatusResponse data = new LoginStatusResponse(loginResult);
-        return new ApiResponse<>(200,"登录成功",data);
+       return new UserLoginService().userLogin(username,password,captcha,request,response);
     }
 
 
