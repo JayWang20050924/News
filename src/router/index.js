@@ -1,8 +1,7 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
-// 引入 views 下的组件
+// 引入 views 下主页组件
 import HomePage from '@/views/HomePage.vue'
-import LoginPage from '@/views/LoginPage.vue'
 
 // 路由规则：路径 -> 对应组件
 const routes = [
@@ -14,7 +13,12 @@ const routes = [
    , {
     path: '/LoginPage',          // 根路径
     name: 'LoginPage',
-    component: LoginPage    // 关联 LoginPage.vue 组件
+    component:()=>import('@/views/LoginPage.vue')   // 懒加载 LoginPage.vue 组件
+  }
+  ,{
+    path:'/RegisterPage',
+    name:'RegisterPage',
+    component:()=>import('@/views/RegisterPage.vue')  // 懒加载注册页面组件
   }
 ]
 

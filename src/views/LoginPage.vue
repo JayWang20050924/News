@@ -188,8 +188,6 @@ const init = () => {
   if (savedUsername) {
     username.value = savedUsername
     isRemember.value = true
-    const usernameEl = document.getElementById('username')
-    usernameEl?.classList.add('pulse-effect')
   }
 }
 init()
@@ -397,22 +395,6 @@ onUnmounted(() => {
 /* 同意协议复选框样式 */
 #agree {
   border: 1px solid red;
-}
-
-/* 输入框高亮动画 */
-@keyframes pulseWhite {
-  0% {
-    background-color: rgb(45, 45, 45);
-  }
-  50% {
-    background-color: white;
-  }
-  100% {
-    background-color: rgb(45, 45, 45);
-  }
-}
-.pulse-effect {
-  animation: pulseWhite 2s ease-in-out;
 }
 
 /* 滚动条样式 */

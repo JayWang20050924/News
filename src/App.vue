@@ -23,8 +23,8 @@ const showNavbar = ref(true)
 watch(
   () => route.path, // 监听路由路径的变化
   (newPath) => {
-    // 定义需要隐藏导航栏的路由路径（可添加多个，用数组包含）
-    const hideNavbarPaths = ['/LoginPage']
+    // 定义需要隐藏导航栏的路由路径（多个，用数组包含）
+    const hideNavbarPaths = ['/LoginPage','/RegisterPage']
     // 如果当前路径在隐藏列表中，隐藏导航栏；否则显示
     showNavbar.value = !hideNavbarPaths.includes(newPath)
   },

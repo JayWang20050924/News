@@ -52,7 +52,7 @@
           <a
             @click="redirectpPage"
             id="registerBtn"
-            href="#"
+            href="/RegisterPage"
             target="_self"
             :class="[
               'dropdown-item block px-6 py-3 text-gray-100 hover:bg-gray-800 transition-colors duration-200 hover:text-gray-100',
