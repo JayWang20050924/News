@@ -154,10 +154,14 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 // 从Element Plus中导入ElMessage（消息提示组件）
 import { ElMessage } from 'element-plus'
+// 引入Vue Router的useRouter函数
 import { useRouter } from 'vue-router'
+// 引入封装的请求模块
 import request from '../utils/request.js'
+// 引入js-cookie库
+import Cookies from 'js-cookie'
 //提示持续时间
-const MESSAGE_DURATION = 2000;
+const MESSAGE_DURATION = 2000
 // 响应式变量定
 const username = ref('')
 const password = ref('')
@@ -178,9 +182,27 @@ const refreshVerifyCode = () => {
   verifyCodeUrl.value = `http://localhost:8080/api/captcha?timestamp=${Date.now()}`
   verifyCode.value = ''
 }
-
+// 从Cookie初始化用户名
+const init = () => {
+  const savedUsername = Cookies.get('username')
+  if (savedUsername) {
+    username.value = savedUsername
+    isRemember.value = true
+    const usernameEl = document.getElementById('username')
+    usernameEl?.classList.add('pulse-effect')
+  }
+}
+init()
 // 处理表单提交
 const handleSubmit = () => {
+  // 记住用户名功能
+  if (isRemember.value) {
+    // 存储30天，路径'/'
+    Cookies.set('username', username.value, { expires: 30, path: '/' })
+  } else {
+    // 删除Cookie（路径需与设置时一致）
+    Cookies.remove('username', { path: '/' })
+  }
   if (!username.value.trim() || !password.value.trim() || !verifyCode.value.trim()) {
     ElMessage({
       message: '提交失败，请检查是否全部填写', // 提示文本（保持不变）
@@ -237,7 +259,7 @@ const handleSubmit = () => {
       }
     } catch (error) {
       ElMessage({
-        message:error,
+        message: error,
         type: 'error',
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,
@@ -255,41 +277,8 @@ const handleKeydown = (e: KeyboardEvent) => {
     handleSubmit()
   }
 }
-
-// 从Cookie初始化数据
-const initFromCookie = () => {
-  const cookies = document.cookie.split('; ')
-  let savedUsername = ''
-  let rememberCookie = false
-
-  cookies.forEach((cookie) => {
-    if (!cookie) return
-    const [name, value] = cookie.split('=').map((item) => item.trim())
-    if (!name || !value) return
-    const cookieValue = decodeURIComponent(value)
-
-    switch (name) {
-      case 'username':
-        savedUsername = cookieValue
-        break
-      case 'remember':
-        rememberCookie = true
-        break
-    }
-  })
-
-  if (rememberCookie && savedUsername) {
-    username.value = savedUsername
-    isRemember.value = true
-    const usernameEl = document.getElementById('username')
-    usernameEl?.classList.add('pulse-effect')
-  }
-
-}
-
 // 组件挂载时初始化
 onMounted(() => {
-  initFromCookie()
   document.addEventListener('keydown', handleKeydown)
   refreshVerifyCode()
 })
