@@ -6,6 +6,9 @@ const service = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
   timeout: 5000, // 请求超时时间
   withCredentials: true, // 跨域请求时发送Cookie
+
+
+
 })
 
 // 请求拦截器：统一添加请求头、处理加载状态等
@@ -32,7 +35,7 @@ service.interceptors.response.use(
       return data // 直接返回业务数据，简化组件逻辑
     }
     // 非200状态码，抛出错误信息
-    return Promise.reject( '未获取到登录状态=>' + msg )
+    return Promise.reject( '登录失败=>'+msg )
   },
   (error) => {
     // 处理网络错误、401、500等状态码

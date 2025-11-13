@@ -67,7 +67,7 @@
         <!-- 图形验证码输入框 -->
         <div class="input-container">
           <label for="verifyCode" class="block text-gray-300 text-sm font-medium mb-2">
-            图形验证码
+            图形验证码(60s内有效)
           </label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300">
@@ -105,12 +105,9 @@
             'font-medium',
             'rounded-lg',
             'btn-hover',
-            { loading: isLoading },
           ]"
-          :disabled="isLoading"
         >
-          <span class="text" v-if="!isLoading"><i class="fa fa-sign-in"></i>&nbsp;登录</span>
-          <i class="fa fa-spinner loading-spinner" v-else></i>
+          <span class="text"><i class="fa fa-sign-in"></i>&nbsp;登录</span>
         </button>
         <!-- 已删除：上次登录时间显示行 -->
         <label class="flex items-center space-x-2">
@@ -159,7 +156,8 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import request from '../utils/request.js'
-
+//提示持续时间
+const MESSAGE_DURATION = 2000;
 // 响应式变量定
 const username = ref('')
 const password = ref('')
@@ -167,7 +165,6 @@ const verifyCode = ref('')
 const passwordType = ref('password')
 const isAgree = ref(false)
 const isRemember = ref(false)
-const isLoading = ref(false)
 const verifyCodeUrl = ref(`http://localhost:8080/api/captcha?timestamp=${Date.now()}`)
 //useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
 const router = useRouter()
@@ -189,7 +186,7 @@ const handleSubmit = () => {
       message: '提交失败，请检查是否全部填写', // 提示文本（保持不变）
       type: 'error', // 提示类型：错误（红色图标）
       customClass: 'custom-message', // 自定义样式类（后续用于统一风格）
-      duration: 1500, // 自动关闭时间（1.5秒，避免阻塞操作）
+      duration: MESSAGE_DURATION, // 自动关闭时间（1.5秒，避免阻塞操作）
     })
     return
   }
@@ -198,7 +195,7 @@ const handleSubmit = () => {
       message: '请先同意用户协议和隐私政策',
       type: 'error',
       customClass: 'custom-message',
-      duration: 1500,
+      duration: MESSAGE_DURATION,
     })
     return
   }
@@ -207,12 +204,11 @@ const handleSubmit = () => {
       message: '请输入4位图形验证码',
       type: 'error',
       customClass: 'custom-message',
-      duration: 1500,
+      duration: MESSAGE_DURATION,
     })
     return
   }
 
-  isLoading.value = true
   async function getLoginResponse() {
     try {
       const params = new URLSearchParams()
@@ -220,37 +216,33 @@ const handleSubmit = () => {
       params.append('password', password.value.trim())
       params.append('captcha', verifyCode.value.trim())
       const data = await request.post('/getLoginResponse', params)
-      //response.data获取响应体response.data.data获取具体数据
+      //response.data获取响应体,response.data.data获取具体数据
       if (data.login) {
         ElMessage({
           message: '登录成功,即将回到主页',
           type: 'success',
           customClass: 'custom-message',
-          duration: 1500,
+          duration: MESSAGE_DURATION,
         })
         // 登录成功后跳转到主页
         router.push('/')
       } else {
-        console.log(data)
-
         ElMessage({
-          message: '登录失败，请重试',
+          message: '登录失败',
           type: 'error',
           customClass: 'custom-message',
-          duration: 1500,
+          duration: MESSAGE_DURATION,
         })
         refreshVerifyCode()
       }
     } catch (error) {
       ElMessage({
-        message: '网络错误，请稍后重试:' + error,
+        message:error,
         type: 'error',
         customClass: 'custom-message',
-        duration: 1500,
+        duration: MESSAGE_DURATION,
       })
       refreshVerifyCode()
-    } finally {
-      isLoading.value = false
     }
   }
   getLoginResponse()
@@ -264,7 +256,7 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 }
 
-// 从Cookie初始化数据（已删除 time 相关逻辑）
+// 从Cookie初始化数据
 const initFromCookie = () => {
   const cookies = document.cookie.split('; ')
   let savedUsername = ''
@@ -283,7 +275,6 @@ const initFromCookie = () => {
       case 'remember':
         rememberCookie = true
         break
-      // 已删除：time cookie 处理逻辑
     }
   })
 
@@ -294,7 +285,6 @@ const initFromCookie = () => {
     usernameEl?.classList.add('pulse-effect')
   }
 
-  // 已删除：latestLoginTime 赋值逻辑
 }
 
 // 组件挂载时初始化
