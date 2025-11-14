@@ -3,7 +3,9 @@ package com.news.backendproject.controller.user;
 import com.google.code.kaptcha.Producer;
 import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.LoginStatusResponse;
+import com.news.backendproject.entity.RegisteStatusResponse;
 import com.news.backendproject.service.UserLoginService;
+import com.news.backendproject.utils.CookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,9 +72,16 @@ public class UserController {
 
     @GetMapping("/getLoginStatus")
     //<LoginStatusResponse>指定data类型
-    public ApiResponse<LoginStatusResponse> getLoginStatus(){
+    public ApiResponse<LoginStatusResponse> getLoginStatus(HttpServletRequest request,HttpServletResponse response) throws IOException {
         boolean isLogin=false;
         LoginStatusResponse data = new LoginStatusResponse(isLogin);
         return new ApiResponse<>(200,"未登录",data);
+    }
+
+    @PostMapping("/getRegisterResponse")
+    public ApiResponse<RegisteStatusResponse> getRegisterResponse(){
+        boolean registResult=false;
+        RegisteStatusResponse data = new RegisteStatusResponse(registResult);
+        return new ApiResponse<>(200,"注册成功",data);
     }
 }

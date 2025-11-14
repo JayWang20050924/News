@@ -4,6 +4,7 @@ import com.news.backendproject.dao.Imp.UserDaoImp;
 import com.news.backendproject.domain.User;
 import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.LoginStatusResponse;
+import com.news.backendproject.utils.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -16,6 +17,7 @@ public  class UserLoginService {
             String captcha,
             HttpServletRequest request,
             HttpServletResponse response
+
     ){
         User user = new User();
         user.setUsername(username);
