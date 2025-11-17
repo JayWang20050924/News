@@ -2,10 +2,12 @@ package com.news.backendproject.utils;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
 
 /**
  * Cookie 工具类：封装 Cookie 的设置、获取、删除操作
  */
+@Component
 public class CookieUtil {
     public static void setCookie(HttpServletResponse response, String cookiename, String cookievalue,int days,boolean secure){
         Cookie cookie = new Cookie(cookiename,cookievalue);

@@ -11,4 +11,5 @@ import lombok.Data;
 public class LoginStatusResponse {
     // 仅需定义字段，Lombok自动补全其他代码
     private boolean isLogin;
+    private String token;
 }
