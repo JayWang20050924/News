@@ -6,9 +6,6 @@ const service = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
   timeout: 5000, // 请求超时时间
   withCredentials: true, // 跨域请求时发送Cookie
-
-
-
 })
 
 // 请求拦截器：统一添加请求头、处理加载状态等
@@ -29,13 +26,17 @@ service.interceptors.request.use(
 // 响应拦截器：统一处理响应、错误码等
 service.interceptors.response.use(
   (response) => {
-    // 假设接口返回格式为 { code, data, msg }
+    // 接口返回格式为 { 状态码, 信息, 数据:{数据内容} }
     const { code,  msg ,data } = response.data
     if (code === 200) {
       return data // 直接返回业务数据，简化组件逻辑
     }
-    // 非200状态码，抛出错误信息
-    return Promise.reject( '登录失败=>'+msg )
+    //401未登录特殊处理将错误信息交给getLoginStatus处理
+    if (code === 401) {
+      return data;
+    }
+    // 非200,401状态码，抛出错误信息
+    return Promise.reject(msg )
   },
   (error) => {
     // 处理网络错误、401、500等状态码
@@ -44,7 +45,7 @@ service.interceptors.response.use(
         case 401:
           // 未授权，跳转到登录页
           // window.location.href = '/login'
-          console.log("未授权，跳转到登录页");
+          console.warn("未登录授权");
           break
         case 500:
           console.log('服务器内部错误，请稍后再试')

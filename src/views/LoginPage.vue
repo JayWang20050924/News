@@ -236,7 +236,7 @@ const handleSubmit = () => {
       params.append('password', password.value.trim())
       params.append('captcha', verifyCode.value.trim())
       const data = await request.post('/getLoginResponse', params)
-      //response.data获取响应体,response.data.data获取具体数据
+      //request返回结果中data字段数据
       if (data.login) {
         ElMessage({
           message: '登录成功,即将回到主页',
@@ -244,6 +244,8 @@ const handleSubmit = () => {
           customClass: 'custom-message',
           duration: MESSAGE_DURATION,
         })
+        //登录成功后存储token
+        localStorage.setItem('token', data.token);
         // 登录成功后跳转到主页
         router.push('/')
       } else {

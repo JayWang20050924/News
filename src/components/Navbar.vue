@@ -72,7 +72,7 @@
             <i class="fa fa-key mr-2"></i>忘记密码
           </a>
           <a
-            @click="redirectpPage"
+            @click="exitLogin(),redirectpPage()"
             href="#"
             id="logoutBtn"
             :class="[
@@ -348,7 +348,18 @@ const showDropdownItems = () => {
     }, 100 * index)
   })
 }
-
+//退出登录
+const exitLogin =async () => {
+  localStorage.removeItem('token');
+  //刷新图标等状态
+   // 调用接口函数
+    const data = await getLoginStatus()
+    //图标状态
+    userIco.value = data.login === true ? 'fa-user-o' : 'fa-user'
+    //下拉菜单项显示状态
+    isLoginShowDropdownItem.value = data.login === true ? 'block' : 'hidden'
+    dontLoginShowDropdownItem.value = data.login === true ? 'hidden' : 'block'
+}
 const resetDropdownItems = () => {
   if (!loginDropdown.value) return
   const dropdownItems = loginDropdown.value.querySelectorAll('.dropdown-item')
