@@ -109,7 +109,6 @@
         >
           <span class="text"><i class="fa fa-sign-in"></i>&nbsp;登录</span>
         </button>
-        <!-- 已删除：上次登录时间显示行 -->
         <label class="flex items-center space-x-2">
           <input
             type="checkbox"
@@ -136,14 +135,15 @@
         </label>
       </div>
 
+
       <!-- 卡片底部 -->
       <div class="bg-gray-800 px-6 py-4 text-center flex-shrink-0">
         <span class="text-gray-300 text-sm">
-          <a href="Register.html" target="_blank" class="text-gray-100 hover:underline">立即注册</a>
+          <a href="/RegisterPage" target="_blank" class="text-gray-100 hover:underline">立即注册</a>
           &emsp;|&emsp;
-          <a href="Forgot.html" target="_blank" class="text-gray-100 hover:underline">忘记密码</a>
+          <a href="/ForgotPage" target="_blank" class="text-gray-100 hover:underline">忘记密码</a>
           &emsp;|&emsp;
-          <a href="#" target="_blank" class="text-gray-100 hover:underline">管理员登录</a>
+          <a href="#" target="_blank" class="text-gray-100 hover:underline">后台登录</a>
         </span>
       </div>
     </div>
@@ -157,7 +157,7 @@ import { ElMessage } from 'element-plus'
 // 引入Vue Router的useRouter函数
 import { useRouter } from 'vue-router'
 // 引入封装的请求模块
-import request from '../utils/request.js'
+import request from '@/utils/request.js'
 // 引入js-cookie库
 import Cookies from 'js-cookie'
 //提示持续时间

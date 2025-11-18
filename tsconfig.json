@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".", // 基础路径为项目根目录
+    "paths": {
+      "@/*": ["src/*"] // 将@别名映射到src目录
+    },
+    "types": ["vite/client"] // 可选：添加Vite客户端类型支持
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue"] // 确保包含src下的所有TS和Vue文件
+}

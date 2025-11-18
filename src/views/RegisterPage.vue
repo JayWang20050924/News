@@ -1,9 +1,470 @@
 <template>
-<div style="width: 100vw; height: 60vh; color: white;" class="flex justify-center self-center">
-  <h1 class="text-4xl self-center">注册页面正在建设中，敬请期待！</h1>
-</div>
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <!-- 注册卡片容器 -->
+    <div
+      class="aspect-3-4 flex flex-col register-card w-full max-w-md bg-gray-900 rounded-2xl shadow-2xl shadow-gray-900/50 overflow-hidden relative"
+    >
+      <!-- 卡片头部 -->
+      <div class="bg-gray-800 px-6 py-8 flex-shrink-0">
+        <!-- 取消,回到主页按钮 -->
+        <router-link
+          to="/"
+          class="absolute top-0 right-1 text-gray-300 hover:text-gray-100 text-3xl transition-colors"
+        >
+          <i class="fa fa-times"></i>
+        </router-link>
+        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-gray-100 text-center">账户注册</h2>
+        <p class="text-gray-300 text-center mt-2 text-sm">新建您的账号和密码</p>
+      </div>
+
+      <!-- 表单主体 -->
+      <div class="px-6 py-8 space-y-6 overflow-y-auto" id="loginForm">
+        <!-- 已有账号链接 -->
+        <div class="text-center">
+          <RouterLinkBlank
+            to="/LoginPage"
+            class="text-gray-300 hover:text-gray-100 transition-colors flex items-center justify-center text-base"
+          >
+            <i class="fa fa-arrow-left mr-2"></i>已有账号?前往登录
+          </RouterLinkBlank>
+        </div>
+        <!-- 用户名输入框 -->
+        <div class="input-container">
+          <label for="username" class="block text-gray-300 text-sm font-medium mb-2">
+            新建用户名
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300">
+              <i class="fa fa-user"></i>
+            </span>
+            <input
+              type="text"
+              id="username"
+              v-model="username"
+              required
+              class="w-full pl-10 pr-4 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
+              placeholder="输入8-20位数字和字母的用户名"
+            />
+          </div>
+        </div>
+
+        <!-- 密码输入框 -->
+        <div class="input-container">
+          <label for="password" class="block text-gray-300 text-sm font-medium mb-2"> 密码 </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300 text-sm">
+              <i class="fa fa-lock"></i>
+            </span>
+            <input
+              :type="passwordType"
+              id="password"
+              v-model="password"
+              required
+              class="w-full pl-10 pr-4 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
+              placeholder="输入8-20位数字和字母的密码"
+            />
+            <button
+              type="button"
+              @click="togglePassword"
+              class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-300 hover:text-gray-100"
+            >
+              <i :class="['fa', passwordType === 'password' ? 'fa-eye-slash' : 'fa-eye']"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 确认密码输入框 -->
+        <div class="input-container">
+          <label for="confirmPassword" class="block text-gray-300 text-sm font-medium mb-2">
+            确认密码
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300 text-sm">
+              <i class="fa fa-lock"></i>
+            </span>
+            <input
+              :type="passwordType"
+              id="confirmPassword"
+              v-model="confirmPassword"
+              required
+              class="w-full pl-10 pr-4 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
+              placeholder="确认您的密码"
+            />
+            <button
+              type="button"
+              @click="togglePassword"
+              class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-300 hover:text-gray-100"
+            >
+              <i :class="['fa', passwordType === 'password' ? 'fa-eye-slash' : 'fa-eye']"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 图形验证码输入框 -->
+        <div class="input-container">
+          <label for="verifyCode" class="block text-gray-300 text-sm font-medium mb-2">
+            图形验证码(60s内有效)
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300">
+              <i class="fa fa-shield"></i>
+            </span>
+            <input
+              type="text"
+              id="verifyCode"
+              v-model="verifyCode"
+              required
+              class="w-full pl-10 pr-36 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
+              placeholder="请输入验证码"
+              maxlength="4"
+            />
+            <!-- 验证码图片 -->
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+              <img
+                :src="verifyCodeUrl"
+                alt="图形验证码"
+                class="h-10 rounded cursor-pointer hover:opacity-90 transition-opacity"
+                style="width: 100px"
+                @click="refreshVerifyCode"
+              />
+            </div>
+          </div>
+        </div>
+
+        <button
+          @click="handleSubmit"
+          :class="[
+            'submit-link',
+            'py-3',
+            'bg-gray-700',
+            'text-gray-100',
+            'font-medium',
+            'rounded-lg',
+            'btn-hover',
+          ]"
+        >
+          <span class="text"><i class="fa fa-user-plus"></i>&nbsp;注册</span>
+        </button>
+        <label class="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="agree"
+            v-model="isAgree"
+            class="h-4 w-4 text-gray-300 bg-gray-800 border-gray-700 rounded focus:ring-gray-300"
+          />
+          <span class="text-gray-300 text-sm">
+            我同意<a href="#" target="_blank" class="text-gray-100 hover:underline"
+              >《用户服务协议》</a
+            >和<a href="#" target="_blank" class="text-gray-100 hover:underline">《隐私政策》</a>
+          </span>
+        </label>
+      </div>
+
+      <!-- 卡片底部 -->
+      <div class="bg-gray-800 px-6 py-4 text-center flex-shrink-0">
+        <span class="text-gray-300 text-sm">
+          <RouterLinkBlank to="/LoginPage" class="text-gray-100 hover:underline"
+            >立即登录</RouterLinkBlank
+          >
+          &emsp;|&emsp;
+          <a href="/ForgotPage" target="_blank" class="text-gray-100 hover:underline">忘记密码</a>
+          &emsp;|&emsp;
+          <a href="#" target="_blank" class="text-gray-100 hover:underline">后台登录</a>
+        </span>
+      </div>
+    </div>
+  </div>
 </template>
+
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
+// 从Element Plus中导入ElMessage（消息提示组件）
+import { ElMessage } from 'element-plus'
+// 引入Vue Router的useRouter函数
+import { useRouter } from 'vue-router'
+// 引入封装的请求模块
+import request from '@/utils/request.js'
+//引入routerlinkblank组件
+import RouterLinkBlank from '@/components/RouterLinkBlank.vue'
+//提示持续时间
+const MESSAGE_DURATION = 2000
+// 响应式变量定
+const username = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+const verifyCode = ref('')
+const passwordType = ref('password')
+const isAgree = ref(false)
+const verifyCodeUrl = ref(`http://localhost:8080/api/captcha?timestamp=${Date.now()}`)
+// 验证规则：8-20位数字+字母（无特殊字符/中文）
+const validatePattern = /^[A-Za-z0-9]{8,20}$/
+//useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
+const router = useRouter()
+// 切换密码可见性
+const togglePassword = () => {
+  passwordType.value = passwordType.value === 'password' ? 'text' : 'password'
+}
+
+// 刷新验证码
+const refreshVerifyCode = () => {
+  verifyCodeUrl.value = `http://localhost:8080/api/captcha?timestamp=${Date.now()}`
+  verifyCode.value = ''
+}
+// 处理表单提交
+const handleSubmit = () => {
+  if (
+    !username.value.trim() ||
+    !password.value.trim() ||
+    !verifyCode.value.trim() ||
+    !confirmPassword.value.trim()
+  ) {
+    ElMessage({
+      message: '提交失败，请检查是否全部填写', // 提示文本（保持不变）
+      type: 'error', // 提示类型：错误（红色图标）
+      customClass: 'custom-message', // 自定义样式类（后续用于统一风格）
+      duration: MESSAGE_DURATION, // 自动关闭时间（1.5秒，避免阻塞操作）
+    })
+    return
+  }
+  if (password.value.trim() !== confirmPassword.value.trim()) {
+    ElMessage({
+      message: '两次输入的密码不一致',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    return
+  }
+  // 格式验证
+  if (!validatePattern.test(username.value.trim())||!validatePattern.test(password.value.trim())) {
+    ElMessage({
+      message: '用户名或密码格式错误',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    return
+  }
+  //同意协议验证
+  if (!isAgree.value) {
+    ElMessage({
+      message: '请先同意用户协议和隐私政策',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    return
+  }
+  //验证码长度验证
+  if (verifyCode.value.trim().length !== 4) {
+    ElMessage({
+      message: '请输入4位图形验证码',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    return
+  }
+  // 异步函数处理注册请求
+  async function getLoginResponse() {
+    try {
+      const params = new URLSearchParams()
+      params.append('username', username.value.trim())
+      params.append('password', password.value.trim())
+      params.append('confirmPassword', confirmPassword.value.trim())
+      params.append('captcha', verifyCode.value.trim())
+      const data = await request.post('/getRegisterResponse', params)
+      console.log(data)
+      //request返回结果中data字段数据
+      if (data.register) {
+        ElMessage({
+          message: '注册成功,即将跳转登录',
+          type: 'success',
+          customClass: 'custom-message',
+          duration: MESSAGE_DURATION,
+        })
+        //登录成功后存储token
+        localStorage.setItem('token', data.token)
+        // 登录成功后跳转到登录页
+        router.push('/LoginPage')
+      } else {
+        ElMessage({
+          message: '登录失败',
+          type: 'error',
+          customClass: 'custom-message',
+          duration: MESSAGE_DURATION,
+        })
+        refreshVerifyCode()
+      }
+    } catch (error) {
+      ElMessage({
+        message: error,
+        type: 'error',
+        customClass: 'custom-message',
+        duration: MESSAGE_DURATION,
+      })
+      refreshVerifyCode()
+    }
+  }
+  getLoginResponse()
+}
+
+// 按下回车键提交表单
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Enter') {
+    e.preventDefault()
+    handleSubmit()
+  }
+}
+// 组件挂载时初始化
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown)
+  refreshVerifyCode()
+})
+
+// 组件卸载时移除事件监听
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+})
 </script>
+
 <style>
+/* 表单容器动画 */
+.register-card {
+  animation: fadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.login-success-message {
+  background-color: #f0f9eb !important; /* 浅绿背景 */
+  color: #198754 !important; /* 深绿文字 */
+  border-left: 4px solid #52c41a !important; /* 左侧绿色边框 */
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.08); /* 轻微阴影 */
+}
+/* 自定义消息框基础样式 - 与输入框背景一致 */
+.custom-message {
+  background-color: #2d2d2d !important; /* 输入框背景色：#2D2D2D */
+  border: 1px solid #4a4a4a !important; /* 灰色边框：与滚动条轨道颜色一致 */
+  color: #e0e0e0 !important; /* 文字色：浅灰色，避免过亮刺眼 */
+}
+/* 错误类型提示的图标颜色 - 柔和红色（不破坏深色主题） */
+.custom-message .el-icon-error {
+  color: #ff6b6b !important;
+}
+
+/* 警告类型提示的图标颜色 - 柔和黄色（不破坏深色主题） */
+.custom-message .el-icon-warning {
+  color: #ffd166 !important;
+}
+/* 调整消息框位置 - 从默认顶部改为20%高度，视觉上更贴近登录卡片 */
+.el-message {
+  top: 20% !important;
+}
+/* 输入框波纹效果 */
+.input-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.input-container:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #b3b3b3, transparent);
+  transition: left 0.6s ease;
+}
+
+.input-container:focus-within:after {
+  left: 100%;
+}
+
+/* 提交按钮样式 */
+.submit-link {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+}
+.submit-link:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 加载动画 */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+  display: none;
+}
+
+.submit-link.loading .text {
+  display: none;
+}
+
+.submit-link.loading .loading-spinner {
+  display: inline-block;
+}
+
+/* 输入框样式 */
+#password,
+#confirmPassword,
+#username,
+#verifyCode {
+  background-color: rgb(45, 45, 45);
+  transition: background-color 0.3s;
+}
+
+/* 同意协议复选框样式 */
+#agree {
+  border: 1px solid red;
+}
+
+/* 滚动条样式 */
+.register-card ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.register-card ::-webkit-scrollbar-track {
+  background: #2d2d2d;
+}
+.register-card ::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 3px;
+}
+.register-card ::-webkit-scrollbar-thumb:hover {
+  background: #666666;
+}
+
+/* 响应式配置 */
+@media (max-width: 768px) {
+  .register-card {
+    aspect-ratio: auto;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+/* 自定义工具类：定义宽高比为3:4 */
+.aspect-3-4 {
+  @apply aspect-[3/4]; /* Tailwind的aspect-ratio属性，宽度:高度=3:4 */
+}
 </style>
