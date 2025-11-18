@@ -6,5 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class RegisteStatusResponse {
-    private boolean registResult;
+    private boolean register;
+    private String token;
 }

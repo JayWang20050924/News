@@ -79,14 +79,14 @@ public class UserController {
 
     @PostMapping("/getRegisterResponse")
     public ApiResponse<RegisteStatusResponse> getRegisterResponse(){
-        boolean registResult=false;
-        RegisteStatusResponse data = new RegisteStatusResponse(registResult);
+        boolean register=true;
+        RegisteStatusResponse data = new RegisteStatusResponse(register,null);
         return new ApiResponse<>(200,"注册成功",data);
     }
     @GetMapping("/getUserProfile")
     public ApiResponse<RegisteStatusResponse> getUserProfile(){
         boolean registResult=false;
-        RegisteStatusResponse data = new RegisteStatusResponse(registResult);
+        RegisteStatusResponse data = new RegisteStatusResponse(registResult,null);
         return new ApiResponse<>(200,"获取信息",data);
     }
 }
