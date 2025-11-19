@@ -82,15 +82,22 @@
               placeholder="请输入验证码"
               maxlength="4"
             />
+            <input v-model="captchaId" type="hidden" name="captchaId" id="captchaId" />
             <!-- 验证码图片 -->
             <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+              <!-- 有图片URL时显示图片 v-if -->
               <img
                 :src="verifyCodeUrl"
                 alt="图形验证码"
                 class="h-10 rounded cursor-pointer hover:opacity-90 transition-opacity"
                 style="width: 100px"
                 @click="refreshVerifyCode"
+                v-if="verifyCodeUrl"
               />
+              <!-- 加载状态：无图片URL时显示加载动画  v-else -->
+              <div v-else class="h-10 w-[100px] flex items-center justify-center">
+                <i class="fa fa-spinner fa-spin text-gray-400"></i>
+              </div>
             </div>
           </div>
         </div>
@@ -135,7 +142,6 @@
         </label>
       </div>
 
-
       <!-- 卡片底部 -->
       <div class="bg-gray-800 px-6 py-4 text-center flex-shrink-0">
         <span class="text-gray-300 text-sm">
@@ -166,10 +172,11 @@ const MESSAGE_DURATION = 2000
 const username = ref('')
 const password = ref('')
 const verifyCode = ref('')
+const captchaId = ref('')
 const passwordType = ref('password')
 const isAgree = ref(false)
 const isRemember = ref(false)
-const verifyCodeUrl = ref(`http://localhost:8080/api/captcha?timestamp=${Date.now()}`)
+const verifyCodeUrl = ref('')
 //useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
 const router = useRouter()
 // 切换密码可见性
@@ -178,10 +185,39 @@ const togglePassword = () => {
 }
 
 // 刷新验证码
-const refreshVerifyCode = () => {
-  verifyCodeUrl.value = `http://localhost:8080/api/captcha?timestamp=${Date.now()}`
-  verifyCode.value = ''
-}
+const refreshVerifyCode = async () => {
+  verifyCode.value = ''; // 清空输入的验证码
+  verifyCodeUrl.value = ''; // 清空图片URL，显示加载动画
+  try {
+    // 用axios请求验证码接口，注意：
+    // 1.需向接口指定responseType为'blob'（因为返回的是图片二进制流）
+    // 2.带上operationType=login参数
+    const response = await request.get('/captcha', {
+      params: { operationType: 'login' }, // 业务参数
+      responseType: 'blob' //指定接口响应类型为二进制流用于临时url转换
+    });
+
+    // 1. 从响应头获取X-Captcha-Id(axios返回的header键是小写)
+    const newCaptchaId = response.headers['x-captcha-id'];
+    if (newCaptchaId) {
+      captchaId.value = newCaptchaId; // 赋值给隐藏表单
+    } else {
+      throw new Error('未获取到验证码ID');
+    }
+
+    // 2. 将二进制图片数据转为可用于img.src的URL
+    // 用URL.createObjectURL生成临时Blob URL
+    verifyCodeUrl.value = URL.createObjectURL(response.data);
+
+  } catch (error) {
+    console.error('获取验证码失败：', error);
+    ElMessage({
+      message: '验证码加载失败，请重试',
+      type: 'error',
+      duration: MESSAGE_DURATION
+    });
+  }
+};
 // 从Cookie初始化用户名
 const init = () => {
   const savedUsername = Cookies.get('username')
@@ -228,13 +264,22 @@ const handleSubmit = () => {
     })
     return
   }
-
+  if(captchaId.value.trim().length===0){
+    ElMessage({
+      message: '请重新获取验证码',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    return
+  }
   async function getLoginResponse() {
     try {
       const params = new URLSearchParams()
       params.append('username', username.value.trim())
       params.append('password', password.value.trim())
       params.append('captcha', verifyCode.value.trim())
+      params.append('captchaId', captchaId.value.trim())
       const data = await request.post('/getLoginResponse', params)
       //request返回结果中data字段数据
       if (data.login) {
@@ -245,7 +290,7 @@ const handleSubmit = () => {
           duration: MESSAGE_DURATION,
         })
         //登录成功后存储token
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', data.token)
         // 登录成功后跳转到主页
         router.push('/')
       } else {
@@ -286,6 +331,10 @@ onMounted(() => {
 // 组件卸载时移除事件监听
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
+  // 清理验证码图片的临时URL
+  if (verifyCodeUrl.value) {
+    URL.revokeObjectURL(verifyCodeUrl.value);
+  }
 })
 </script>
 

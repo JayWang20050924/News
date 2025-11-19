@@ -11,6 +11,14 @@ const service = axios.create({
 // 请求拦截器：统一添加请求头、处理加载状态等
 service.interceptors.request.use(
   (config) => {
+    // 生成时间戳
+    const timestamp = Date.now();
+    // 如果已有params，直接添加时间戳；否则初始化并添加时间戳params
+    if (config.params) {
+      config.params.timestamp = timestamp;
+    } else {
+      config.params = { timestamp:timestamp};
+    }
     // 示例：添加token到请求头
     const token = localStorage.getItem('token')
     if (token) {
@@ -26,6 +34,10 @@ service.interceptors.request.use(
 // 响应拦截器：统一处理响应、错误码等
 service.interceptors.response.use(
   (response) => {
+     // 关键：如果是blob类型（验证码图片），直接返回完整响应，不解析
+    if (response.config.responseType === 'blob') {
+      return response; // 直接返回response，包含headers和data（blob）
+    }
     // 接口返回格式为 { 状态码, 信息, 数据:{数据内容} }
     const { code,  msg ,data } = response.data
     if (code === 200) {
