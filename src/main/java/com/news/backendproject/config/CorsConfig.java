@@ -18,6 +18,8 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedMethods("*") // "*" 表示允许所有方法
                 // 允许的请求头（如Content-Type、Authorization等）
                 .allowedHeaders("*")
+                // 暴露自定义响应头（前端需要获取的头）
+                .exposedHeaders("X-Captcha-Id")
                 // 允许携带凭证（Cookie、Token等，前后端需一致开启）
                 .allowCredentials(true)
                 // 预检请求的缓存时间（3600秒=1小时，减少重复预检请求）

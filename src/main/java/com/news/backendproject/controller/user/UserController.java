@@ -7,6 +7,7 @@ import com.news.backendproject.entity.RegisteStatusResponse;
 import com.news.backendproject.service.UserGetLoginStatusService;
 import com.news.backendproject.service.UserLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * UserController:控制所有用户关联的行为
@@ -32,7 +34,8 @@ public class UserController {
     private UserLoginService userLoginService;
     @Autowired
     private UserGetLoginStatusService userGetLoginStatusService;
-
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
     @GetMapping("/captcha")
     public void generateCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // 禁用缓存
@@ -44,14 +47,18 @@ public class UserController {
         response.setContentType("image/jpeg");
 
         // 生成验证码文本
-        String captchaText = kaptchaProducer.createText();
+        String captchaOraginal = kaptchaProducer.createText();
         // 验证码文本存入Session（用于后续验证）
         HttpSession session = request.getSession();
-        session.setAttribute("captcha", captchaText);
-        // 验证码创建时间存入session
-        session.setAttribute("captchaCreateTime", System.currentTimeMillis());
+        // 设置uuid作为验证码唯一标识
+        String captchaId = UUID.randomUUID().toString().replace("-", "");
+        // captchaId为key,验证码原文为value
+        session.setAttribute(captchaId, captchaOraginal);
+        session.setMaxInactiveInterval(60); // 单位：秒
+        //将UUID通过响应头传递给前端（自定义头，X-Captcha-Id）
+        response.setHeader("X-Captcha-Id", captchaId);
         // 生成验证码图片
-        BufferedImage image = kaptchaProducer.createImage(captchaText);
+        BufferedImage image = kaptchaProducer.createImage(captchaOraginal);
         ServletOutputStream out = response.getOutputStream();
         ImageIO.write(image, "jpg", out);
         out.flush();
@@ -64,9 +71,10 @@ public class UserController {
             @RequestParam String username,
             @RequestParam String password,
             @RequestParam String captcha,
+            @RequestParam String captchaId,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-       return userLoginService.userLogin(username,password,captcha,request,response);
+       return userLoginService.userLogin(username,password,captcha,captchaId,request,response);
     }
 
     @GetMapping("/getLoginStatus")

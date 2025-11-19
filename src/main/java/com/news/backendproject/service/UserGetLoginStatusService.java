@@ -1,5 +1,7 @@
 package com.news.backendproject.service;
 
+import com.news.backendproject.dao.Imp.UserDaoImp;
+import com.news.backendproject.domain.User;
 import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.LoginStatusResponse;
 import com.news.backendproject.utils.JwtUtil;
@@ -10,33 +12,38 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserGetLoginStatusService {
     private final JwtUtil jwtUtil;
+    private final UserDaoImp userDaoImp;
 
-    public UserGetLoginStatusService(JwtUtil jwtUtil) {
+    public UserGetLoginStatusService(JwtUtil jwtUtil, UserDaoImp userDaoImp) {
         this.jwtUtil = jwtUtil;
+        this.userDaoImp = userDaoImp;
     }
 
     public ApiResponse<LoginStatusResponse> getLoginStatus(HttpServletRequest request){
-        // 手动读取请求头中的 token
+        // 读取请求头中的 token
         String authHeader = request.getHeader("Authorization");
         String currentUsername = null;
-        boolean isLogin=false;
         // 如果有 token，尝试验证
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try {
-                currentUsername = jwtUtil.extractUsername(token); // 手动验证 token
-                System.err.println("currentUsername（手动验证）:" + currentUsername);
-                LoginStatusResponse data = new LoginStatusResponse(!isLogin, null);
-                return new ApiResponse<>(200,"已登录",data);
+                currentUsername = jwtUtil.extractUsername(token); // 解析成功即代表令牌有效
+                User user = new User();//新建user类进行用户存在性判断
+                user.setUsername(currentUsername);
+                if(userDaoImp.verifyUserExistenceService(user)!=0){
+                    LoginStatusResponse data = new LoginStatusResponse(true, null);
+                    return new ApiResponse<>(200, "已登录", data);
+                }
+                LoginStatusResponse data = new LoginStatusResponse(false, null);
+                return new ApiResponse<>(401, "用户失效", data);
             } catch (JwtException e) {
-                // token 无效，忽略（视为未登录）
-                LoginStatusResponse data = new LoginStatusResponse(isLogin, null);
-                System.err.println("token 无效：" + e.getMessage());
-                return new ApiResponse<>(401,"未登录",data);
+                // 解析失败（签名无效/过期等），视为未登录
+                LoginStatusResponse data = new LoginStatusResponse(false, null);
+                return new ApiResponse<>(401, "未登录", data);
             }
         }
         //没有token
-        LoginStatusResponse data = new LoginStatusResponse(isLogin, null);
+        LoginStatusResponse data = new LoginStatusResponse(false, null);
         System.err.println("无token");
         return new ApiResponse<>(401,"未登录",data);
     }

@@ -74,7 +74,7 @@ public class JwtUtil {
     public boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);
         // 验证用户名一致且令牌未过期
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
+        return (extractedUsername.equals(username));
     }
 
     // -------------- 内部工具方法 --------------

@@ -5,7 +5,9 @@ import com.news.backendproject.mapper.UserMapper;
 import com.news.backendproject.dao.UserDao;
 import com.news.backendproject.utils.MyBatisUtil;
 import org.apache.ibatis.session.SqlSession;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserDaoImp implements UserDao {
     // 通过SqlSession获取Mapper
     private UserMapper getUserMapper() {
