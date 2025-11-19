@@ -3,7 +3,6 @@
   <header
     id="navbar"
     class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-5"
-    style="background-color: rgb(45 45 45)"
   >
     <div class="container mx-auto px-4 md:px-6 flex items-center justify-between">
       <!-- 左上角登录图标下拉组件 -->
@@ -233,6 +232,8 @@ import getLoginStatus from '../api/getLoginStatus.js'
 import { RouterLink } from 'vue-router'
 //导入 RouterLinkBlank（用于创建新窗口的路由导航）
 import RouterLinkBlank from './RouterLinkBlank.vue'
+//引入element-plus消息提示
+import { ElMessage } from 'element-plus'
 // 下拉菜单项显示状态
 const isLoginShowDropdownItem = ref('hidden')
 const dontLoginShowDropdownItem = ref('block')
@@ -262,7 +263,7 @@ const handleVisibilityChange = () => {
       isFirstLoad.value = false // 首次加载后标记为 false
     } else {
       // 非首次加载，说明是“回到本页”，执行刷新登录状态图标的操作
-      async function RefreshUserIcon() {
+      const RefreshUserIcon=async()=> {
         const data = await getLoginStatus()
         //图标状态
         userIco.value = data.login === true ? 'fa-user-o' : 'fa-user'
@@ -270,7 +271,7 @@ const handleVisibilityChange = () => {
         isLoginShowDropdownItem.value = data.login === true ? 'block' : 'hidden'
         dontLoginShowDropdownItem.value = data.login === true ? 'hidden' : 'block'
       }
-      RefreshUserIcon()
+      RefreshUserIcon();
     }
   }
 }
@@ -359,6 +360,13 @@ const exitLogin =async () => {
     //下拉菜单项显示状态
     isLoginShowDropdownItem.value = data.login === true ? 'block' : 'hidden'
     dontLoginShowDropdownItem.value = data.login === true ? 'hidden' : 'block'
+     ElMessage({
+      message: '您已退出登录',
+      type: 'warning',
+      customClass: 'custom-message',
+      duration: 1500,
+    })
+    return
 }
 const resetDropdownItems = () => {
   if (!loginDropdown.value) return
@@ -410,6 +418,9 @@ onUnmounted(() => {
 })
 </script>
 <style>
+#navbar {
+  background-color: rgb(52, 52, 52);
+}
 .custom-message {
   background-color: #2d2d2d !important; /* 输入框背景色：#2D2D2D */
   border: 1px solid #4a4a4a !important; /* 灰色边框：与滚动条轨道颜色一致 */
@@ -441,5 +452,8 @@ onUnmounted(() => {
     left 0.3s ease,
     width 0.3s ease;
   border-radius: 2px;
+}
+.custom-message .el-icon-warning {
+  color: #ffd166 !important;
 }
 </style>

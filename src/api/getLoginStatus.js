@@ -1,18 +1,18 @@
-import request from '../utils/request.js';
+import request from '../utils/request.js'
 
-async function getLoginStatus () {
+async function getLoginStatus() {
   try {
-    const data=await request.get('/getLoginStatus');
+    const data = await request.get('/getLoginStatus')
     if (data.login) {
-      return data;
-    }else{
-      console.warn('未登录');
-      return false;
+      return data
+    } else {
+      console.warn('未登录')
+      return false
     }
   } catch (error) {
-    console.error( error);
-    return false;
+    console.error(error)
+    return false
   }
 }
 
-export default getLoginStatus;
+export default getLoginStatus

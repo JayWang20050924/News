@@ -31,7 +31,7 @@
         <!-- 用户名输入框 -->
         <div class="input-container">
           <label for="username" class="block text-gray-300 text-sm font-medium mb-2">
-            新建用户名
+            新建用户名 <span style="color: red">*</span>
           </label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300">
@@ -50,7 +50,9 @@
 
         <!-- 密码输入框 -->
         <div class="input-container">
-          <label for="password" class="block text-gray-300 text-sm font-medium mb-2"> 密码 </label>
+          <label for="password" class="block text-gray-300 text-sm font-medium mb-2">
+            密码 <span style="color: red">*</span>
+          </label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300 text-sm">
               <i class="fa fa-lock"></i>
@@ -76,7 +78,7 @@
         <!-- 确认密码输入框 -->
         <div class="input-container">
           <label for="confirmPassword" class="block text-gray-300 text-sm font-medium mb-2">
-            确认密码
+            确认密码 <span style="color: red">*</span>
           </label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300 text-sm">
@@ -100,10 +102,42 @@
           </div>
         </div>
 
-        <!-- 图形验证码输入框 -->
+        <!-- 邮箱绑定 -->
+        <div class="input-container">
+          <label for="bindEmail" class="block text-gray-300 text-sm font-medium mb-2">
+            绑定邮箱 <span style="color: red">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300 text-sm">
+              <i class="fa fa-envelope"></i>
+            </span>
+            <input
+              type="email"
+              id="bindEmail"
+              v-model="bindEmail"
+              required
+              class="w-full pl-10 pr-4 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
+              placeholder="绑定您的邮箱"
+            />
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+              <button
+                @click="getVerifyCode"
+                :class="[cursorStatus, 'bg-gray-700 rounded-lg ']"
+                style="width: 100px; height: 40px"
+              >
+                <!-- 动态显示文本：倒计时中显示秒数，否则显示默认文本 -->
+                <span :class="[textGray]">{{
+                  isDisabled ? `${count}秒后重试` : '获取验证码'
+                }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 验证码输入 -->
         <div class="input-container">
           <label for="verifyCode" class="block text-gray-300 text-sm font-medium mb-2">
-            图形验证码(60s内有效)
+            输入验证码 <span style="color: red">*</span>
           </label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300">
@@ -118,19 +152,10 @@
               placeholder="请输入验证码"
               maxlength="4"
             />
-            <!-- 验证码图片 -->
-            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-              <img
-                :src="verifyCodeUrl"
-                alt="图形验证码"
-                class="h-10 rounded cursor-pointer hover:opacity-90 transition-opacity"
-                style="width: 100px"
-                @click="refreshVerifyCode"
-              />
-            </div>
           </div>
         </div>
 
+        <!-- 提交按钮和同意协议复选框 -->
         <button
           @click="handleSubmit"
           :class="[
@@ -174,6 +199,13 @@
       </div>
     </div>
   </div>
+  <!-- 人机验证组件 -->
+  <!-- handleCaptchaSuccess处理人机验证通过 -->
+  <CaptchaModule
+    :visible="captchaVisible"
+    @close="captchaVisible = false"
+    @success="handleCaptchaSuccess"
+  />
 </template>
 
 <script setup lang="ts">
@@ -183,41 +215,80 @@ import { ElMessage } from 'element-plus'
 // 引入Vue Router的useRouter函数
 import { useRouter } from 'vue-router'
 // 引入封装的请求模块
-import request from '@/utils/request.js'
+import request from '../utils/request.js'
 //引入routerlinkblank组件
-import RouterLinkBlank from '@/components/RouterLinkBlank.vue'
+import RouterLinkBlank from '../components/RouterLinkBlank.vue'
+//引入人机验证模块
+import CaptchaModule from '../components/CaptchaModule.vue'
+
 //提示持续时间
 const MESSAGE_DURATION = 2000
 // 响应式变量定
 const username = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const bindEmail = ref('')
+const count = ref(60) // 倒计时初始值
+const isDisabled = ref(false) // 按钮禁用状态
+const cursorStatus = ref('cursor-pointer') // 按钮光标状态
+const textGray = ref('text-gray-100') // 按钮文字颜色
 const verifyCode = ref('')
+const captchaVisible = ref(false) // 控制验证码组件是否显示
 const passwordType = ref('password')
 const isAgree = ref(false)
-const verifyCodeUrl = ref(`http://localhost:8080/api/captcha?timestamp=${Date.now()}`)
-// 验证规则：8-20位数字+字母（无特殊字符/中文）
-const validatePattern = /^[A-Za-z0-9]{8,20}$/
+//定时器常量
+let timer = null
+// 用户名密码验证规则：8-20位数字+字母（无特殊字符/中文）
+const validatePatternUserPass = /^[A-Za-z0-9]{8,20}$/
+// 邮箱验证规则
+const validatePatternEmail = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
 //useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
 const router = useRouter()
 // 切换密码可见性
 const togglePassword = () => {
   passwordType.value = passwordType.value === 'password' ? 'text' : 'password'
 }
+//获取邮箱验证码
+const getVerifyCode = async () => {
+  if (validatePatternEmail.test(bindEmail.value.trim())) {
+    // 避免重复点击：如果已禁用，直接返回
+    if (isDisabled.value) return
+    // 显示人机验证组件
+    captchaVisible.value = true
+    //禁用按钮，开始倒计时
+    isDisabled.value = true
+    cursorStatus.value = 'cursor-not-allowed'
+    textGray.value = 'text-gray-500'
 
-// 刷新验证码
-const refreshVerifyCode = () => {
-  verifyCodeUrl.value = `http://localhost:8080/api/captcha?timestamp=${Date.now()}`
-  verifyCode.value = ''
+    ElMessage({
+      message: '邮箱格式正确,注意查收验证码',
+      type: 'success',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION + 1000,
+    })
+    // 2. 启动定时器（每秒执行一次）
+    timer = setInterval(() => {
+      count.value-- // 秒数减1
+
+      // 3. 倒计时结束：清除定时器，重置状态
+      if (count.value <= 0) {
+        clearInterval(timer) // 清除定时器，防止内存泄漏
+        count.value = 60 // 重置秒数
+        isDisabled.value = false // 启用按钮
+      }
+    }, 1000)
+  } else {
+    ElMessage({
+      message: '邮箱格式错误',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+  }
 }
 // 处理表单提交
 const handleSubmit = () => {
-  if (
-    !username.value.trim() ||
-    !password.value.trim() ||
-    !verifyCode.value.trim() ||
-    !confirmPassword.value.trim()
-  ) {
+  if (!username.value.trim() || !password.value.trim() || !confirmPassword.value.trim()) {
     ElMessage({
       message: '提交失败，请检查是否全部填写', // 提示文本（保持不变）
       type: 'error', // 提示类型：错误（红色图标）
@@ -236,7 +307,10 @@ const handleSubmit = () => {
     return
   }
   // 格式验证
-  if (!validatePattern.test(username.value.trim())||!validatePattern.test(password.value.trim())) {
+  if (
+    !validatePatternUserPass.test(username.value.trim()) ||
+    !validatePatternUserPass.test(password.value.trim())
+  ) {
     ElMessage({
       message: '用户名或密码格式错误',
       type: 'error',
@@ -255,10 +329,10 @@ const handleSubmit = () => {
     })
     return
   }
-  //验证码长度验证
-  if (verifyCode.value.trim().length !== 4) {
+  //邮箱绑定验证
+  if (verifyCode.value.trim() == '' || bindEmail.value.trim() == '') {
     ElMessage({
-      message: '请输入4位图形验证码',
+      message: '请先绑定邮箱',
       type: 'error',
       customClass: 'custom-message',
       duration: MESSAGE_DURATION,
@@ -272,7 +346,6 @@ const handleSubmit = () => {
       params.append('username', username.value.trim())
       params.append('password', password.value.trim())
       params.append('confirmPassword', confirmPassword.value.trim())
-      params.append('captcha', verifyCode.value.trim())
       const data = await request.post('/getRegisterResponse', params)
       console.log(data)
       //request返回结果中data字段数据
@@ -283,9 +356,9 @@ const handleSubmit = () => {
           customClass: 'custom-message',
           duration: MESSAGE_DURATION,
         })
-        //登录成功后存储token
+        //注册成功后存储token
         localStorage.setItem('token', data.token)
-        // 登录成功后跳转到登录页
+        // 注册成功后跳转到登录页
         router.push('/LoginPage')
       } else {
         ElMessage({
@@ -294,7 +367,6 @@ const handleSubmit = () => {
           customClass: 'custom-message',
           duration: MESSAGE_DURATION,
         })
-        refreshVerifyCode()
       }
     } catch (error) {
       ElMessage({
@@ -303,7 +375,6 @@ const handleSubmit = () => {
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,
       })
-      refreshVerifyCode()
     }
   }
   getLoginResponse()
@@ -319,12 +390,12 @@ const handleKeydown = (e: KeyboardEvent) => {
 // 组件挂载时初始化
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown)
-  refreshVerifyCode()
 })
 
 // 组件卸载时移除事件监听
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
+  if (timer) clearInterval(timer) // 清除定时器，防止内存泄漏
 })
 </script>
 
@@ -429,6 +500,7 @@ onUnmounted(() => {
 #password,
 #confirmPassword,
 #username,
+#bindEmail,
 #verifyCode {
   background-color: rgb(45, 45, 45);
   transition: background-color 0.3s;

@@ -157,7 +157,7 @@ import { ElMessage } from 'element-plus'
 // 引入Vue Router的useRouter函数
 import { useRouter } from 'vue-router'
 // 引入封装的请求模块
-import request from '@/utils/request.js'
+import request from '../utils/request.js'
 // 引入js-cookie库
 import Cookies from 'js-cookie'
 //提示持续时间
