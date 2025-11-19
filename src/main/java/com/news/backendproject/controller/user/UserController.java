@@ -56,8 +56,6 @@ public class UserController {
         ImageIO.write(image, "jpg", out);
         out.flush();
         out.close();
-        //获取到服务器timestamp进行有效性校验
-
     }
 
 
