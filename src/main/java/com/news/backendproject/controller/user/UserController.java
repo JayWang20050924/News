@@ -6,6 +6,7 @@ import com.news.backendproject.entity.LoginStatusResponse;
 import com.news.backendproject.entity.RegisteStatusResponse;
 import com.news.backendproject.service.UserGetLoginStatusService;
 import com.news.backendproject.service.UserLoginService;
+import com.news.backendproject.utils.CookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +38,10 @@ public class UserController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @GetMapping("/captcha")
-    public void generateCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void generateCaptcha(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestParam String operationType) throws IOException {
         // 禁用缓存
         response.setDateHeader("Expires", 0);
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
@@ -46,17 +50,18 @@ public class UserController {
         // 设置响应类型为图片
         response.setContentType("image/jpeg");
 
-        // 生成验证码文本
+        // 生成验证码原文
+        // 验证码原文为value
         String captchaOraginal = kaptchaProducer.createText();
-        // 验证码文本存入Session（用于后续验证）
+        // 获取session对象
         HttpSession session = request.getSession();
-        // 设置uuid作为验证码唯一标识
-        String captchaId = UUID.randomUUID().toString().replace("-", "");
-        // captchaId为key,验证码原文为value
-        session.setAttribute(captchaId, captchaOraginal);
-        session.setMaxInactiveInterval(60); // 单位：秒
-        //将UUID通过响应头传递给前端（自定义头，X-Captcha-Id）
-        response.setHeader("X-Captcha-Id", captchaId);
+        // 获取sessionId
+        String sessionId = session.getId();
+        // 设置业务场景operationType+sessionId作为验证码唯一标识key
+        String captchaKey =operationType+"-"+sessionId;
+        // Secure=true的作用:浏览器仅会在「HTTPS 协议的请求」中，携带标记为 Secure=true 的 Cookie
+        // 过期时间1分钟,httpOnly=true（禁止前端读取）
+        CookieUtil.setCookie(response, captchaKey, captchaOraginal, 60, false, true);
         // 生成验证码图片
         BufferedImage image = kaptchaProducer.createImage(captchaOraginal);
         ServletOutputStream out = response.getOutputStream();
@@ -71,15 +76,24 @@ public class UserController {
             @RequestParam String username,
             @RequestParam String password,
             @RequestParam String captcha,
-            @RequestParam String captchaId,
+            @RequestParam String operationType,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-       return userLoginService.userLogin(username,password,captcha,captchaId,request,response);
+        //限制访问携带的验证码来自于登录业务
+        if (!operationType.equals("login")) {
+            //抛出400错误让前端使用try-catch配合element-plus处理
+            return new ApiResponse<>(400,"非法验证请求",new LoginStatusResponse(false,null));
+        }
+        String captchaKey=operationType+"-"+request.getSession().getId();
+        return userLoginService.userLogin(username,password,captcha,captchaKey,request,response);
     }
 
     @GetMapping("/getLoginStatus")
     //<LoginStatusResponse>指定data类型
-    public ApiResponse<LoginStatusResponse> getLoginStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ApiResponse<LoginStatusResponse> getLoginStatus(
+            HttpServletRequest request,
+            HttpServletResponse response
+            ) throws IOException {
         return userGetLoginStatusService.getLoginStatus(request);
     }
 
