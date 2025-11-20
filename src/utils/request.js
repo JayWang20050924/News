@@ -19,7 +19,7 @@ service.interceptors.request.use(
     } else {
       config.params = { timestamp:timestamp};
     }
-    // 示例：添加token到请求头
+    //添加token到请求头
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`

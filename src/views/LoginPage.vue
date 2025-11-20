@@ -82,7 +82,6 @@
               placeholder="请输入验证码"
               maxlength="4"
             />
-            <input v-model="captchaId" type="hidden" name="captchaId" id="captchaId" />
             <!-- 验证码图片 -->
             <div class="absolute inset-y-0 right-0 flex items-center pr-3">
               <!-- 有图片URL时显示图片 v-if -->
@@ -168,11 +167,10 @@ import request from '../utils/request.js'
 import Cookies from 'js-cookie'
 //提示持续时间
 const MESSAGE_DURATION = 2000
-// 响应式变量定
+// 响应式变量
 const username = ref('')
 const password = ref('')
 const verifyCode = ref('')
-const captchaId = ref('')
 const passwordType = ref('password')
 const isAgree = ref(false)
 const isRemember = ref(false)
@@ -184,40 +182,30 @@ const togglePassword = () => {
   passwordType.value = passwordType.value === 'password' ? 'text' : 'password'
 }
 
-// 刷新验证码
+// 获取验证码
 const refreshVerifyCode = async () => {
-  verifyCode.value = ''; // 清空输入的验证码
-  verifyCodeUrl.value = ''; // 清空图片URL，显示加载动画
+  verifyCode.value = '' // 清空输入的验证码
+  verifyCodeUrl.value = '' // 清空图片URL，显示加载动画
   try {
     // 用axios请求验证码接口，注意：
-    // 1.需向接口指定responseType为'blob'（因为返回的是图片二进制流）
-    // 2.带上operationType=login参数
+    // 1.向接口指定responseType为'blob'（返回的是图片二进制流）
+    // 2.operationType=login参数表明验证码用于登录业务的场景
     const response = await request.get('/captcha', {
       params: { operationType: 'login' }, // 业务参数
-      responseType: 'blob' //指定接口响应类型为二进制流用于临时url转换
-    });
-
-    // 1. 从响应头获取X-Captcha-Id(axios返回的header键是小写)
-    const newCaptchaId = response.headers['x-captcha-id'];
-    if (newCaptchaId) {
-      captchaId.value = newCaptchaId; // 赋值给隐藏表单
-    } else {
-      throw new Error('未获取到验证码ID');
-    }
-
-    // 2. 将二进制图片数据转为可用于img.src的URL
+      responseType: 'blob', //指定接口响应类型为二进制流用于临时url转换
+    })
+    // 将二进制图片数据转为可用于img.src的URL
     // 用URL.createObjectURL生成临时Blob URL
-    verifyCodeUrl.value = URL.createObjectURL(response.data);
-
+    verifyCodeUrl.value = URL.createObjectURL(response.data)
   } catch (error) {
-    console.error('获取验证码失败：', error);
+    console.error('获取验证码失败：', error)
     ElMessage({
       message: '验证码加载失败，请重试',
       type: 'error',
-      duration: MESSAGE_DURATION
-    });
+      duration: MESSAGE_DURATION,
+    })
   }
-};
+}
 // 从Cookie初始化用户名
 const init = () => {
   const savedUsername = Cookies.get('username')
@@ -264,22 +252,14 @@ const handleSubmit = () => {
     })
     return
   }
-  if(captchaId.value.trim().length===0){
-    ElMessage({
-      message: '请重新获取验证码',
-      type: 'error',
-      customClass: 'custom-message',
-      duration: MESSAGE_DURATION,
-    })
-    return
-  }
   async function getLoginResponse() {
     try {
       const params = new URLSearchParams()
       params.append('username', username.value.trim())
       params.append('password', password.value.trim())
       params.append('captcha', verifyCode.value.trim())
-      params.append('captchaId', captchaId.value.trim())
+      //当前操作为登录用于后端验证来源
+      params.append('operationType', "login")
       const data = await request.post('/getLoginResponse', params)
       //request返回结果中data字段数据
       if (data.login) {
@@ -289,7 +269,7 @@ const handleSubmit = () => {
           customClass: 'custom-message',
           duration: MESSAGE_DURATION,
         })
-        //登录成功后存储token
+        //登录成功后存储jwt token到本地存储
         localStorage.setItem('token', data.token)
         // 登录成功后跳转到主页
         router.push('/')
@@ -333,7 +313,7 @@ onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
   // 清理验证码图片的临时URL
   if (verifyCodeUrl.value) {
-    URL.revokeObjectURL(verifyCodeUrl.value);
+    URL.revokeObjectURL(verifyCodeUrl.value)
   }
 })
 </script>
