@@ -120,9 +120,10 @@
               placeholder="绑定您的邮箱"
             />
             <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+              <!-- 根据isDisabled切换光标状态 -->
               <button
-                @click="getVerifyCode"
-                :class="[cursorStatus, 'bg-gray-700 rounded-lg ']"
+                @click="showBotCheck"
+                :class="[isDisabled ? 'cursor-not-allowed' :'cursor-pointer', 'bg-gray-700 rounded-lg ']"
                 style="width: 100px; height: 40px"
               >
                 <!-- 动态显示文本：倒计时中显示秒数，否则显示默认文本 -->
@@ -136,7 +137,7 @@
 
         <!-- 验证码输入 -->
         <div class="input-container">
-          <label for="verifyCode" class="block text-gray-300 text-sm font-medium mb-2">
+          <label for="emailCaptcha" class="block text-gray-300 text-sm font-medium mb-2">
             输入验证码 <span style="color: red">*</span>
           </label>
           <div class="relative">
@@ -145,8 +146,8 @@
             </span>
             <input
               type="text"
-              id="verifyCode"
-              v-model="verifyCode"
+              id="emailCaptcha"
+              v-model="emailCaptcha"
               required
               class="w-full pl-10 pr-36 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
               placeholder="请输入验证码"
@@ -204,7 +205,7 @@
   <CaptchaModule
     :visible="captchaVisible"
     @close="captchaVisible = false"
-    @success="handleCaptchaSuccess"
+    @success="getEmailCaptcha"
     :operationType=" 'register' "
   />
 </template>
@@ -231,9 +232,8 @@ const confirmPassword = ref('')
 const bindEmail = ref('')
 const count = ref(60) // 倒计时初始值
 const isDisabled = ref(false) // 按钮禁用状态
-const cursorStatus = ref('cursor-pointer') // 按钮光标状态
 const textGray = ref('text-gray-100') // 按钮文字颜色
-const verifyCode = ref('')
+const emailCaptcha = ref('')
 const captchaVisible = ref(false) // 控制验证码组件是否显示
 const passwordType = ref('password')
 const isAgree = ref(false)
@@ -250,7 +250,7 @@ const togglePassword = () => {
   passwordType.value = passwordType.value === 'password' ? 'text' : 'password'
 }
 //获取邮箱验证码
-const getVerifyCode = async () => {
+const showBotCheck = async () => {
   if (validatePatternEmail.test(bindEmail.value.trim())) {
     // 避免重复点击：如果已禁用，直接返回
     if (isDisabled.value) return
@@ -266,12 +266,15 @@ const getVerifyCode = async () => {
     })
   }
 }
+
+//开始倒计时效果
 const startCountdown = () => {
   if (timer) clearInterval(timer);
+    isDisabled.value = true;
+    textGray.value = 'text-gray-500';
     count.value = 60;
     timer = setInterval(() => {
     count.value--;
-
     // 倒计时结束：重置按钮状态
     if (count.value <= 0) {
       clearInterval(timer);
@@ -279,18 +282,21 @@ const startCountdown = () => {
     }
   }, 1000);
   }
+
+//倒计时效果init
 const resetVerifyButton = () => {
-   isDisabled.value = false;
-  cursorStatus.value = 'cursor-pointer';
+  isDisabled.value = false;
   textGray.value = 'text-gray-100';
   count.value = 60;
   if (timer) clearInterval(timer);
   }
-const handleCaptchaSuccess=async () => {
+//向后端请求发送邮箱验证码
+const getEmailCaptcha=async () => {
+  startCountdown();
 
 }
 
-// 处理表单提交
+// 处理注册表单提交
 const handleSubmit = () => {
   if (!username.value.trim() || !password.value.trim() || !confirmPassword.value.trim()) {
     ElMessage({
@@ -334,7 +340,7 @@ const handleSubmit = () => {
     return
   }
   //邮箱绑定验证
-  if (verifyCode.value.trim() == '' || bindEmail.value.trim() == '') {
+  if (emailCaptcha.value.trim() == '' || bindEmail.value.trim() == '') {
     ElMessage({
       message: '请先绑定邮箱',
       type: 'error',
@@ -372,7 +378,7 @@ const handleSubmit = () => {
       }
     } catch (error) {
       ElMessage({
-        message: error,
+        message:"注册失败:"+ error,
         type: 'error',
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,
@@ -503,7 +509,7 @@ onUnmounted(() => {
 #confirmPassword,
 #username,
 #bindEmail,
-#verifyCode {
+#emailCaptcha {
   background-color: rgb(45, 45, 45);
   transition: background-color 0.3s;
 }

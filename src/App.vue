@@ -58,4 +58,17 @@ watch(
 .el-message {
   top: 20% !important;
 }
+/* 毛玻璃质感 */
+.glass-header {
+  /* 黑灰半透明背景（透明度 0.2-0.3 最佳，兼顾通透和辨识度） */
+  background-color: rgba(0, 0, 0, 0.25); /* 黑灰底色，alpha 控制透明度 */
+  backdrop-filter: blur(8px); /* 背景模糊程度（数值越大越模糊，8px 常用） */
+  -webkit-backdrop-filter: blur(8px); /* 兼容 Safari 浏览器 */
+
+  /* 细节增强：轻微边框+阴影，提升质感 */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* 上边框（可选） */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 底部阴影，增强层次感 */
+
+  padding: 0.8rem 2rem; /* 内边距，根据需求调整 */
+}
 </style>

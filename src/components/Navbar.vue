@@ -2,7 +2,7 @@
   <!-- 导航栏 -->
   <header
     id="navbar"
-    class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-5"
+    class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-5 "
   >
     <div class="container mx-auto px-4 md:px-6 flex items-center justify-between">
       <!-- 左上角登录图标下拉组件 -->
@@ -23,7 +23,7 @@
             'absolute top-full left-0 mt-3 w-40 bg-gray-900 rounded-lg shadow-xl shadow-gray-900/60 border border-gray-700 transition-all duration-300 ease-in-out transform origin-top-right',
           ]"
         >
-          <!-- 替换原a标签为router-link -->
+          <!-- router-link -->
           <router-link
             @click="redirectpPage"
             :class="[
@@ -85,14 +85,14 @@
       </div>
 
       <!-- 网站Logo -->
-      <div class="flex items-center">
-        <a href="#" class="md:text-3xl font-bold text-gray-100" style="font-size: 2.4rem;">
+      <div class="flex items-center md:text-3xl font-bold text-gray-100" style="font-size: 2rem;">
+        <a href="#" style="font-size: 2.5rem;" >
           <i class="fa fa-newspaper-o mr-2"></i>
-          <span>&nbsp;环&nbsp;球&nbsp;新&nbsp;闻&nbsp;</span>
         </a>
+        <span>&nbsp;环&nbsp;球&nbsp;新&nbsp;闻&nbsp;</span>
       </div>
 
-      <!-- 桌面端导航菜单 - 导航项@click移除$el参数 -->
+      <!-- 桌面端导航菜单 -->
       <nav class="hidden md:flex items-center">
         <div :class="['desktop-nav-container flex items-center space-x-8 mr-2']">
           <a

@@ -78,7 +78,6 @@
 import { ref, onMounted,onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import request from '../utils/request.js'
-import { ca } from 'element-plus/es/locales.mjs'
 // 响应式变量
 const verifyCode = ref('')
 const verifyCodeUrl = ref('')
@@ -138,15 +137,47 @@ const handleOverlayClick = () => {
 //提交并验证验证码
 const handleVerify = async () => {
   if (!verifyCode.value.trim()) {
-    ElMessage.warning('请输入验证码')
+        ElMessage({
+        message: "请输入验证码",
+        type: 'warning',
+        customClass: 'custom-message',
+        duration: MESSAGE_DURATION,
+      })
     return
   }
 
   if (verifyCode.value.trim().length !== 4) {
-    ElMessage.warning('请输入4位验证码')
+     ElMessage({
+        message: "请输入4位验证码",
+        type: 'warning',
+        customClass: 'custom-message',
+        duration: MESSAGE_DURATION,
+      })
     return
   }
+  //向后端请求人机验证结果
   try {
+    const response=await request.get("/verifyCaptcha",{
+      params:{operationType:props.operationType,captcha:verifyCode.value}
+    })
+    if(response.status){
+       ElMessage({
+        message: "验证通过",
+        type: 'success',
+        customClass: 'custom-message',
+        duration: MESSAGE_DURATION,
+      })
+      emit('success');
+      handleClose();
+    }else{
+       ElMessage({
+        message: response.msg,
+        type: 'error',
+        customClass: 'custom-message',
+        duration: MESSAGE_DURATION,
+      })
+      refreshVerifyCode();
+    }
 
   }catch (error) {
      ElMessage({
@@ -155,6 +186,7 @@ const handleVerify = async () => {
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,
       })
+      refreshVerifyCode();
   }
       // ElMessage.success('验证通过')
       // emit('success')
