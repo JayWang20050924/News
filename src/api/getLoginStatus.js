@@ -3,14 +3,11 @@ import request from '../utils/request.js'
 async function getLoginStatus() {
   try {
     const data = await request.get('/getLoginStatus')
-    if (data.login) {
+    if (data.status) {
       return data
-    } else {
-      console.warn('未登录')
-      return false
     }
   } catch (error) {
-    console.error(error)
+    console.warn(error)
     return false
   }
 }

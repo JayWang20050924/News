@@ -31,33 +31,27 @@ service.interceptors.request.use(
   }
 )
 
-// 响应拦截器：统一处理响应、错误码等
+// 响应拦截器
 service.interceptors.response.use(
   (response) => {
-     // 关键：如果是blob类型（验证码图片），直接返回完整响应，不解析
+     // 如果是blob类型（验证码图片），直接返回完整响应，不解析
     if (response.config.responseType === 'blob') {
-      return response; // 直接返回response，包含headers和data（blob）
+      return response;
     }
     // 接口返回格式为 { 状态码, 信息, 数据:{数据内容} }
     const { code,  msg ,data } = response.data
     if (code === 200) {
       return data // 直接返回业务数据，简化组件逻辑
     }
-    //401未登录特殊处理将错误信息交给getLoginStatus处理
-    if (code === 401) {
-      return data;
-    }
-    // 非200,401状态码，抛出错误信息
-    return Promise.reject(msg )
+    // 非200状态码，抛出接口返回的错误信息可被catch(error)捕获
+    return Promise.reject(msg)
   },
   (error) => {
     // 处理网络错误、401、500等状态码
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          // 未授权，跳转到登录页
-          // window.location.href = '/login'
-          console.warn("未登录授权");
+          console.warn("当前访问页面需要登录");
           break
         case 500:
           console.log('服务器内部错误，请稍后再试')

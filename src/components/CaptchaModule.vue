@@ -34,8 +34,8 @@
             </span>
             <input
               type="text"
-              id="captchaCode"
-              v-model="captchaCode"
+              id="verifyCode"
+              v-model="verifyCode"
               required
               class="w-full pl-10 pr-36 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
               placeholder="请输入验证码"
@@ -65,7 +65,7 @@
         <button
           class="verify-btn"
           @click="handleVerify"
-          :disabled="!captchaCode.trim()"
+          :disabled="!verifyCode.trim()"
         >
           <i class="fa fa-check"></i> 验证
         </button>
@@ -78,10 +78,16 @@
 import { ref, onMounted,onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import request from '../utils/request.js'
-
+import { ca } from 'element-plus/es/locales.mjs'
+// 响应式变量
+const verifyCode = ref('')
+const verifyCodeUrl = ref('')
+//常量
+const MESSAGE_DURATION = 3000;
 // 组件属性
 const props = defineProps<{
   visible: boolean
+  operationType?: string
 }>()
 
 // 组件事件
@@ -90,21 +96,38 @@ const emit = defineEmits<{
   (e: 'success'): void
 }>()
 
-// 响应式变量
-const captchaCode = ref('')
-const verifyCodeUrl = ref(`http://localhost:8080/api/captcha?timestamp=${Date.now()}`)
-// 初始化验证码
-// 刷新验证码
-const refreshVerifyCode = () => {
-  verifyCodeUrl.value = `http://localhost:8080/api/captcha?timestamp=${Date.now()}`
-  verifyCode.value = ''
-}
 
+// 刷新验证码
+const refreshVerifyCode = async () => {
+  verifyCode.value = '' // 清空输入的验证码
+  verifyCodeUrl.value = '' // 清空图片URL，显示加载动画
+  try {
+    // 用axios请求验证码接口，注意：
+    // 1.向接口指定responseType为'blob'（返回的是图片二进制流）
+    // 2.operationType=login参数表明验证码用于登录业务的场景
+    const response = await request.get('/captcha', {
+      params: {operationType:props.operationType}, // 业务参数由父组件传入
+      responseType: 'blob', //指定接口响应类型为二进制流用于临时url转换
+    })
+    // 将二进制图片数据转为可用于img.src的URL
+    // 用URL.createObjectURL生成临时Blob URL
+    verifyCodeUrl.value = URL.createObjectURL(response.data)
+  } catch (error) {
+    console.error('获取验证码失败：', error)
+    ElMessage({
+      message: '验证码加载失败，请重试',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+  }
+}
+refreshVerifyCode();
 
 // 关闭验证码组件
 const handleClose = () => {
   emit('close')
-  captchaCode.value = '' // 重置输入
+  verifyCode.value = '' // 重置输入
 }
 
 // 点击遮罩层关闭
@@ -112,24 +135,33 @@ const handleOverlayClick = () => {
   handleClose()
 }
 
-// 验证验证码
+//提交并验证验证码
 const handleVerify = async () => {
-  if (!captchaCode.value.trim()) {
+  if (!verifyCode.value.trim()) {
     ElMessage.warning('请输入验证码')
     return
   }
 
-  if (captchaCode.value.trim().length !== 4) {
+  if (verifyCode.value.trim().length !== 4) {
     ElMessage.warning('请输入4位验证码')
     return
   }
+  try {
 
-      ElMessage.success('验证通过')
-      emit('success') // 通知父组件验证成功
-      handleClose()
+  }catch (error) {
+     ElMessage({
+        message: error,
+        type: 'error',
+        customClass: 'custom-message',
+        duration: MESSAGE_DURATION,
+      })
+  }
+      // ElMessage.success('验证通过')
+      // emit('success')
+      // handleClose()
 
-      ElMessage.error('验证码错误，请重新输入')
-      refreshVerifyCode() // 验证失败后刷新验证码
+      // ElMessage.error('验证码错误，请重新输入')
+      // refreshVerifyCode()
 }
 
 
@@ -364,7 +396,7 @@ onUnmounted(()=>{
     height: 140px;
   }
 }
-#captchaCode{
+#verifyCode{
   background-color: rgb(45, 45, 45);
 }
 </style>

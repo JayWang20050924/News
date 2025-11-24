@@ -205,6 +205,7 @@
     :visible="captchaVisible"
     @close="captchaVisible = false"
     @success="handleCaptchaSuccess"
+    :operationType=" 'register' "
   />
 </template>
 
@@ -255,28 +256,7 @@ const getVerifyCode = async () => {
     if (isDisabled.value) return
     // 显示人机验证组件
     captchaVisible.value = true
-    //禁用按钮，开始倒计时
-    isDisabled.value = true
-    cursorStatus.value = 'cursor-not-allowed'
-    textGray.value = 'text-gray-500'
 
-    ElMessage({
-      message: '邮箱格式正确,注意查收验证码',
-      type: 'success',
-      customClass: 'custom-message',
-      duration: MESSAGE_DURATION + 1000,
-    })
-    // 2. 启动定时器（每秒执行一次）
-    timer = setInterval(() => {
-      count.value-- // 秒数减1
-
-      // 3. 倒计时结束：清除定时器，重置状态
-      if (count.value <= 0) {
-        clearInterval(timer) // 清除定时器，防止内存泄漏
-        count.value = 60 // 重置秒数
-        isDisabled.value = false // 启用按钮
-      }
-    }, 1000)
   } else {
     ElMessage({
       message: '邮箱格式错误',
@@ -286,6 +266,30 @@ const getVerifyCode = async () => {
     })
   }
 }
+const startCountdown = () => {
+  if (timer) clearInterval(timer);
+    count.value = 60;
+    timer = setInterval(() => {
+    count.value--;
+
+    // 倒计时结束：重置按钮状态
+    if (count.value <= 0) {
+      clearInterval(timer);
+      resetVerifyButton();
+    }
+  }, 1000);
+  }
+const resetVerifyButton = () => {
+   isDisabled.value = false;
+  cursorStatus.value = 'cursor-pointer';
+  textGray.value = 'text-gray-100';
+  count.value = 60;
+  if (timer) clearInterval(timer);
+  }
+const handleCaptchaSuccess=async () => {
+
+}
+
 // 处理表单提交
 const handleSubmit = () => {
   if (!username.value.trim() || !password.value.trim() || !confirmPassword.value.trim()) {
@@ -349,15 +353,13 @@ const handleSubmit = () => {
       const data = await request.post('/getRegisterResponse', params)
       console.log(data)
       //request返回结果中data字段数据
-      if (data.register) {
+      if (data.status) {
         ElMessage({
           message: '注册成功,即将跳转登录',
           type: 'success',
           customClass: 'custom-message',
           duration: MESSAGE_DURATION,
         })
-        //注册成功后存储token
-        localStorage.setItem('token', data.token)
         // 注册成功后跳转到登录页
         router.push('/LoginPage')
       } else {

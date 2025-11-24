@@ -30,5 +30,32 @@ watch(
   { immediate: true } // 初始加载时就执行一次判断
 )
 </script>
+
 <style>
+/* 无 scoped，全局生效 */
+.login-success-message {
+  background-color: #f0f9eb !important; /* 浅绿背景 */
+  color: #198754 !important; /* 深绿文字 */
+  border-left: 4px solid #52c41a !important; /* 左侧绿色边框 */
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.08); /* 轻微阴影 */
+}
+/* 自定义消息框基础样式 - 与输入框背景一致 */
+.custom-message {
+  background-color: #2d2d2d !important; /* 输入框背景色：#2D2D2D */
+  border: 1px solid #4a4a4a !important; /* 灰色边框：与滚动条轨道颜色一致 */
+  color: #e0e0e0 !important; /* 文字色：浅灰色，避免过亮刺眼 */
+}
+/* 错误类型提示的图标颜色 - 柔和红色（不破坏深色主题） */
+.custom-message .el-icon-error {
+  color: #ff6b6b !important;
+}
+
+/* 警告类型提示的图标颜色 - 柔和黄色（不破坏深色主题） */
+.custom-message .el-icon-warning {
+  color: #ffd166 !important;
+}
+/* 调整消息框位置 - 从默认顶部改为20%高度，视觉上更贴近登录卡片 */
+.el-message {
+  top: 20% !important;
+}
 </style>

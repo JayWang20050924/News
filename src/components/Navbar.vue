@@ -266,10 +266,10 @@ const handleVisibilityChange = () => {
       const RefreshUserIcon=async()=> {
         const data = await getLoginStatus()
         //图标状态
-        userIco.value = data.login === true ? 'fa-user-o' : 'fa-user'
+        userIco.value = data.status === true ? 'fa-user-o' : 'fa-user'
         //下拉菜单项显示状态
-        isLoginShowDropdownItem.value = data.login === true ? 'block' : 'hidden'
-        dontLoginShowDropdownItem.value = data.login === true ? 'hidden' : 'block'
+        isLoginShowDropdownItem.value = data.status === true ? 'block' : 'hidden'
+        dontLoginShowDropdownItem.value = data.status === true ? 'hidden' : 'block'
       }
       RefreshUserIcon();
     }
@@ -282,10 +282,10 @@ onMounted(async () => {
     // 调用接口函数
     const data = await getLoginStatus()
     //图标状态
-    userIco.value = data.login === true ? 'fa-user-o' : 'fa-user'
+    userIco.value = data.status === true ? 'fa-user-o' : 'fa-user'
     //下拉菜单项显示状态
-    isLoginShowDropdownItem.value = data.login === true ? 'block' : 'hidden'
-    dontLoginShowDropdownItem.value = data.login === true ? 'hidden' : 'block'
+    isLoginShowDropdownItem.value = data.status === true ? 'block' : 'hidden'
+    dontLoginShowDropdownItem.value = data.status === true ? 'hidden' : 'block'
   } catch (error) {
     // 处理接口调用失败（如显示错误提示）
     console.log('获取登录状态失败:', error)
@@ -356,10 +356,10 @@ const exitLogin =async () => {
    // 调用接口函数
     const data = await getLoginStatus()
     //图标状态
-    userIco.value = data.login === true ? 'fa-user-o' : 'fa-user'
+    userIco.value = data.status === true ? 'fa-user-o' : 'fa-user'
     //下拉菜单项显示状态
-    isLoginShowDropdownItem.value = data.login === true ? 'block' : 'hidden'
-    dontLoginShowDropdownItem.value = data.login === true ? 'hidden' : 'block'
+    isLoginShowDropdownItem.value = data.status === true ? 'block' : 'hidden'
+    dontLoginShowDropdownItem.value = data.status === true ? 'hidden' : 'block'
      ElMessage({
       message: '您已退出登录',
       type: 'warning',
@@ -420,11 +420,6 @@ onUnmounted(() => {
 <style>
 #navbar {
   background-color: rgb(52, 52, 52);
-}
-.custom-message {
-  background-color: #2d2d2d !important; /* 输入框背景色：#2D2D2D */
-  border: 1px solid #4a4a4a !important; /* 灰色边框：与滚动条轨道颜色一致 */
-  color: #e0e0e0 !important; /* 文字色：浅灰色，避免过亮刺眼 */
 }
 .dropdown-item {
   opacity: 0;
