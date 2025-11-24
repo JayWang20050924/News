@@ -5,7 +5,9 @@ import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.GenaralDataResponse;
 import com.news.backendproject.service.UserGetLoginStatusService;
 import com.news.backendproject.service.UserLoginService;
+import com.news.backendproject.service.UserRegisterService;
 import com.news.backendproject.utils.CookieUtil;
+import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +36,8 @@ public class UserController {
     private UserLoginService userLoginService;
     @Autowired
     private UserGetLoginStatusService userGetLoginStatusService;
+    @Autowired
+    private UserRegisterService userRegisterService;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @GetMapping("/captcha")
@@ -71,6 +75,7 @@ public class UserController {
 
     @PostMapping("/getLoginResponse")
     public ApiResponse<GenaralDataResponse> getLoginResponse(
+            //@RequestParam定义的参数必须传入，否则400错误
             @RequestParam String username,
             @RequestParam String password,
             @RequestParam String captcha,
@@ -94,20 +99,58 @@ public class UserController {
             ) throws IOException {
         return userGetLoginStatusService.getLoginStatus(request);
     }
-
+    //单独验证人机接口，对应前端单独人机验证组件
     @GetMapping("/verifyCaptcha")
     public ApiResponse<GenaralDataResponse>  verifyCaptcha(
             @RequestParam String captcha,
             @RequestParam String operationType,
             HttpServletRequest request,
             HttpServletResponse response){
-        GenaralDataResponse data = new GenaralDataResponse(true,null);
-        return new ApiResponse<>(200,"验证成功",data);
+        if (!operationType.equals("register")) {
+            //抛出400错误,前端使用try-catch配合element-plus处理
+            return new ApiResponse<>(400,"非法验证请求",new GenaralDataResponse(false,null));
+        }
+        //获取当前请求来源的行为类型+sessionid组成key值查询对应value
+        String captchaKey=operationType+"-"+request.getSession().getId();
+        // 从请求的httpOnly的Cookie 中获取存储的验证码值
+        String cptchaValue = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                System.err.println("cookiename:"+cookie.getName());
+                //有存储了的验证码键值对应上了当前业务获取验证码原文
+                if (cookie.getName().equals(captchaKey)) {
+                    cptchaValue = cookie.getValue();
+                    System.err.println("cookievalue:"+cptchaValue);
+                    break;
+                }
+            }
+        }
+        //验证码过期(只有验证码键对应后cptchaValue才会被赋值)
+        if (cptchaValue == null) {
+            GenaralDataResponse data = new GenaralDataResponse(false, null);
+            //抛出400错误让前端使用try-catch配合element-plus处理
+            return new ApiResponse<>(400, "验证码已过期", data);
+        }
+        System.out.println("cptchaValue:"+cptchaValue);
+        //验证码不匹配
+        if(cptchaValue.trim().equals(captcha.trim())){
+            //返回验证码正确的结果
+            GenaralDataResponse data = new GenaralDataResponse(true,null);
+            return new ApiResponse<>(200,"验证码正确",data);
+        }else if (!cptchaValue.trim().equals(captcha.trim())){
+            //返回验证码错误的结果
+            GenaralDataResponse data = new GenaralDataResponse(false,null);
+            return new ApiResponse<>(400,"验证码错误",data);
+        }
+        GenaralDataResponse data = new GenaralDataResponse(false,null);
+        return new ApiResponse<>(400,"未知错误请重试",data);
     }
+
+
     @PostMapping("/getRegisterResponse")
     public ApiResponse<GenaralDataResponse> getRegisterResponse(){
-        GenaralDataResponse data = new GenaralDataResponse(true,null);
-        return new ApiResponse<>(200,"注册成功",data);
+        return userRegisterService.userRegister(null);
     }
 
 
