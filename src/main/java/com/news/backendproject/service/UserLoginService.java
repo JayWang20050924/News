@@ -3,12 +3,11 @@ package com.news.backendproject.service;
 import com.news.backendproject.dao.Imp.UserDaoImp;
 import com.news.backendproject.domain.User;
 import com.news.backendproject.entity.ApiResponse;
-import com.news.backendproject.entity.LoginStatusResponse;
+import com.news.backendproject.entity.GenaralDataResponse;
 import com.news.backendproject.utils.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,7 @@ public  class UserLoginService {
     private JwtUtil jwtUtil;
     @Autowired
     private UserDaoImp userDaoImp;
-    public ApiResponse<LoginStatusResponse> userLogin(
+    public ApiResponse<GenaralDataResponse> userLogin(
             String username,
             String password,
             String captcha,
@@ -46,7 +45,7 @@ public  class UserLoginService {
             }
         }
         if (cptchaValue == null) {
-            LoginStatusResponse data = new LoginStatusResponse(false, null);
+            GenaralDataResponse data = new GenaralDataResponse(false, null);
             //抛出400错误让前端使用try-catch配合element-plus处理
             return new ApiResponse<>(400, "验证码已过期", data);
         }
@@ -54,20 +53,20 @@ public  class UserLoginService {
         //验证码不匹配或过期
         if(!cptchaValue.trim().equals(captcha.trim())){
             //返回验证码错误的结果
-            LoginStatusResponse data = new LoginStatusResponse(false,null);
+            GenaralDataResponse data = new GenaralDataResponse(false,null);
             return new ApiResponse<>(400,"验证码错误",data);
         }
         //用户不存在
         else if(cptchaValue.trim().equals(captcha.trim())
                 &&userDaoImp.verifyUserExistenceService(user)==0){
-            LoginStatusResponse data = new LoginStatusResponse(false,null);
+            GenaralDataResponse data = new GenaralDataResponse(false,null);
             return new ApiResponse<>(404,"用户不存在",data);
         }
         //密码错误
         else if (cptchaValue.trim().equals(captcha.trim())
                 &&userDaoImp.verifyUserExistenceService(user)!=0
                 &&userDaoImp.verifyUserPasswordService(user)==0) {
-            LoginStatusResponse data = new LoginStatusResponse(false,null);
+            GenaralDataResponse data = new GenaralDataResponse(false,null);
             return new ApiResponse<>(404,"密码错误",data);
         }
         //登录成功
@@ -75,11 +74,11 @@ public  class UserLoginService {
                 &&userDaoImp.verifyUserExistenceService(user)!=0
                 &&userDaoImp.verifyUserPasswordService(user)!=0){
             String token = jwtUtil.generateToken(user.getUsername()); // 传入用户名生成令牌
-            LoginStatusResponse data = new LoginStatusResponse(true,token);
+            GenaralDataResponse data = new GenaralDataResponse(true,token);
             System.err.println("接口发送的token:"+token);
             return new ApiResponse<>(200,"登录成功",data);
         }
-        LoginStatusResponse data = new LoginStatusResponse(false,null);
+        GenaralDataResponse data = new GenaralDataResponse(false,null);
         return new ApiResponse<>(404,"未知的错误",data);
     }
 }

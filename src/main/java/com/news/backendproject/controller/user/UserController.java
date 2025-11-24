@@ -2,8 +2,7 @@ package com.news.backendproject.controller.user;
 
 import com.google.code.kaptcha.Producer;
 import com.news.backendproject.entity.ApiResponse;
-import com.news.backendproject.entity.LoginStatusResponse;
-import com.news.backendproject.entity.RegisteStatusResponse;
+import com.news.backendproject.entity.GenaralDataResponse;
 import com.news.backendproject.service.UserGetLoginStatusService;
 import com.news.backendproject.service.UserLoginService;
 import com.news.backendproject.utils.CookieUtil;
@@ -53,7 +52,7 @@ public class UserController {
         // 生成验证码原文
         // 验证码原文为value
         String captchaOraginal = kaptchaProducer.createText();
-        // 获取session对象
+
         HttpSession session = request.getSession();
         // 获取sessionId
         String sessionId = session.getId();
@@ -70,9 +69,8 @@ public class UserController {
         out.close();
     }
 
-
     @PostMapping("/getLoginResponse")
-    public ApiResponse<LoginStatusResponse> getLoginResponse(
+    public ApiResponse<GenaralDataResponse> getLoginResponse(
             @RequestParam String username,
             @RequestParam String password,
             @RequestParam String captcha,
@@ -81,32 +79,41 @@ public class UserController {
             HttpServletResponse response) throws IOException {
         //限制访问携带的验证码来自于登录业务
         if (!operationType.equals("login")) {
-            //抛出400错误让前端使用try-catch配合element-plus处理
-            return new ApiResponse<>(400,"非法验证请求",new LoginStatusResponse(false,null));
+            //抛出400错误,前端使用try-catch配合element-plus处理
+            return new ApiResponse<>(400,"非法验证请求",new GenaralDataResponse(false,null));
         }
         String captchaKey=operationType+"-"+request.getSession().getId();
         return userLoginService.userLogin(username,password,captcha,captchaKey,request,response);
     }
 
     @GetMapping("/getLoginStatus")
-    //<LoginStatusResponse>指定data类型
-    public ApiResponse<LoginStatusResponse> getLoginStatus(
+    //指定data类型
+    public ApiResponse<GenaralDataResponse> getLoginStatus(
             HttpServletRequest request,
             HttpServletResponse response
             ) throws IOException {
         return userGetLoginStatusService.getLoginStatus(request);
     }
 
+    @GetMapping("/verifyCaptcha")
+    public ApiResponse<GenaralDataResponse>  verifyCaptcha(
+            @RequestParam String captcha,
+            @RequestParam String operationType,
+            HttpServletRequest request,
+            HttpServletResponse response){
+        GenaralDataResponse data = new GenaralDataResponse(true,null);
+        return new ApiResponse<>(200,"验证成功",data);
+    }
     @PostMapping("/getRegisterResponse")
-    public ApiResponse<RegisteStatusResponse> getRegisterResponse(){
-        boolean register=true;
-        RegisteStatusResponse data = new RegisteStatusResponse(register,null);
+    public ApiResponse<GenaralDataResponse> getRegisterResponse(){
+        GenaralDataResponse data = new GenaralDataResponse(true,null);
         return new ApiResponse<>(200,"注册成功",data);
     }
+
+
     @GetMapping("/getUserProfile")
-    public ApiResponse<RegisteStatusResponse> getUserProfile(){
-        boolean registResult=false;
-        RegisteStatusResponse data = new RegisteStatusResponse(registResult,null);
+    public ApiResponse<GenaralDataResponse> getUserProfile(){
+        GenaralDataResponse data = new GenaralDataResponse(false,null);
         return new ApiResponse<>(200,"获取信息",data);
     }
 }
