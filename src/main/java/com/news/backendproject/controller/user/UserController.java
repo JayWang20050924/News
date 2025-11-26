@@ -100,45 +100,47 @@ public class UserController {
         return userGetLoginStatusService.getLoginStatus(request);
     }
     //单独验证人机接口，对应前端单独人机验证组件
-    @GetMapping("/verifyCaptcha")
-    public ApiResponse<GenaralDataResponse>  verifyCaptcha(
+    @GetMapping("/botCheck")
+    public ApiResponse<GenaralDataResponse>  botCheck(
             @RequestParam String captcha,
             @RequestParam String operationType,
             HttpServletRequest request,
             HttpServletResponse response){
+        //先验证业务场景是否合法
         if (!operationType.equals("register")) {
+
             //抛出400错误,前端使用try-catch配合element-plus处理
-            return new ApiResponse<>(400,"非法验证请求",new GenaralDataResponse(false,null));
+            return new ApiResponse<>(400,"非法验证请求operationType:"+operationType,new GenaralDataResponse(false,null));
         }
         //获取当前请求来源的行为类型+sessionid组成key值查询对应value
         String captchaKey=operationType+"-"+request.getSession().getId();
         // 从请求的httpOnly的Cookie 中获取存储的验证码值
-        String cptchaValue = null;
+        String captchaValue = null;
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 System.err.println("cookiename:"+cookie.getName());
                 //有存储了的验证码键值对应上了当前业务获取验证码原文
                 if (cookie.getName().equals(captchaKey)) {
-                    cptchaValue = cookie.getValue();
-                    System.err.println("cookievalue:"+cptchaValue);
+                    captchaValue = cookie.getValue();
+                    System.err.println("cookievalue:"+captchaValue);
                     break;
                 }
             }
         }
-        //验证码过期(只有验证码键对应后cptchaValue才会被赋值)
-        if (cptchaValue == null) {
+        //验证码过期(只有验证码键对应后captchaValue才会被赋值)
+        if (captchaValue == null) {
             GenaralDataResponse data = new GenaralDataResponse(false, null);
             //抛出400错误让前端使用try-catch配合element-plus处理
             return new ApiResponse<>(400, "验证码已过期", data);
         }
-        System.out.println("cptchaValue:"+cptchaValue);
+        System.out.println("captchaValue:"+captchaValue);
         //验证码不匹配
-        if(cptchaValue.trim().equals(captcha.trim())){
+        if(captchaValue.trim().equals(captcha.trim())){
             //返回验证码正确的结果
             GenaralDataResponse data = new GenaralDataResponse(true,null);
             return new ApiResponse<>(200,"验证码正确",data);
-        }else if (!cptchaValue.trim().equals(captcha.trim())){
+        }else if (!captchaValue.trim().equals(captcha.trim())){
             //返回验证码错误的结果
             GenaralDataResponse data = new GenaralDataResponse(false,null);
             return new ApiResponse<>(400,"验证码错误",data);

@@ -31,46 +31,46 @@ public  class UserLoginService {
         user.setUsername(username);
         user.setPassword(password);
         // 从请求的httpOnly的Cookie 中获取存储的验证码值
-        String cptchaValue = null;
+        String captchaValue = null;
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 System.err.println("cookiename:"+cookie.getName());
                 //有存储了的验证码键值对应上了当前业务获取验证码原文
                 if (cookie.getName().equals(captchaKey)) {
-                    cptchaValue = cookie.getValue();
-                    System.err.println("cookievalue:"+cptchaValue);
+                    captchaValue = cookie.getValue();
+                    System.err.println("cookievalue:"+captchaValue);
                     break;
                 }
             }
         }
-        if (cptchaValue == null) {
+        if (captchaValue == null) {
             GenaralDataResponse data = new GenaralDataResponse(false, null);
             //抛出400错误让前端使用try-catch配合element-plus处理
             return new ApiResponse<>(400, "验证码已过期", data);
         }
-        System.out.println("cptchaValue:"+cptchaValue);
+        System.out.println("captchaValue:"+captchaValue);
         //验证码不匹配或过期
-        if(!cptchaValue.trim().equals(captcha.trim())){
+        if(!captchaValue.trim().equals(captcha.trim())){
             //返回验证码错误的结果
             GenaralDataResponse data = new GenaralDataResponse(false,null);
             return new ApiResponse<>(400,"验证码错误",data);
         }
         //用户不存在
-        else if(cptchaValue.trim().equals(captcha.trim())
+        else if(captchaValue.trim().equals(captcha.trim())
                 &&userDaoImp.verifyUserExistenceService(user)==0){
             GenaralDataResponse data = new GenaralDataResponse(false,null);
             return new ApiResponse<>(404,"用户不存在",data);
         }
         //密码错误
-        else if (cptchaValue.trim().equals(captcha.trim())
+        else if (captchaValue.trim().equals(captcha.trim())
                 &&userDaoImp.verifyUserExistenceService(user)!=0
                 &&userDaoImp.verifyUserPasswordService(user)==0) {
             GenaralDataResponse data = new GenaralDataResponse(false,null);
             return new ApiResponse<>(404,"密码错误",data);
         }
         //登录成功
-        else if (cptchaValue.trim().equals(captcha.trim())
+        else if (captchaValue.trim().equals(captcha.trim())
                 &&userDaoImp.verifyUserExistenceService(user)!=0
                 &&userDaoImp.verifyUserPasswordService(user)!=0){
             String token = jwtUtil.generateToken(user.getUsername()); // 传入用户名生成令牌

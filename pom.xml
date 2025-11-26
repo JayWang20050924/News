@@ -89,7 +89,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <!-- 已默认包含JUnit 5，无需额外配置 -->
+            <!-- 已默认包含JUnit 5 -->
+        </dependency>
+        <!-- 连接池依赖（推荐，优化连接性能） -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
         </dependency>
         <!-- MyBatis测试支持 -->
         <dependency>
