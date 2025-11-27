@@ -1,6 +1,7 @@
 package com.news.backendproject.controller.user;
 
 import com.google.code.kaptcha.Producer;
+import com.news.backendproject.annotation.AccessRestriction;
 import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.GenaralDataResponse;
 import com.news.backendproject.service.UserGetLoginStatusService;
@@ -40,6 +41,8 @@ public class UserController {
     private UserRegisterService userRegisterService;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @AccessRestriction(message = "验证码请求过于频繁,1分钟后再试")
     @GetMapping("/captcha")
     public void generateCaptcha(
             HttpServletRequest request,
@@ -72,7 +75,7 @@ public class UserController {
         out.flush();
         out.close();
     }
-
+    @AccessRestriction(limit = 5,period = 60,message = "登录过于频繁,1分钟后再试")
     @PostMapping("/getLoginResponse")
     public ApiResponse<GenaralDataResponse> getLoginResponse(
             //@RequestParam定义的参数必须传入，否则400错误

@@ -27,7 +27,7 @@ public @interface  AccessRestriction {
      * 3. 扩展属性：访问超限后的提示信息（默认值可自定义）
      * 示例：@AccessRestriction(message = "1分钟最多访问3次！") → 自定义提示
      */
-    String message() default "接口访问过于频繁，请稍后再试！";
+    String message() default "请求频繁,请稍后再试";
 
     /**
      * （可选）4. 扩展属性：是否启用限制（默认启用，支持临时关闭）
