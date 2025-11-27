@@ -12,12 +12,12 @@ const service = axios.create({
 service.interceptors.request.use(
   (config) => {
     // 生成时间戳
-    const timestamp = Date.now();
+    const timestamp = Date.now()
     // 如果已有params，直接添加时间戳；否则初始化并添加时间戳params
     if (config.params) {
-      config.params.timestamp = timestamp;
+      config.params.timestamp = timestamp
     } else {
-      config.params = { timestamp:timestamp};
+      config.params = { timestamp: timestamp }
     }
     //添加token到请求头
     const token = localStorage.getItem('token')
@@ -27,43 +27,42 @@ service.interceptors.request.use(
     return config
   },
   (error) => {
+    console.error('请求出错', error)
     return Promise.reject(error)
-  }
+  },
 )
 
 // 响应拦截器
 service.interceptors.response.use(
-  (response) => {
-     // 如果是blob类型（验证码图片），直接返回完整响应，不解析
+  async (response) => {
+    // 如果响应是blob类型（验证码图片），直接返回完整响应，不解析
     if (response.config.responseType === 'blob') {
-      return response;
+      // 通过响应头判断是否是错误信息
+      const isError = response.headers['x-error-type'] === 'rate-limit'
+      if (isError) {
+        const blobText = await new Response(response.data).text()
+        const jsonData = JSON.parse(blobText)
+        return Promise.reject(jsonData.msg)
+      }
+      return response
     }
     // 接口返回格式为 { 状态码, 信息, 数据:{数据内容} }
-    const { code,  msg ,data } = response.data
-    if (code === 200) {
-      return data // 直接返回业务数据，简化组件逻辑
+    const { code, msg, data } = response.data
+    if (code == 200) {
+      return data
     }
-    // 非200状态码，抛出接口返回的错误信息可被catch(error)捕获
+    // 其他状态码，抛出接口返回的错误信息可被catch(error)捕获
     return Promise.reject(msg)
   },
+  //兼容blob转换为json的异步操作
   (error) => {
-    // 处理网络错误、401、500等状态码
-    if (error.response) {
-      switch (error.response.status) {
-        case 401:
-          console.warn("当前访问页面需要登录");
-          break
-        case 500:
-          console.log('服务器内部错误，请稍后再试')
-          break
-        default:
-          console.log(error.response.data.msg || '请求失败')
-      }
-    } else {
-      console.log('连接失败');
-    }
-    return Promise.reject(error)
-  }
+    // 非业务级报错,真正网络层面故障
+    console.log('网络层面错误：', error)
+    return Promise.reject({
+      type: 'network-error',
+      msg: '网络连接失败，请检查网络后重试~',
+    })
+  },
 )
 
 export default service

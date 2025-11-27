@@ -66,7 +66,7 @@
 
         <!-- 图形验证码输入框 -->
         <div class="input-container">
-          <label for="verifyCode" class="block text-gray-300 text-sm font-medium mb-2">
+          <label for="botCheckCode" class="block text-gray-300 text-sm font-medium mb-2">
             图形验证码(60s内有效)
           </label>
           <div class="relative">
@@ -75,8 +75,8 @@
             </span>
             <input
               type="text"
-              id="verifyCode"
-              v-model="verifyCode"
+              id="botCheckCode"
+              v-model="botCheckCode"
               required
               class="w-full pl-10 pr-36 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
               placeholder="请输入验证码"
@@ -86,12 +86,12 @@
             <div class="absolute inset-y-0 right-0 flex items-center pr-3">
               <!-- 有图片URL时显示图片 v-if -->
               <img
-                :src="verifyCodeUrl"
-                alt="图形验证码"
+                :src="botCheckCodeUrl"
+                alt="加载中..."
                 class="h-10 rounded cursor-pointer hover:opacity-90 transition-opacity"
                 style="width: 100px"
-                @click="refreshVerifyCode"
-                v-if="verifyCodeUrl"
+                @click="refreshBotCheckCode"
+                v-if="botCheckCodeUrl"
               />
               <!-- 加载状态：无图片URL时显示加载动画  v-else -->
               <div v-else class="h-10 w-[100px] flex items-center justify-center">
@@ -167,14 +167,16 @@ import request from '../utils/request.js'
 import Cookies from 'js-cookie'
 //提示持续时间
 const MESSAGE_DURATION = 2000
+//人机验证码格式规则
+const validatebotCheckCodePattern = /^[A-Za-z0-9]{4}$/;
 // 响应式变量
 const username = ref('')
 const password = ref('')
-const verifyCode = ref('')
+const botCheckCode = ref('')
 const passwordType = ref('password')
 const isAgree = ref(false)
 const isRemember = ref(false)
-const verifyCodeUrl = ref('')
+const botCheckCodeUrl = ref('')
 //useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
 const router = useRouter()
 // 切换密码可见性
@@ -183,9 +185,9 @@ const togglePassword = () => {
 }
 
 // 获取验证码
-const refreshVerifyCode = async () => {
-  verifyCode.value = '' // 清空输入的验证码
-  verifyCodeUrl.value = '' // 清空图片URL，显示加载动画
+const refreshBotCheckCode = async () => {
+  botCheckCode.value = '' // 清空输入的验证码
+  botCheckCodeUrl.value = '' // 清空图片URL，显示加载动画
   try {
     // 用axios请求验证码接口，注意：
     // 1.向接口指定responseType为'blob'（返回的是图片二进制流）
@@ -196,11 +198,10 @@ const refreshVerifyCode = async () => {
     })
     // 将二进制图片数据转为可用于img.src的URL
     // 用URL.createObjectURL生成临时Blob URL
-    verifyCodeUrl.value = URL.createObjectURL(response.data)
+    botCheckCodeUrl.value = URL.createObjectURL(response.data)
   } catch (error) {
-    console.error('获取验证码失败：', error)
     ElMessage({
-      message: '验证码加载失败，请重试',
+      message: error,
       type: 'error',
       duration: MESSAGE_DURATION,
     })
@@ -225,9 +226,9 @@ const handleSubmit = async () => {
     // 删除Cookie（路径需与设置时一致）
     Cookies.remove('username', { path: '/' })
   }
-  if (!username.value.trim() || !password.value.trim() || !verifyCode.value.trim()) {
+  if (!username.value.trim() || !password.value.trim() || !botCheckCode.value.trim()) {
     ElMessage({
-      message: '提交失败，请检查是否全部填写', // 提示文本（保持不变）
+      message: '登录失败，请检查是否全部填写', // 提示文本（保持不变）
       type: 'error', // 提示类型：错误（红色图标）
       customClass: 'custom-message', // 自定义样式类（后续用于统一风格）
       duration: MESSAGE_DURATION, // 自动关闭时间（1.5秒，避免阻塞操作）
@@ -243,7 +244,7 @@ const handleSubmit = async () => {
     })
     return
   }
-  if (verifyCode.value.trim().length !== 4) {
+  if (!(validatebotCheckCodePattern.test(botCheckCode.value.trim()))) {
     ElMessage({
       message: '请输入4位图形验证码',
       type: 'error',
@@ -256,7 +257,7 @@ const handleSubmit = async () => {
     const params = new URLSearchParams();
     params.append('username', username.value.trim());
     params.append('password', password.value.trim());
-    params.append('captcha', verifyCode.value.trim());
+    params.append('captcha', botCheckCode.value.trim());
     params.append('operationType', 'login');
 
     const data = await request.post('/getLoginResponse', params);
@@ -277,7 +278,7 @@ const handleSubmit = async () => {
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,
       })
-    refreshVerifyCode();
+    refreshBotCheckCode();
   }
 }
 const handleKeydown = (e: KeyboardEvent) => {
@@ -289,15 +290,15 @@ const handleKeydown = (e: KeyboardEvent) => {
 // 组件挂载时初始化
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown)
-  refreshVerifyCode()
+  refreshBotCheckCode()
 })
 
 // 组件卸载时移除事件监听
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
   // 清理验证码图片的临时URL
-  if (verifyCodeUrl.value) {
-    URL.revokeObjectURL(verifyCodeUrl.value)
+  if (botCheckCodeUrl.value) {
+    URL.revokeObjectURL(botCheckCodeUrl.value)
   }
 })
 </script>
@@ -352,33 +353,11 @@ onUnmounted(() => {
   box-shadow: none;
 }
 
-/* 加载动画 */
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.loading-spinner {
-  animation: spin 1s linear infinite;
-  display: none;
-}
-
-.submit-link.loading .text {
-  display: none;
-}
-
-.submit-link.loading .loading-spinner {
-  display: inline-block;
-}
 
 /* 输入框样式 */
 #password,
 #username,
-#verifyCode {
+#botCheckCode {
   background-color: rgb(45, 45, 45);
   transition: background-color 0.3s;
 }

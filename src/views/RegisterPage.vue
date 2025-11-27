@@ -138,7 +138,7 @@
         <!-- 验证码输入 -->
         <div class="input-container">
           <label for="emailCaptcha" class="block text-gray-300 text-sm font-medium mb-2">
-            输入验证码 <span style="color: red">*</span>
+            输入邮箱验证码 <span style="color: red">*</span>
           </label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300">
@@ -150,10 +150,12 @@
               v-model="emailCaptcha"
               required
               class="w-full pl-10 pr-36 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
-              placeholder="请输入验证码"
-              maxlength="4"
+              placeholder="请输入8位验证码"
+              maxlength="8"
+              @blur="validateEmailCaptcha"
             />
           </div>
+          <span :class="[textColor,'text-sm']">{{ validateEmailCaptchaMess }}</span>
         </div>
 
         <!-- 提交按钮和同意协议复选框 -->
@@ -230,6 +232,8 @@ const username = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const bindEmail = ref('')
+const validateEmailCaptchaMess=ref('')
+const textColor=ref('text-gray-100')
 const count = ref(60) // 倒计时初始值
 const isDisabled = ref(false) // 按钮禁用状态
 const textGray = ref('text-gray-100') // 按钮文字颜色
@@ -237,12 +241,15 @@ const emailCaptcha = ref('')
 const captchaVisible = ref(false) // 控制验证码组件是否显示
 const passwordType = ref('password')
 const isAgree = ref(false)
+
 //定时器常量
 let timer = null
 // 用户名密码验证规则：8-20位数字+字母（无特殊字符/中文）
 const validatePatternUserPass = /^[A-Za-z0-9]{8,20}$/
 // 邮箱验证规则
 const validatePatternEmail = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
+// 邮箱验证码规则
+const validateEmailCaptchaPattern = /^[A-Z0-9]{8}$/;
 //useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
 const router = useRouter()
 // 切换密码可见性
@@ -266,7 +273,29 @@ const showBotCheck = async () => {
     })
   }
 }
-
+//邮箱验证码输入后且失去焦点则自动进行格式验证并提交
+const validateEmailCaptcha=async ()=>{
+  if(emailCaptcha.value.trim()==''){
+    ElMessage({
+      message: '邮箱验证码不为空',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    return
+  }
+  //显示提示信息
+  if(emailCaptcha.value.trim()!=''&&emailCaptcha.value.trim().length!=8){
+    validateEmailCaptchaMess.value="邮箱验证码要求8位"
+    textColor.value="text-red-500";
+    return
+  }
+  if(validateEmailCaptchaPattern.test(emailCaptcha.value.trim())){
+    validateEmailCaptchaMess.value="可以进行验证码提交"
+    textColor.value="text-green-500";
+  }
+  return;
+}
 //开始倒计时效果
 const startCountdown = () => {
   if (timer) clearInterval(timer);
@@ -293,17 +322,16 @@ const resetVerifyButton = () => {
 //向后端请求发送邮箱验证码
 const getEmailCaptcha=async () => {
   startCountdown();
-
 }
 
 // 处理注册表单提交
 const handleSubmit = () => {
   if (!username.value.trim() || !password.value.trim() || !confirmPassword.value.trim()) {
     ElMessage({
-      message: '提交失败，请检查是否全部填写', // 提示文本（保持不变）
-      type: 'error', // 提示类型：错误（红色图标）
-      customClass: 'custom-message', // 自定义样式类（后续用于统一风格）
-      duration: MESSAGE_DURATION, // 自动关闭时间（1.5秒，避免阻塞操作）
+      message: '注册失败，请检查是否全部填写',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
     })
     return
   }

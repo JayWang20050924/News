@@ -25,7 +25,7 @@
 
      <!-- 图形验证码输入框 -->
         <div class="input-container">
-          <label for="verifyCode" class="block text-gray-300 text-sm font-medium mb-2">
+          <label for="botCheckCode" class="block text-gray-300 text-sm font-medium mb-2">
             图形验证码(60s内有效)
           </label>
           <div class="relative">
@@ -34,8 +34,8 @@
             </span>
             <input
               type="text"
-              id="verifyCode"
-              v-model="verifyCode"
+              id="botCheckCode"
+              v-model="botCheckCode"
               required
               class="w-full pl-10 pr-36 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
               placeholder="请输入验证码"
@@ -44,12 +44,16 @@
             <!-- 验证码图片 -->
             <div class="absolute inset-y-0 right-0 flex items-center pr-3">
               <img
-                :src="verifyCodeUrl"
-                alt="图形验证码"
+                :src="botCheckCodeUrl"
+                alt="加载中..."
                 class="h-10 rounded cursor-pointer hover:opacity-90 transition-opacity"
                 style="width: 100px"
-                @click="refreshVerifyCode"
+                @click="refreshBotCheckCode"
+                v-if="botCheckCodeUrl"
               />
+               <div v-else class="h-10 w-[100px] flex items-center justify-center">
+                <i class="fa fa-spinner fa-spin text-gray-400"></i>
+              </div>
             </div>
           </div>
         </div>
@@ -65,7 +69,7 @@
         <button
           class="verify-btn"
           @click="handleVerify"
-          :disabled="!verifyCode.trim()"
+          :disabled="!botCheckCode.trim()"
         >
           <i class="fa fa-check"></i> 验证
         </button>
@@ -78,9 +82,11 @@
 import { ref, onMounted,onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import request from '../utils/request.js'
+//人机验证码格式规则
+const validatebotCheckCodePattern = /^[A-Za-z0-9]{4}$/;
 // 响应式变量
-const verifyCode = ref('')
-const verifyCodeUrl = ref('')
+const botCheckCode = ref('')
+const botCheckCodeUrl = ref('')
 //常量
 const MESSAGE_DURATION = 3000;
 // 组件属性
@@ -97,9 +103,9 @@ const emit = defineEmits<{
 
 
 // 刷新验证码
-const refreshVerifyCode = async () => {
-  verifyCode.value = '' // 清空输入的验证码
-  verifyCodeUrl.value = '' // 清空图片URL，显示加载动画
+const refreshBotCheckCode = async () => {
+  botCheckCode.value = '' // 清空输入的验证码
+  botCheckCodeUrl.value = '' // 清空图片URL，显示加载动画
   try {
     // 用axios请求验证码接口，注意：
     // 1.向接口指定responseType为'blob'（返回的是图片二进制流）
@@ -110,23 +116,21 @@ const refreshVerifyCode = async () => {
     })
     // 将二进制图片数据转为可用于img.src的URL
     // 用URL.createObjectURL生成临时Blob URL
-    verifyCodeUrl.value = URL.createObjectURL(response.data)
+    botCheckCodeUrl.value = URL.createObjectURL(response.data)
   } catch (error) {
-    console.error('获取验证码失败：', error)
     ElMessage({
-      message: '验证码加载失败，请重试',
+      message: error,
       type: 'error',
-      customClass: 'custom-message',
       duration: MESSAGE_DURATION,
     })
   }
 }
-refreshVerifyCode();
+refreshBotCheckCode();
 
 // 关闭验证码组件
 const handleClose = () => {
   emit('close')
-  verifyCode.value = '' // 重置输入
+  botCheckCode.value = '' // 重置输入
 }
 
 // 点击遮罩层关闭
@@ -136,7 +140,7 @@ const handleOverlayClick = () => {
 
 //提交并验证验证码
 const handleVerify = async () => {
-  if (!verifyCode.value.trim()) {
+  if (!botCheckCode.value.trim()) {
         ElMessage({
         message: "请输入验证码",
         type: 'warning',
@@ -146,7 +150,7 @@ const handleVerify = async () => {
     return
   }
 
-  if (verifyCode.value.trim().length !== 4) {
+  if (!(validatebotCheckCodePattern.test(botCheckCode.value.trim()))) {
      ElMessage({
         message: "请输入4位验证码",
         type: 'warning',
@@ -157,12 +161,12 @@ const handleVerify = async () => {
   }
   //向后端请求人机验证结果
   try {
-    const response=await request.get("/verifyCaptcha",{
-      params:{operationType:props.operationType,captcha:verifyCode.value}
+    const response=await request.get("/botCheck",{
+      params:{operationType:props.operationType,captcha:botCheckCode.value}
     })
     if(response.status){
        ElMessage({
-        message: "验证通过",
+        message: "验证通过,注意查收邮箱",
         type: 'success',
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,
@@ -176,7 +180,7 @@ const handleVerify = async () => {
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,
       })
-      refreshVerifyCode();
+      refreshBotCheckCode();
     }
 
   }catch (error) {
@@ -186,14 +190,8 @@ const handleVerify = async () => {
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,
       })
-      refreshVerifyCode();
+      refreshBotCheckCode();
   }
-      // ElMessage.success('验证通过')
-      // emit('success')
-      // handleClose()
-
-      // ElMessage.error('验证码错误，请重新输入')
-      // refreshVerifyCode()
 }
 
 
@@ -201,13 +199,13 @@ const handleVerify = async () => {
 // 组件挂载时初始化验证码
 onMounted(() => {
   if (props.visible) {
-    refreshVerifyCode();
+    refreshBotCheckCode();
   }
 })
 
 onUnmounted(()=>{
   if (!props.visible) {
-    refreshVerifyCode();
+    refreshBotCheckCode();
   }
 })
 
@@ -428,7 +426,7 @@ onUnmounted(()=>{
     height: 140px;
   }
 }
-#verifyCode{
+#botCheckCode{
   background-color: rgb(45, 45, 45);
 }
 </style>
