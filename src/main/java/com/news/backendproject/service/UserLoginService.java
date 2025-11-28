@@ -9,6 +9,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +19,9 @@ public  class UserLoginService {
     private JwtUtil jwtUtil;
     @Autowired
     private UserDaoImp userDaoImp;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     public ApiResponse<GenaralDataResponse> userLogin(
             String username,
             String password,
@@ -30,34 +34,31 @@ public  class UserLoginService {
         User user = new User();
         user.setUsername(username);
         user.setPassword(password);
-        // 从请求的httpOnly的Cookie 中获取存储的验证码值
+        // 从Redis读取验证码
         String captchaValue = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                System.err.println("cookiename:"+cookie.getName());
-                //有存储了的验证码键值对应上了当前业务获取验证码原文
-                if (cookie.getName().equals(captchaKey)) {
-                    captchaValue = cookie.getValue();
-                    System.err.println("cookievalue:"+captchaValue);
-                    break;
-                }
-            }
+        try {
+            captchaValue = stringRedisTemplate.opsForValue().get(captchaKey);
+        } catch (Exception e) {
+            return new ApiResponse<>(500, "服务器升级中稍后再试", new GenaralDataResponse(false, null));
         }
+
+        // 验证码过期/不存在
         if (captchaValue == null) {
-            GenaralDataResponse data = new GenaralDataResponse(false, null);
-            //抛出400错误让前端使用try-catch配合element-plus处理
-            return new ApiResponse<>(400, "验证码已过期", data);
+            return new ApiResponse<>(400, "验证码已过期", new GenaralDataResponse(false, null));
         }
-        System.out.println("captchaValue:"+captchaValue);
-        //验证码不匹配或过期
-        if(!captchaValue.trim().equals(captcha.trim())){
-            //返回验证码错误的结果
-            GenaralDataResponse data = new GenaralDataResponse(false,null);
-            return new ApiResponse<>(400,"验证码错误",data);
+
+        // 验证码不匹配
+        if (!captchaValue.trim().equals(captcha.trim())) {
+            return new ApiResponse<>(400, "验证码错误", new GenaralDataResponse(false, null));
+        }
+        // 验证成功后删除Redis Key（防止重复提交）
+        try {
+            stringRedisTemplate.delete(captchaKey);
+        } catch (Exception e) {
+            System.err.println("删除验证码Key失败：" + e.getMessage());
         }
         //用户不存在
-        else if(captchaValue.trim().equals(captcha.trim())
+        if(captchaValue.trim().equals(captcha.trim())
                 &&userDaoImp.verifyUserExistenceService(user)==0){
             GenaralDataResponse data = new GenaralDataResponse(false,null);
             return new ApiResponse<>(404,"用户不存在",data);

@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * UserController:控制所有用户关联的行为
@@ -64,10 +65,21 @@ public class UserController {
         // 获取sessionId
         String sessionId = session.getId();
         // 设置业务场景operationType+sessionId作为验证码唯一标识key
-        String captchaKey =operationType+"-"+sessionId;
-        // Secure=true的作用:浏览器仅会在「HTTPS 协议的请求」中，携带标记为 Secure=true 的 Cookie
-        // 过期时间1分钟,httpOnly=true（禁止前端读取）
-        CookieUtil.setCookie(response, captchaKey, captchaOraginal, 60, false, true);
+        // 验证码Key：业务场景+sessionId
+        String captchaKey = "captcha:" + operationType + "-" + sessionId;
+        // 存入redis
+        try {
+            // 存入Redis，设置60秒过期
+            stringRedisTemplate.opsForValue().set(
+                    captchaKey,
+                    captchaOraginal,
+                    60,
+                    TimeUnit.SECONDS
+            );
+        } catch (Exception e) {
+            // Redis异常降级：允许继续生成图片，但验证码无法验证（避免功能完全不可用）
+            System.err.println("Redis存储验证码失败：" + e.getMessage());
+        }
         // 生成验证码图片
         BufferedImage image = kaptchaProducer.createImage(captchaOraginal);
         ServletOutputStream out = response.getOutputStream();
@@ -75,7 +87,16 @@ public class UserController {
         out.flush();
         out.close();
     }
-    @AccessRestriction(limit = 5,period = 60,message = "登录过于频繁,1分钟后再试")
+    @AccessRestriction(limit =30,period = 60,message = "登录过于频繁,1分钟后再试")
+    @GetMapping("/getLoginStatus")
+    //指定data类型
+    public ApiResponse<GenaralDataResponse> getLoginStatus(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        return userGetLoginStatusService.getLoginStatus(request);
+    }
+    @AccessRestriction(limit = 5,period = 60,message = "登录过于频繁,1分钟后再试",limitKey = false)
     @PostMapping("/getLoginResponse")
     public ApiResponse<GenaralDataResponse> getLoginResponse(
             //@RequestParam定义的参数必须传入，否则400错误
@@ -90,18 +111,11 @@ public class UserController {
             //抛出400错误,前端使用try-catch配合element-plus处理
             return new ApiResponse<>(400,"非法验证请求",new GenaralDataResponse(false,null));
         }
-        String captchaKey=operationType+"-"+request.getSession().getId();
+        String captchaKey = "captcha:" + operationType + "-" + request.getSession().getId();
         return userLoginService.userLogin(username,password,captcha,captchaKey,request,response);
     }
 
-    @GetMapping("/getLoginStatus")
-    //指定data类型
-    public ApiResponse<GenaralDataResponse> getLoginStatus(
-            HttpServletRequest request,
-            HttpServletResponse response
-            ) throws IOException {
-        return userGetLoginStatusService.getLoginStatus(request);
-    }
+
     //单独验证人机接口，对应前端单独人机验证组件
     @GetMapping("/botCheck")
     public ApiResponse<GenaralDataResponse>  botCheck(
@@ -111,48 +125,31 @@ public class UserController {
             HttpServletResponse response){
         //先验证业务场景是否合法
         if (!operationType.equals("register")) {
-
             //抛出400错误,前端使用try-catch配合element-plus处理
             return new ApiResponse<>(400,"非法验证请求operationType:"+operationType,new GenaralDataResponse(false,null));
         }
-        //获取当前请求来源的行为类型+sessionid组成key值查询对应value
-        String captchaKey=operationType+"-"+request.getSession().getId();
-        // 从请求的httpOnly的Cookie 中获取存储的验证码值
+        //获取当前请求来源的行为类型+sessionid组成key值查询redis中对应value
+        String captchaKey = "captcha:" + operationType + "-" + request.getSession().getId();
         String captchaValue = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                System.err.println("cookiename:"+cookie.getName());
-                //有存储了的验证码键值对应上了当前业务获取验证码原文
-                if (cookie.getName().equals(captchaKey)) {
-                    captchaValue = cookie.getValue();
-                    System.err.println("cookievalue:"+captchaValue);
-                    break;
-                }
-            }
-        }
-        //验证码过期(只有验证码键对应后captchaValue才会被赋值)
+        // 验证码不存在（过期或未生成）
         if (captchaValue == null) {
-            GenaralDataResponse data = new GenaralDataResponse(false, null);
-            //抛出400错误让前端使用try-catch配合element-plus处理
-            return new ApiResponse<>(400, "验证码已过期", data);
+            return new ApiResponse<>(400, "验证码已过期", new GenaralDataResponse(false, null));
         }
-        System.out.println("captchaValue:"+captchaValue);
-        //验证码不匹配
+        // 验证码匹配校验
         if(captchaValue.trim().equals(captcha.trim())){
-            //返回验证码正确的结果
-            GenaralDataResponse data = new GenaralDataResponse(true,null);
-            return new ApiResponse<>(200,"验证码正确",data);
-        }else if (!captchaValue.trim().equals(captcha.trim())){
-            //返回验证码错误的结果
-            GenaralDataResponse data = new GenaralDataResponse(false,null);
-            return new ApiResponse<>(400,"验证码错误",data);
+            // 验证成功后删除Key，防止重复使用
+            try {
+                stringRedisTemplate.delete(captchaKey);
+            } catch (Exception e) {
+                System.err.println("Redis删除验证码失败：" + e.getMessage());
+            }
+            return new ApiResponse<>(200,"验证码正确",new GenaralDataResponse(true,null));
+        } else {
+            return new ApiResponse<>(400,"验证码错误",new GenaralDataResponse(false,null));
         }
-        GenaralDataResponse data = new GenaralDataResponse(false,null);
-        return new ApiResponse<>(400,"未知错误请重试",data);
     }
 
-
+    @AccessRestriction(limit = 5,period = 60,message = "注册过于频繁,1分钟后再试",limitKey = false)
     @PostMapping("/getRegisterResponse")
     public ApiResponse<GenaralDataResponse> getRegisterResponse(){
         return userRegisterService.userRegister(null);

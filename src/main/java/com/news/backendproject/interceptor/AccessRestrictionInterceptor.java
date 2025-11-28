@@ -46,12 +46,19 @@ public class AccessRestrictionInterceptor implements HandlerInterceptor {
         // 解析注解参数
         int limit = annotation.limit(); // 最大访问次数
         int period = annotation.period(); // 时间窗口（秒）
-        String message = annotation.message(); // 超限提示
-
-        // 生成唯一key：区分不同接口 + 不同访问者（这里用 IP 作为访问者标识）
-        String ip = getClientIp(request); // 获取客户端IP
-        String methodName = handlerMethod.getMethod().getName(); // 接口方法名
-        String redisKey = "access_limit:" + methodName + ":" + ip;
+        String message = annotation.message();// 超限提示
+        boolean limitKey= annotation.limitKey();
+        String redisKey =null;
+        // 生成唯一key：区分不同接口 + 不同访问者（用 IP或sessionid [true|false]作为访问者标识）
+        if (limitKey){
+            String  ip = getClientIp(request); // 获取客户端IP
+            String methodName = handlerMethod.getMethod().getName(); // 接口方法名
+            redisKey = "access_limit:" + methodName + ":" + ip;
+        }else {
+            String sessionId = request.getSession().getId();
+            String methodName = handlerMethod.getMethod().getName();
+            redisKey = "access_limit:" + methodName + ":" + sessionId;
+        }
         //未过期的 Key 会持续累计访问次数，只要在有效期内次数超限，就会拦截
         // Redis 计数：原子递增（避免并发问题）
         Long count=null;
