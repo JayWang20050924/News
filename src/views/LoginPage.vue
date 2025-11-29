@@ -1,4 +1,4 @@
-  <template>
+<template>
   <div class="min-h-screen flex items-center justify-center p-4">
     <!-- 登录卡片容器 -->
     <div
@@ -82,8 +82,11 @@
               placeholder="请输入验证码"
               maxlength="4"
             />
-            <!-- 验证码图片 -->
-            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+            <!-- 验证码 -->
+            <button
+              class="absolute inset-y-0 right-0 flex items-center pr-3 botCheckCodeBtn"
+              :disabled="isBotCheckCodeDisabled"
+            >
               <!-- 有图片URL时显示图片 v-if -->
               <img
                 :src="botCheckCodeUrl"
@@ -94,10 +97,14 @@
                 v-if="botCheckCodeUrl"
               />
               <!-- 加载状态：无图片URL时显示加载动画  v-else -->
-              <div v-else class="h-10 w-[100px] flex items-center justify-center">
+              <div
+                v-else
+                :class="['h-10 w-[100px] flex items-center justify-center']"
+                @click="refreshBotCheckCode"
+              >
                 <i class="fa fa-spinner fa-spin text-gray-400"></i>
               </div>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -168,7 +175,9 @@ import Cookies from 'js-cookie'
 //提示持续时间
 const MESSAGE_DURATION = 2000
 //人机验证码格式规则
-const validatebotCheckCodePattern = /^[A-Za-z0-9]{4}$/;
+const validatebotCheckCodePattern = /^[A-Za-z0-9]{4}$/
+//存储倒计时定时器
+let botCheckCodeCountdownTimer = null
 // 响应式变量
 const username = ref('')
 const password = ref('')
@@ -177,6 +186,7 @@ const passwordType = ref('password')
 const isAgree = ref(false)
 const isRemember = ref(false)
 const botCheckCodeUrl = ref('')
+const isBotCheckCodeDisabled = ref(false)
 //useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
 const router = useRouter()
 // 切换密码可见性
@@ -186,6 +196,8 @@ const togglePassword = () => {
 
 // 获取验证码
 const refreshBotCheckCode = async () => {
+  // 如果已处于禁用状态，直接返回
+  if (isBotCheckCodeDisabled.value) return
   botCheckCode.value = '' // 清空输入的验证码
   botCheckCodeUrl.value = '' // 清空图片URL，显示加载动画
   try {
@@ -205,6 +217,15 @@ const refreshBotCheckCode = async () => {
       type: 'error',
       duration: MESSAGE_DURATION,
     })
+    if (error == '验证码请求过于频繁,1分钟后再试') {
+      isBotCheckCodeDisabled.value = true
+      //清除旧的定时器
+      clearTimeout(botCheckCodeCountdownTimer)
+      botCheckCodeCountdownTimer = setTimeout(() => {
+        isBotCheckCodeDisabled.value = false
+        refreshBotCheckCode()
+      }, 60 * 1000)
+    }
   }
 }
 // 从Cookie初始化用户名
@@ -244,7 +265,7 @@ const handleSubmit = async () => {
     })
     return
   }
-  if (!(validatebotCheckCodePattern.test(botCheckCode.value.trim()))) {
+  if (!validatebotCheckCodePattern.test(botCheckCode.value.trim())) {
     ElMessage({
       message: '请输入4位图形验证码',
       type: 'error',
@@ -254,31 +275,31 @@ const handleSubmit = async () => {
     return
   }
   try {
-    const params = new URLSearchParams();
-    params.append('username', username.value.trim());
-    params.append('password', password.value.trim());
-    params.append('captcha', botCheckCode.value.trim());
-    params.append('operationType', 'login');
+    const params = new URLSearchParams()
+    params.append('username', username.value.trim())
+    params.append('password', password.value.trim())
+    params.append('captcha', botCheckCode.value.trim())
+    params.append('operationType', 'login')
 
-    const data = await request.post('/getLoginResponse', params);
+    const data = await request.post('/getLoginResponse', params)
     if (data.status) {
-       ElMessage({
+      ElMessage({
         message: '登录成功，即将跳转',
         type: 'success',
         customClass: 'login-success-message',
         duration: MESSAGE_DURATION,
       })
-      localStorage.setItem('token', data.token);
-      router.push('/');
+      localStorage.setItem('token', data.token)
+      router.push('/')
     }
   } catch (error) {
-     ElMessage({
-        message: error,
-        type: 'error',
-        customClass: 'custom-message',
-        duration: MESSAGE_DURATION,
-      })
-    refreshBotCheckCode();
+    ElMessage({
+      message: error,
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    refreshBotCheckCode()
   }
 }
 const handleKeydown = (e: KeyboardEvent) => {
@@ -300,10 +321,18 @@ onUnmounted(() => {
   if (botCheckCodeUrl.value) {
     URL.revokeObjectURL(botCheckCodeUrl.value)
   }
+  // 新增：清除定时器
+  if (botCheckCodeCountdownTimer) {
+    clearTimeout(botCheckCodeCountdownTimer)
+  }
 })
 </script>
 
-<style>
+<style scoped>
+.botCheckCodeBtn:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
 /* 表单容器动画 */
 .login-card {
   animation: fadeIn 0.6s ease-out forwards;
@@ -352,7 +381,6 @@ onUnmounted(() => {
   transform: none;
   box-shadow: none;
 }
-
 
 /* 输入框样式 */
 #password,

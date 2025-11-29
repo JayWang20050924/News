@@ -35,9 +35,9 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   async (response) => {
-    // 如果响应是blob类型（验证码图片），直接返回完整响应，不解析
+    //通过是否有响应头x-error-type判断判断人机验证码接口返回的是图片还是错误信息
     if (response.config.responseType === 'blob') {
-      // 通过响应头判断是否是错误信息
+      //获取响应头
       const isError = response.headers['x-error-type'] === 'rate-limit'
       if (isError) {
         const blobText = await new Response(response.data).text()
@@ -54,14 +54,9 @@ service.interceptors.response.use(
     // 其他状态码，抛出接口返回的错误信息可被catch(error)捕获
     return Promise.reject(msg)
   },
-  //兼容blob转换为json的异步操作
   (error) => {
-    // 非业务级报错,真正网络层面故障
     console.log('网络层面错误：', error)
-    return Promise.reject({
-      type: 'network-error',
-      msg: '网络连接失败，请检查网络后重试~',
-    })
+    return Promise.reject('无法连接服务器请稍后再试~')
   },
 )
 

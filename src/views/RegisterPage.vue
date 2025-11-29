@@ -204,9 +204,9 @@
   </div>
   <!-- 人机验证组件 -->
   <!-- handleCaptchaSuccess处理人机验证通过 -->
-  <CaptchaModule
-    :visible="captchaVisible"
-    @close="captchaVisible = false"
+  <BotCheckModule
+    :visible=botChecModuleVisible
+    @close="botChecModuleVisible= false"
     @success="getEmailCaptcha"
     :operationType=" 'register' "
   />
@@ -223,7 +223,7 @@ import request from '../utils/request.js'
 //引入routerlinkblank组件
 import RouterLinkBlank from '../components/RouterLinkBlank.vue'
 //引入人机验证模块
-import CaptchaModule from '../components/CaptchaModule.vue'
+import BotCheckModule from '../components/BotCheckModule.vue'
 
 //提示持续时间
 const MESSAGE_DURATION = 2000
@@ -238,7 +238,7 @@ const count = ref(60) // 倒计时初始值
 const isDisabled = ref(false) // 按钮禁用状态
 const textGray = ref('text-gray-100') // 按钮文字颜色
 const emailCaptcha = ref('')
-const captchaVisible = ref(false) // 控制验证码组件是否显示
+const botChecModuleVisible = ref(false) // 控制验证码组件是否显示
 const passwordType = ref('password')
 const isAgree = ref(false)
 
@@ -262,8 +262,7 @@ const showBotCheck = async () => {
     // 避免重复点击：如果已禁用，直接返回
     if (isDisabled.value) return
     // 显示人机验证组件
-    captchaVisible.value = true
-
+    botChecModuleVisible.value = true
   } else {
     ElMessage({
       message: '邮箱格式错误',
