@@ -13,7 +13,7 @@ public class CorsConfig implements WebMvcConfigurer {
                 // 对所有接口生效（可指定路径，如 "/api/**" 仅对/api下接口生效）
                 .addMapping("/**")
                 // 允许的前端域名（开发环境可写"*"，生产环境必须指定具体域名）
-                .allowedOrigins("http://localhost:8080", "http://localhost:5173")
+                .allowedOrigins("http://localhost:8080", "http://localhost:5173","http://localhost:5174")
                 // 允许的HTTP方法（GET/POST/PUT/DELETE等）
                 .allowedMethods("*") // "*" 表示允许所有方法
                 // 允许的请求头（如Content-Type、Authorization等）

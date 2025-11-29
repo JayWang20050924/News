@@ -87,34 +87,6 @@ public class UserController {
         out.flush();
         out.close();
     }
-    @AccessRestriction(limit =30,period = 60,message = "登录过于频繁,1分钟后再试")
-    @GetMapping("/getLoginStatus")
-    //指定data类型
-    public ApiResponse<GenaralDataResponse> getLoginStatus(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
-        return userGetLoginStatusService.getLoginStatus(request);
-    }
-    @AccessRestriction(limit = 5,period = 60,message = "登录过于频繁,1分钟后再试",limitKey = false)
-    @PostMapping("/getLoginResponse")
-    public ApiResponse<GenaralDataResponse> getLoginResponse(
-            //@RequestParam定义的参数必须传入，否则400错误
-            @RequestParam String username,
-            @RequestParam String password,
-            @RequestParam String captcha,
-            @RequestParam String operationType,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
-        //限制访问携带的验证码来自于登录业务
-        if (!operationType.equals("login")) {
-            //抛出400错误,前端使用try-catch配合element-plus处理
-            return new ApiResponse<>(400,"非法验证请求",new GenaralDataResponse(false,null));
-        }
-        String captchaKey = "captcha:" + operationType + "-" + request.getSession().getId();
-        return userLoginService.userLogin(username,password,captcha,captchaKey,request,response);
-    }
-
 
     //单独验证人机接口，对应前端单独人机验证组件
     @GetMapping("/botCheck")
@@ -148,6 +120,37 @@ public class UserController {
             return new ApiResponse<>(400,"验证码错误",new GenaralDataResponse(false,null));
         }
     }
+
+    @AccessRestriction(limit =30,period = 60,message = "登录过于频繁,1分钟后再试")
+    @GetMapping("/getLoginStatus")
+    //指定data类型
+    public ApiResponse<GenaralDataResponse> getLoginStatus(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        return userGetLoginStatusService.getLoginStatus(request);
+    }
+    @AccessRestriction(limit = 5,period = 60,message = "登录过于频繁,1分钟后再试",limitKey = false)
+    @PostMapping("/getLoginResponse")
+    public ApiResponse<GenaralDataResponse> getLoginResponse(
+            //@RequestParam定义的参数必须传入，否则400错误
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String captcha,
+            @RequestParam String operationType,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+        //限制访问携带的验证码来自于登录业务
+        if (!operationType.equals("login")) {
+            //抛出400错误,前端使用try-catch配合element-plus处理
+            return new ApiResponse<>(400,"非法验证请求",new GenaralDataResponse(false,null));
+        }
+        String captchaKey = "captcha:" + operationType + "-" + request.getSession().getId();
+        return userLoginService.userLogin(username,password,captcha,captchaKey,request,response);
+    }
+
+
+
 
     @AccessRestriction(limit = 5,period = 60,message = "注册过于频繁,1分钟后再试",limitKey = false)
     @PostMapping("/getRegisterResponse")
