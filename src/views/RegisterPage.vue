@@ -155,7 +155,6 @@
               class="w-full pl-10 pr-36 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
               placeholder="请输入8位验证码"
               maxlength="8"
-              @blur="validateEmailCaptcha"
             />
           </div>
           <span :class="[textColor, 'text-sm']">{{ validateEmailCaptchaMess }}</span>
@@ -227,6 +226,7 @@ import request from '../utils/request.js'
 import RouterLinkBlank from '../components/RouterLinkBlank.vue'
 //引入人机验证模块
 import BotCheckModule from '../components/BotCheckModule.vue'
+import { ca } from 'element-plus/es/locales.mjs'
 
 //提示持续时间
 const MESSAGE_DURATION = 2000
@@ -273,46 +273,6 @@ const showBotCheck = async () => {
       customClass: 'custom-message',
       duration: MESSAGE_DURATION,
     })
-  }
-}
-//邮箱验证码输入后且失去焦点则自动进行格式验证并提交
-const validateEmailCaptcha = async () => {
-    if(bindEmail.value.trim() == ''){
-    ElMessage({
-      message: '请先输入邮箱',
-      type: 'error',
-      customClass: 'custom-message',
-      duration: MESSAGE_DURATION,
-    })
-    return
-  }
-  if (emailCaptcha.value.trim() == '') {
-    ElMessage({
-      message: '邮箱验证码不为空',
-      type: 'error',
-      customClass: 'custom-message',
-      duration: MESSAGE_DURATION,
-    })
-    return
-  }
-
-  //显示提示信息
-  if (bindEmail.value.trim() != ''&&emailCaptcha.value.trim() != '' && emailCaptcha.value.trim().length != 8) {
-    validateEmailCaptchaMess.value = '邮箱验证码要求8位'
-    textColor.value = 'text-red-500'
-    return
-  }
-
-  if (validateEmailCaptchaPattern.test(emailCaptcha.value.trim())&& bindEmail.value.trim() != '') {
-    const response = await request.get('/verifyEmailCaptcha', {
-      params: { email: bindEmail.value.trim(), captcha: emailCaptcha.value.trim() },
-    })
-    if (response.status) {
-      textColor.value = 'text-green-500'
-      validateEmailCaptchaMess.value = '邮箱验证码验证通过'
-    }
-
-    return
   }
 }
 //开始倒计时效果
@@ -410,6 +370,16 @@ const handleSubmit = () => {
   if (emailCaptcha.value.trim() == '' || bindEmail.value.trim() == '') {
     ElMessage({
       message: '请先绑定邮箱',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    return
+  }
+  // 邮箱验证码格式验证
+  if (!validateEmailCaptchaPattern.test(emailCaptcha.value.trim())) {
+    ElMessage({
+      message: '邮箱验证码格式错误',
       type: 'error',
       customClass: 'custom-message',
       duration: MESSAGE_DURATION,

@@ -33,12 +33,6 @@ watch(
 
 <style>
 /* 无 scoped，全局生效 */
-.login-success-message {
-  background-color: #f0f9eb !important; /* 浅绿背景 */
-  color: #198754 !important; /* 深绿文字 */
-  border-left: 4px solid #52c41a !important; /* 左侧绿色边框 */
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.08); /* 轻微阴影 */
-}
 /* 自定义消息框基础样式 - 与输入框背景一致 */
 .custom-message {
   background-color: #2d2d2d !important; /* 输入框背景色：#2D2D2D */

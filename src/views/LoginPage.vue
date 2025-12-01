@@ -286,7 +286,7 @@ const handleSubmit = async () => {
       ElMessage({
         message: '登录成功，即将跳转',
         type: 'success',
-        customClass: 'login-success-message',
+        customClass: 'custom-message',
         duration: MESSAGE_DURATION,
       })
       localStorage.setItem('token', data.token)
