@@ -44,7 +44,7 @@ public class UserController {
     private StringRedisTemplate stringRedisTemplate;
 
     @AccessRestriction(message = "验证码请求过于频繁,1分钟后再试")
-    @GetMapping("/captcha")
+    @GetMapping("/sendBotCaptcha")
     public void generateCaptcha(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -98,11 +98,16 @@ public class UserController {
         //先验证业务场景是否合法
         if (!operationType.equals("register")) {
             //抛出400错误,前端使用try-catch配合element-plus处理
-            return new ApiResponse<>(400,"非法验证请求operationType:"+operationType,new GenaralDataResponse(false,null));
+            return new ApiResponse<>(400,"非法验证请求",new GenaralDataResponse(false,null));
         }
         //获取当前请求来源的行为类型+sessionid组成key值查询redis中对应value
         String captchaKey = "captcha:" + operationType + "-" + request.getSession().getId();
         String captchaValue = null;
+        try {
+            captchaValue = stringRedisTemplate.opsForValue().get(captchaKey);
+        } catch (Exception e) {
+            return new ApiResponse<>(500, "服务器升级中稍后再试", new GenaralDataResponse(false, null));
+        }
         // 验证码不存在（过期或未生成）
         if (captchaValue == null) {
             return new ApiResponse<>(400, "验证码已过期", new GenaralDataResponse(false, null));
@@ -149,8 +154,21 @@ public class UserController {
         return userLoginService.userLogin(username,password,captcha,captchaKey,request,response);
     }
 
+    @AccessRestriction(limit = 1,period = 60,message = "获取验证码过于频繁,1分钟后再试")
+    @GetMapping("/sendEmailCaptcha")
+    public ApiResponse<GenaralDataResponse> sendEmailCaptcha(
+            @RequestParam String email,
+            @RequestParam String operationType
+    ){
+        System.out.println("email:"+email+",operationType:"+operationType);
+        return new ApiResponse<>(200,"已发送验证码注意查收",new GenaralDataResponse(true,null));
+    }
 
-
+    @AccessRestriction(limit = 10,period = 60,message = "验证过于频繁,1分钟后再试")
+    @GetMapping("/verifyEmailCaptcha")
+    public ApiResponse<GenaralDataResponse> verifyEmailCaptcha(){
+        return new ApiResponse<>(200,"邮箱验证码正确",new GenaralDataResponse(true,null));
+    }
 
     @AccessRestriction(limit = 5,period = 60,message = "注册过于频繁,1分钟后再试",limitKey = false)
     @PostMapping("/getRegisterResponse")
