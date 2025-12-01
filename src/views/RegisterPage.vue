@@ -123,7 +123,10 @@
               <!-- 根据isDisabled切换光标状态 -->
               <button
                 @click="showBotCheck"
-                :class="[isDisabled ? 'cursor-not-allowed' :'cursor-pointer', 'bg-gray-700 rounded-lg ']"
+                :class="[
+                  isDisabled ? 'cursor-not-allowed' : 'cursor-pointer',
+                  'bg-gray-700 rounded-lg ',
+                ]"
                 style="width: 100px; height: 40px"
               >
                 <!-- 动态显示文本：倒计时中显示秒数，否则显示默认文本 -->
@@ -155,7 +158,7 @@
               @blur="validateEmailCaptcha"
             />
           </div>
-          <span :class="[textColor,'text-sm']">{{ validateEmailCaptchaMess }}</span>
+          <span :class="[textColor, 'text-sm']">{{ validateEmailCaptchaMess }}</span>
         </div>
 
         <!-- 提交按钮和同意协议复选框 -->
@@ -205,10 +208,10 @@
   <!-- 人机验证组件 -->
   <!-- handleCaptchaSuccess处理人机验证通过 -->
   <BotCheckModule
-    :visible=botChecModuleVisible
-    @close="botChecModuleVisible= false"
+    :visible="botChecModuleVisible"
+    @close="botChecModuleVisible = false"
     @success="getEmailCaptcha"
-    :operationType=" 'register' "
+    :operationType="'register'"
   />
 </template>
 
@@ -232,8 +235,8 @@ const username = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const bindEmail = ref('')
-const validateEmailCaptchaMess=ref('')
-const textColor=ref('text-gray-100')
+const validateEmailCaptchaMess = ref('')
+const textColor = ref('text-gray-100')
 const count = ref(60) // 倒计时初始值
 const isDisabled = ref(false) // 按钮禁用状态
 const textGray = ref('text-gray-100') // 按钮文字颜色
@@ -249,7 +252,7 @@ const validatePatternUserPass = /^[A-Za-z0-9]{8,20}$/
 // 邮箱验证规则
 const validatePatternEmail = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
 // 邮箱验证码规则
-const validateEmailCaptchaPattern = /^[A-Z0-9]{8}$/;
+const validateEmailCaptchaPattern = /^[A-Z0-9]{8}$/
 //useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
 const router = useRouter()
 // 切换密码可见性
@@ -273,8 +276,17 @@ const showBotCheck = async () => {
   }
 }
 //邮箱验证码输入后且失去焦点则自动进行格式验证并提交
-const validateEmailCaptcha=async ()=>{
-  if(emailCaptcha.value.trim()==''){
+const validateEmailCaptcha = async () => {
+    if(bindEmail.value.trim() == ''){
+    ElMessage({
+      message: '请先输入邮箱',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    return
+  }
+  if (emailCaptcha.value.trim() == '') {
     ElMessage({
       message: '邮箱验证码不为空',
       type: 'error',
@@ -283,44 +295,72 @@ const validateEmailCaptcha=async ()=>{
     })
     return
   }
+
   //显示提示信息
-  if(emailCaptcha.value.trim()!=''&&emailCaptcha.value.trim().length!=8){
-    validateEmailCaptchaMess.value="邮箱验证码要求8位"
-    textColor.value="text-red-500";
+  if (bindEmail.value.trim() != ''&&emailCaptcha.value.trim() != '' && emailCaptcha.value.trim().length != 8) {
+    validateEmailCaptchaMess.value = '邮箱验证码要求8位'
+    textColor.value = 'text-red-500'
     return
   }
-  if(validateEmailCaptchaPattern.test(emailCaptcha.value.trim())){
-    validateEmailCaptchaMess.value="可以进行验证码提交"
-    textColor.value="text-green-500";
+
+  if (validateEmailCaptchaPattern.test(emailCaptcha.value.trim())&& bindEmail.value.trim() != '') {
+    const response = await request.get('/verifyEmailCaptcha', {
+      params: { email: bindEmail.value.trim(), captcha: emailCaptcha.value.trim() },
+    })
+    if (response.status) {
+      textColor.value = 'text-green-500'
+      validateEmailCaptchaMess.value = '邮箱验证码验证通过'
+    }
+
+    return
   }
-  return;
 }
 //开始倒计时效果
 const startCountdown = () => {
-  if (timer) clearInterval(timer);
-    isDisabled.value = true;
-    textGray.value = 'text-gray-500';
-    count.value = 60;
-    timer = setInterval(() => {
-    count.value--;
+  if (timer) clearInterval(timer)
+  isDisabled.value = true
+  textGray.value = 'text-gray-500'
+  count.value = 60
+  timer = setInterval(() => {
+    count.value--
     // 倒计时结束：重置按钮状态
     if (count.value <= 0) {
-      clearInterval(timer);
-      resetVerifyButton();
+      clearInterval(timer)
+      resetGetEmailCaptchaBtn()
     }
-  }, 1000);
-  }
+  }, 1000)
+}
 
 //倒计时效果init
-const resetVerifyButton = () => {
-  isDisabled.value = false;
-  textGray.value = 'text-gray-100';
-  count.value = 60;
-  if (timer) clearInterval(timer);
-  }
+const resetGetEmailCaptchaBtn = () => {
+  isDisabled.value = false
+  textGray.value = 'text-gray-100'
+  count.value = 60
+  if (timer) clearInterval(timer)
+}
 //向后端请求发送邮箱验证码
-const getEmailCaptcha=async () => {
-  startCountdown();
+const getEmailCaptcha = async () => {
+  startCountdown()
+try{
+  const response = await request.get('/sendEmailCaptcha', {
+    params: { email: bindEmail.value.trim(), operationType: 'register' },
+  })
+  if (response.status) {
+    ElMessage({
+      message: '验证通过,注意查收邮箱',
+      type: 'success',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+  }
+  }catch (error) {
+    ElMessage({
+      message: error,
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+  }
 }
 
 // 处理注册表单提交
@@ -405,7 +445,7 @@ const handleSubmit = () => {
       }
     } catch (error) {
       ElMessage({
-        message:"注册失败:"+ error,
+        message: '注册失败:' + error,
         type: 'error',
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,

@@ -11,7 +11,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 
 // 常量配置（可根据需求调整）
-const STAR_COUNT = 250; // 星星数量
+const STAR_COUNT = 150; // 星星数量
 const STAR_COLOR_BASE = 'rgba(240, 240, 240, '; // 星星基础颜色（配合亮度）
 const BG_OPACITY = 0.2; // 背景拖影透明度
 const BG_COLOR = `rgba(18, 18, 18, ${BG_OPACITY})`; // 背景拖影颜色

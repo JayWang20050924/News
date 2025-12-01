@@ -97,7 +97,7 @@ const refreshBotCheckCode = async () => {
     // 用axios请求验证码接口，注意：
     // 1.向接口指定responseType为'blob'（返回的是图片二进制流）
     // 2.operationType=login参数表明验证码用于登录业务的场景
-    const response = await request.get('/captcha', {
+    const response = await request.get('/sendBotCaptcha', {
       params: { operationType: props.operationType }, // 业务参数由父组件传入
       responseType: 'blob', //指定接口响应类型为二进制流用于临时url转换
     })
@@ -158,12 +158,6 @@ const handleVerify = async () => {
       params: { operationType: props.operationType, captcha: botCheckCode.value },
     })
     if (response.status) {
-      ElMessage({
-        message: '验证通过,注意查收邮箱',
-        type: 'success',
-        customClass: 'custom-message',
-        duration: MESSAGE_DURATION,
-      })
       emit('success')
       handleClose()
     } else {

@@ -204,7 +204,7 @@ const refreshBotCheckCode = async () => {
     // 用axios请求验证码接口，注意：
     // 1.向接口指定responseType为'blob'（返回的是图片二进制流）
     // 2.operationType=login参数表明验证码用于登录业务的场景
-    const response = await request.get('/captcha', {
+    const response = await request.get('/sendBotCaptcha', {
       params: { operationType: 'login' }, // 业务参数
       responseType: 'blob', //指定接口响应类型为二进制流用于临时url转换
     })
