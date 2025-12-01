@@ -26,9 +26,7 @@ public  class UserLoginService {
             String username,
             String password,
             String captcha,
-            String captchaKey,
-            HttpServletRequest request,
-            HttpServletResponse response
+            String captchaKey
 
     ){
         User user = new User();

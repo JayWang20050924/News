@@ -4,13 +4,15 @@ import com.google.code.kaptcha.Producer;
 import com.news.backendproject.annotation.AccessRestriction;
 import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.GenaralDataResponse;
+import com.news.backendproject.service.SendEmailCaptcha;
 import com.news.backendproject.service.UserGetLoginStatusService;
 import com.news.backendproject.service.UserLoginService;
 import com.news.backendproject.service.UserRegisterService;
-import com.news.backendproject.utils.CookieUtil;
-import jakarta.servlet.http.Cookie;
+import com.news.backendproject.verify.BotCaptchaVerification;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,15 +25,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
  * UserController:控制所有用户关联的行为
  */
 @RestController
+@Validated//启用参数验证
 public class UserController {
-
     @Autowired
     private Producer kaptchaProducer;
     @Autowired
@@ -42,7 +43,11 @@ public class UserController {
     private UserRegisterService userRegisterService;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
-
+    @Autowired
+    private BotCaptchaVerification botCaptchaVerification;
+    @Autowired
+    private SendEmailCaptcha sendEmailCaptcha;
+    //发送人机验证码
     @AccessRestriction(message = "验证码请求过于频繁,1分钟后再试")
     @GetMapping("/sendBotCaptcha")
     public void generateCaptcha(
@@ -60,26 +65,17 @@ public class UserController {
         // 生成验证码原文
         // 验证码原文为value
         String captchaOraginal = kaptchaProducer.createText();
-
-        HttpSession session = request.getSession();
-        // 获取sessionId
-        String sessionId = session.getId();
         // 设置业务场景operationType+sessionId作为验证码唯一标识key
         // 验证码Key：业务场景+sessionId
-        String captchaKey = "captcha:" + operationType + "-" + sessionId;
+        String redisKey =operationType+request.getSession().getId();
         // 存入redis
-        try {
-            // 存入Redis，设置60秒过期
-            stringRedisTemplate.opsForValue().set(
-                    captchaKey,
-                    captchaOraginal,
-                    60,
-                    TimeUnit.SECONDS
-            );
-        } catch (Exception e) {
-            // Redis异常降级：允许继续生成图片，但验证码无法验证（避免功能完全不可用）
-            System.err.println("Redis存储验证码失败：" + e.getMessage());
-        }
+        // 存入Redis，设置60秒过期
+        stringRedisTemplate.opsForValue().set(
+                redisKey,
+                captchaOraginal,
+                60,
+                TimeUnit.SECONDS
+        );
         // 生成验证码图片
         BufferedImage image = kaptchaProducer.createImage(captchaOraginal);
         ServletOutputStream out = response.getOutputStream();
@@ -88,54 +84,29 @@ public class UserController {
         out.close();
     }
 
-    //单独验证人机接口，对应前端单独人机验证组件
+    //人机验证码的验证接口
     @GetMapping("/botCheck")
-    public ApiResponse<GenaralDataResponse>  botCheck(
-            @RequestParam String captcha,
+    public ApiResponse<GenaralDataResponse>botCheck(
+            //限制验证码格式
+            @RequestParam @Pattern(regexp = "^[0-9a-z]{4}$") String captcha,
             @RequestParam String operationType,
-            HttpServletRequest request,
-            HttpServletResponse response){
-        //先验证业务场景是否合法
-        if (!operationType.equals("register")) {
+            HttpServletRequest request){
+        System.out.println(operationType);
+        if (!(operationType.equals("register") || operationType.equals("forgot"))) {
             //抛出400错误,前端使用try-catch配合element-plus处理
-            return new ApiResponse<>(400,"非法验证请求",new GenaralDataResponse(false,null));
+            return new ApiResponse<>(400,"非法请求",new GenaralDataResponse(false,null));
         }
-        //获取当前请求来源的行为类型+sessionid组成key值查询redis中对应value
-        String captchaKey = "captcha:" + operationType + "-" + request.getSession().getId();
-        String captchaValue = null;
-        try {
-            captchaValue = stringRedisTemplate.opsForValue().get(captchaKey);
-        } catch (Exception e) {
-            return new ApiResponse<>(500, "服务器升级中稍后再试", new GenaralDataResponse(false, null));
-        }
-        // 验证码不存在（过期或未生成）
-        if (captchaValue == null) {
-            return new ApiResponse<>(400, "验证码已过期", new GenaralDataResponse(false, null));
-        }
-        // 验证码匹配校验
-        if(captchaValue.trim().equals(captcha.trim())){
-            // 验证成功后删除Key，防止重复使用
-            try {
-                stringRedisTemplate.delete(captchaKey);
-            } catch (Exception e) {
-                System.err.println("Redis删除验证码失败：" + e.getMessage());
-            }
-            return new ApiResponse<>(200,"验证码正确",new GenaralDataResponse(true,null));
-        } else {
-            return new ApiResponse<>(400,"验证码错误",new GenaralDataResponse(false,null));
-        }
+        String redisKey =operationType+request.getSession().getId();
+       return botCaptchaVerification.verify(captcha,redisKey);
     }
 
-    @AccessRestriction(limit =30,period = 60,message = "登录过于频繁,1分钟后再试")
+    @AccessRestriction(limit =30,message = "获取登录状态过于频繁")
     @GetMapping("/getLoginStatus")
-    //指定data类型
-    public ApiResponse<GenaralDataResponse> getLoginStatus(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
+    public ApiResponse<GenaralDataResponse> getLoginStatus(HttpServletRequest request){
         return userGetLoginStatusService.getLoginStatus(request);
     }
-    @AccessRestriction(limit = 5,period = 60,message = "登录过于频繁,1分钟后再试",limitKey = false)
+
+    @AccessRestriction(limit = 5,message = "登录过于频繁,1分钟后再试",limitKey = false)
     @PostMapping("/getLoginResponse")
     public ApiResponse<GenaralDataResponse> getLoginResponse(
             //@RequestParam定义的参数必须传入，否则400错误
@@ -143,36 +114,45 @@ public class UserController {
             @RequestParam String password,
             @RequestParam String captcha,
             @RequestParam String operationType,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
-        //限制访问携带的验证码来自于登录业务
+            HttpServletRequest request){
+        //限制访问携带的验证码来自登录业务
         if (!operationType.equals("login")) {
             //抛出400错误,前端使用try-catch配合element-plus处理
             return new ApiResponse<>(400,"非法验证请求",new GenaralDataResponse(false,null));
         }
-        String captchaKey = "captcha:" + operationType + "-" + request.getSession().getId();
-        return userLoginService.userLogin(username,password,captcha,captchaKey,request,response);
+        String redisKey =operationType+request.getSession().getId();
+        return userLoginService.userLogin(username,password,captcha,redisKey);
     }
 
-    @AccessRestriction(limit = 1,period = 60,message = "获取验证码过于频繁,1分钟后再试")
+    //todo:完成邮箱验证码的存储与读取
+    //发送邮箱验证码
+    @AccessRestriction(limit = 1,message = "验证码请求过于频繁,1分钟后再试",limitKey = false)
     @GetMapping("/sendEmailCaptcha")
-    public ApiResponse<GenaralDataResponse> sendEmailCaptcha(
+    public  ApiResponse<GenaralDataResponse> sendEmailCaptcha(
             @RequestParam String email,
-            @RequestParam String operationType
+            @RequestParam String operationType,
+            HttpServletRequest request
     ){
-        System.out.println("email:"+email+",operationType:"+operationType);
-        return new ApiResponse<>(200,"已发送验证码注意查收",new GenaralDataResponse(true,null));
+        String redisKey = operationType + request.getSession().getId();
+        if (!(operationType.equals("register")||operationType.equals("forgot"))) {
+            //抛出400错误,前端使用try-catch配合element-plus处理
+            return new ApiResponse<>(400,"非法请求",new GenaralDataResponse(false,null));
+        }else {
+            return sendEmailCaptcha.send(email,redisKey);
+        }
     }
-
-    @AccessRestriction(limit = 10,period = 60,message = "验证过于频繁,1分钟后再试")
-    @GetMapping("/verifyEmailCaptcha")
-    public ApiResponse<GenaralDataResponse> verifyEmailCaptcha(){
-        return new ApiResponse<>(200,"邮箱验证码正确",new GenaralDataResponse(true,null));
-    }
-
-    @AccessRestriction(limit = 5,period = 60,message = "注册过于频繁,1分钟后再试",limitKey = false)
+    //注册接口包含验证绑定邮箱验证码
+    @AccessRestriction(limit = 5,message = "注册过于频繁,1分钟后再试",limitKey = false)
     @PostMapping("/getRegisterResponse")
-    public ApiResponse<GenaralDataResponse> getRegisterResponse(){
+    public ApiResponse<GenaralDataResponse> getRegisterResponse(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String email,
+            @RequestParam String emailCaptcha,
+            @RequestParam String operationType,
+            HttpServletRequest request
+    ){
+
         return userRegisterService.userRegister(null);
     }
 
