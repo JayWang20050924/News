@@ -8,8 +8,8 @@ export default {
     extend: {
       colors: {
         dark: '#121212',
-        'gray-900': 'rgb(30 30 30 / 60%)',
-        'gray-800': 'rgb(45 45 45 / 60%)',
+        'gray-900': 'rgb(30 30 30)',
+        'gray-800': 'rgb(45 45 45)',
         'gray-700': '#3D3D3D',
         'gray-300': '#B3B3B3',
         'gray-100': '#F0F0F0',

@@ -18,7 +18,7 @@
       </div>
 
       <!-- 表单主体 -->
-      <div class="px-6 py-8 space-y-6 overflow-y-auto" id="loginForm">
+      <div class="px-6 py-8 space-y-6 overflow-y-auto" id="registerForm">
         <!-- 已有账号链接 -->
         <div class="text-center">
           <RouterLinkBlank
@@ -198,8 +198,6 @@
           >
           &emsp;|&emsp;
           <a href="/ForgotPage" target="_blank" class="text-gray-100 hover:underline">忘记密码</a>
-          &emsp;|&emsp;
-          <a href="#" target="_blank" class="text-gray-100 hover:underline">后台登录</a>
         </span>
       </div>
     </div>
@@ -226,7 +224,7 @@ import request from '../utils/request.js'
 import RouterLinkBlank from '../components/RouterLinkBlank.vue'
 //引入人机验证模块
 import BotCheckModule from '../components/BotCheckModule.vue'
-import { ca } from 'element-plus/es/locales.mjs'
+
 
 //提示持续时间
 const MESSAGE_DURATION = 2000
@@ -300,7 +298,6 @@ const resetGetEmailCaptchaBtn = () => {
 }
 //向后端请求发送邮箱验证码
 const getEmailCaptcha = async () => {
-  startCountdown()
 try{
   const response = await request.get('/sendEmailCaptcha', {
     params: { email: bindEmail.value.trim(), operationType: 'register' },
@@ -312,6 +309,7 @@ try{
       customClass: 'custom-message',
       duration: MESSAGE_DURATION,
     })
+    startCountdown()
   }
   }catch (error) {
     ElMessage({
@@ -570,18 +568,5 @@ onUnmounted(() => {
 }
 .register-card ::-webkit-scrollbar-thumb:hover {
   background: #666666;
-}
-
-/* 响应式配置 */
-@media (max-width: 768px) {
-  .register-card {
-    aspect-ratio: auto;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-}
-/* 自定义工具类：定义宽高比为3:4 */
-.aspect-3-4 {
-  @apply aspect-[3/4]; /* Tailwind的aspect-ratio属性，宽度:高度=3:4 */
 }
 </style>

@@ -19,6 +19,15 @@
 
       <!-- 表单主体 -->
       <div class="px-6 py-8 space-y-6 overflow-y-auto" id="loginForm">
+        <!-- 注册账号链接 -->
+        <div class="text-center">
+          <RouterLinkBlank
+            to="/RegisterPage"
+            class="text-gray-300 hover:text-gray-100 transition-colors flex items-center justify-center text-base"
+          >
+            <i class="fa fa-arrow-left mr-2"></i>没有账号?前往注册
+          </RouterLinkBlank>
+        </div>
         <!-- 用户名输入框 -->
         <div class="input-container">
           <label for="username" class="block text-gray-300 text-sm font-medium mb-2">
@@ -172,6 +181,7 @@ import { useRouter } from 'vue-router'
 import request from '../utils/request.js'
 // 引入js-cookie库
 import Cookies from 'js-cookie'
+import RouterLinkBlank from '../components/RouterLinkBlank.vue'
 //提示持续时间
 const MESSAGE_DURATION = 2000
 //人机验证码格式规则
@@ -328,7 +338,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style>
 .botCheckCodeBtn:disabled {
   cursor: not-allowed;
   pointer-events: none;

@@ -46,3 +46,17 @@ body {
 .news-card-overlay {
   background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 60%);
 }
+/* 自定义工具类：定义宽高比为3:4 */
+.aspect-3-4 {
+  @apply aspect-[3/4];
+}
+/* 响应式配置 */
+@media (max-width: 768px) {
+  .register-card {
+    aspect-ratio: auto;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+
