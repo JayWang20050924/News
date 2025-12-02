@@ -147,6 +147,7 @@ public class UserController {
     public ApiResponse<GenaralDataResponse> getRegisterResponse(
             @RequestParam String username,
             @RequestParam String password,
+            @RequestParam String passwordConfirm,
             @RequestParam String email,
             @RequestParam String emailCaptcha,
             @RequestParam String operationType,
