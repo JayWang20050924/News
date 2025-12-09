@@ -230,8 +230,6 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import getLoginStatus from '../api/getLoginStatus.js'
 //导入 RouterLink（用于路由导航）
 import { RouterLink } from 'vue-router'
-//导入 RouterLinkBlank（用于创建新窗口的路由导航）
-import RouterLinkBlank from './RouterLinkBlank.vue'
 //引入element-plus消息提示
 import { ElMessage } from 'element-plus'
 // 下拉菜单项显示状态
@@ -250,19 +248,10 @@ const ifShowMobile = ref('hidden')
 // 导航指示器
 const navIndicator = ref<HTMLElement | null>(null)
 const navItems = ref<HTMLAnchorElement[]>([])
-
-// 标记是否是首次加载页面（首次进入不算“回到本页”）
-const isFirstLoad = ref(true)
-
 // 页面可见性变化时的处理函数
 const handleVisibilityChange = () => {
   // 判断页面是否从不可见变为可见
   if (document.visibilityState === 'visible') {
-    // 排除首次加载的情况
-    if (isFirstLoad.value) {
-      isFirstLoad.value = false // 首次加载后标记为 false
-    } else {
-      // 非首次加载，说明是“回到本页”，执行刷新登录状态图标的操作
       const RefreshUserIcon=async()=> {
         const data = await getLoginStatus()
         //图标状态
@@ -272,7 +261,6 @@ const handleVisibilityChange = () => {
         dontLoginShowDropdownItem.value = data.status === true ? 'hidden' : 'block'
       }
       RefreshUserIcon();
-    }
   }
 }
 

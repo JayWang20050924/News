@@ -34,6 +34,23 @@ body {
 .desktop-nav-container {
   position: relative;
 }
+/* 自定义消息框基础样式 */
+.custom-message {
+  background-color: #2d2d2d !important;
+  border: 1px solid #4a4a4a !important;
+  color: #e0e0e0 !important;
+}
+.custom-message .el-icon-error {
+  color: #cb6565 !important;
+}
+
+.custom-message .el-icon-warning {
+  color: #ffcc54 !important;
+}
+/* 调整消息框位置 - 从默认顶部改为20%高度，视觉上更贴近登录卡片 */
+.el-message {
+  top: 20% !important;
+}
 .nav-indicator {
   position: absolute;
   bottom: -8px;

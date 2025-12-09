@@ -30,39 +30,5 @@ watch(
   { immediate: true } // 初始加载时就执行一次判断
 )
 </script>
-
 <style>
-/* 无 scoped，全局生效 */
-/* 自定义消息框基础样式 - 与输入框背景一致 */
-.custom-message {
-  background-color: #2d2d2d !important; /* 输入框背景色：#2D2D2D */
-  border: 1px solid #4a4a4a !important; /* 灰色边框：与滚动条轨道颜色一致 */
-  color: #e0e0e0 !important; /* 文字色：浅灰色，避免过亮刺眼 */
-}
-/* 错误类型提示的图标颜色 - 柔和红色（不破坏深色主题） */
-.custom-message .el-icon-error {
-  color: #ff6b6b !important;
-}
-
-/* 警告类型提示的图标颜色 - 柔和黄色（不破坏深色主题） */
-.custom-message .el-icon-warning {
-  color: #ffd166 !important;
-}
-/* 调整消息框位置 - 从默认顶部改为20%高度，视觉上更贴近登录卡片 */
-.el-message {
-  top: 20% !important;
-}
-/* 毛玻璃质感 */
-.glass-header {
-  /* 黑灰半透明背景（透明度 0.2-0.3 最佳，兼顾通透和辨识度） */
-  background-color: rgba(0, 0, 0, 0.25); /* 黑灰底色，alpha 控制透明度 */
-  backdrop-filter: blur(8px); /* 背景模糊程度（数值越大越模糊，8px 常用） */
-  -webkit-backdrop-filter: blur(8px); /* 兼容 Safari 浏览器 */
-
-  /* 细节增强：轻微边框+阴影，提升质感 */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* 上边框（可选） */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 底部阴影，增强层次感 */
-
-  padding: 0.8rem 2rem; /* 内边距，根据需求调整 */
-}
 </style>

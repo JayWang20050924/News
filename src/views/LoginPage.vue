@@ -225,6 +225,7 @@ const refreshBotCheckCode = async () => {
     ElMessage({
       message: error,
       type: 'error',
+      customClass: 'custom-message',
       duration: MESSAGE_DURATION,
     })
     if (error == '验证码请求过于频繁,1分钟后再试') {
@@ -254,15 +255,15 @@ const handleSubmit = async () => {
     // 存储30天，路径'/'
     Cookies.set('username', username.value, { expires: 30, path: '/' })
   } else {
-    // 删除Cookie（路径需与设置时一致）
+    // 删除Cookie
     Cookies.remove('username', { path: '/' })
   }
   if (!username.value.trim() || !password.value.trim() || !botCheckCode.value.trim()) {
     ElMessage({
-      message: '登录失败，请检查是否全部填写', // 提示文本（保持不变）
-      type: 'error', // 提示类型：错误（红色图标）
-      customClass: 'custom-message', // 自定义样式类（后续用于统一风格）
-      duration: MESSAGE_DURATION, // 自动关闭时间（1.5秒，避免阻塞操作）
+      message: '登录失败，请检查是否全部填写',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
     })
     return
   }
@@ -338,7 +339,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style>
+<style scoped>
 .botCheckCodeBtn:disabled {
   cursor: not-allowed;
   pointer-events: none;
@@ -362,7 +363,6 @@ onUnmounted(() => {
   position: relative;
   overflow: hidden;
 }
-
 .input-container:after {
   content: '';
   position: absolute;
@@ -404,23 +404,6 @@ onUnmounted(() => {
 #agree {
   border: 1px solid red;
 }
-
-/* 滚动条样式 */
-.login-card ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-.login-card ::-webkit-scrollbar-track {
-  background: #2d2d2d;
-}
-.login-card ::-webkit-scrollbar-thumb {
-  background: #4a4a4a;
-  border-radius: 3px;
-}
-.login-card ::-webkit-scrollbar-thumb:hover {
-  background: #666666;
-}
-
 /* 响应式配置 */
 @media (max-width: 768px) {
   .login-card {

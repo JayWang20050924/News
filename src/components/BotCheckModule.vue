@@ -108,6 +108,7 @@ const refreshBotCheckCode = async () => {
     ElMessage({
       message: error,
       type: 'error',
+      customClass: 'custom-message',
       duration: MESSAGE_DURATION,
     })
     if (error == '验证码请求过于频繁,1分钟后再试') {
@@ -188,7 +189,6 @@ watch(
   },
   { immediate: true }, // 立即执行
 )
-// 组件挂载时初始化验证码
 onMounted(() => {})
 
 onUnmounted(() => {
