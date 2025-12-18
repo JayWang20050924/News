@@ -85,7 +85,7 @@
               <i class="fa fa-lock"></i>
             </span>
             <input
-              :type="passwordType"
+              :type="passwordType_Confirm"
               id="confirmPassword"
               v-model="confirmPassword"
               required
@@ -94,10 +94,12 @@
             />
             <button
               type="button"
-              @click="togglePassword"
+              @click="togglePassword_Confirm"
               class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-300 hover:text-gray-100"
             >
-              <i :class="['fa', passwordType === 'password' ? 'fa-eye-slash' : 'fa-eye']"></i>
+              <i
+                :class="['fa', passwordType_Confirm === 'password' ? 'fa-eye-slash' : 'fa-eye']"
+              ></i>
             </button>
           </div>
         </div>
@@ -225,7 +227,6 @@ import RouterLinkBlank from '../components/RouterLinkBlank.vue'
 //引入人机验证模块
 import BotCheckModule from '../components/BotCheckModule.vue'
 
-
 //提示持续时间
 const MESSAGE_DURATION = 2000
 // 响应式变量定
@@ -241,6 +242,7 @@ const textGray = ref('text-gray-100') // 按钮文字颜色
 const emailCaptcha = ref('')
 const botChecModuleVisible = ref(false) // 控制验证码组件是否显示
 const passwordType = ref('password')
+const passwordType_Confirm = ref('password')
 const isAgree = ref(false)
 
 //定时器常量
@@ -256,6 +258,9 @@ const router = useRouter()
 // 切换密码可见性
 const togglePassword = () => {
   passwordType.value = passwordType.value === 'password' ? 'text' : 'password'
+}
+const togglePassword_Confirm = () => {
+  passwordType_Confirm.value = passwordType_Confirm.value === 'password' ? 'text' : 'password'
 }
 //获取邮箱验证码
 const showBotCheck = async () => {
@@ -298,20 +303,20 @@ const resetGetEmailCaptchaBtn = () => {
 }
 //向后端请求发送邮箱验证码
 const getEmailCaptcha = async () => {
-try{
-  const response = await request.get('/sendEmailCaptcha', {
-    params: { email: bindEmail.value.trim(), operationType: 'register' },
-  })
-  if (response.status) {
-    ElMessage({
-      message: '验证通过,注意查收邮箱',
-      type: 'success',
-      customClass: 'custom-message',
-      duration: MESSAGE_DURATION,
+  try {
+    const response = await request.get('/sendEmailCaptcha', {
+      params: { email: bindEmail.value.trim(), operationType: 'register' },
     })
-    startCountdown()
-  }
-  }catch (error) {
+    if (response.status) {
+      ElMessage({
+        message: '验证通过,注意查收邮箱',
+        type: 'success',
+        customClass: 'custom-message',
+        duration: MESSAGE_DURATION,
+      })
+      startCountdown()
+    }
+  } catch (error) {
     ElMessage({
       message: error,
       type: 'error',
@@ -385,14 +390,18 @@ const handleSubmit = () => {
     return
   }
   // 异步函数处理注册请求
-  async function getLoginResponse() {
+  async function getRegisterResponse() {
     try {
-      const params = new URLSearchParams()
-      params.append('username', username.value.trim())
-      params.append('password', password.value.trim())
-      params.append('confirmPassword', confirmPassword.value.trim())
+      //构建JSON结构的参数对象
+      const params = {
+        username: username.value.trim(),
+        password: password.value.trim(),
+        confirmPassword: confirmPassword.value.trim(),
+        email: bindEmail.value.trim(),
+        emailCaptcha: emailCaptcha.value.trim(),
+        operationType: 'register',
+      }
       const data = await request.post('/getRegisterResponse', params)
-      console.log(data)
       //request返回结果中data字段数据
       if (data.status) {
         ElMessage({
@@ -405,7 +414,7 @@ const handleSubmit = () => {
         router.push('/LoginPage')
       } else {
         ElMessage({
-          message: '登录失败',
+          message: '注册失败:' + data.msg,
           type: 'error',
           customClass: 'custom-message',
           duration: MESSAGE_DURATION,
@@ -420,7 +429,7 @@ const handleSubmit = () => {
       })
     }
   }
-  getLoginResponse()
+  getRegisterResponse()
 }
 
 // 按下回车键提交表单
