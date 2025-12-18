@@ -14,7 +14,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
+import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
@@ -52,6 +52,14 @@ public class GlobalExceptionHandler {
     public ApiResponse<GenaralDataResponse> handleRedisException(Exception e) {
         log.error("Redis操作异常：", e);
         return new ApiResponse<>(500, "缓存服务异常，请稍后重试", new GenaralDataResponse(false, null));
+    }
+    /**
+     * 处理邮件发送异常
+     */
+    @ExceptionHandler(MessagingException.class)
+    public ApiResponse<GenaralDataResponse> handleMessagingException(MessagingException e) {
+        log.error("邮件发送异常：", e);
+        return new ApiResponse<>(500, "邮箱验证码发送失败，请稍后重试", new GenaralDataResponse(false, null));
     }
 
     // ====================== 系统通用异常 ======================

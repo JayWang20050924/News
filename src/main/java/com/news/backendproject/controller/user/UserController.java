@@ -4,7 +4,7 @@ import com.google.code.kaptcha.Producer;
 import com.news.backendproject.annotation.AccessRestriction;
 import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.GenaralDataResponse;
-import com.news.backendproject.service.SendEmailCaptcha;
+import com.news.backendproject.service.SendEmailCaptchaService;
 import com.news.backendproject.service.UserGetLoginStatusService;
 import com.news.backendproject.service.UserLoginService;
 import com.news.backendproject.service.UserRegisterService;
@@ -46,7 +46,7 @@ public class UserController {
     @Autowired
     private BotCaptchaVerification botCaptchaVerification;
     @Autowired
-    private SendEmailCaptcha sendEmailCaptcha;
+    private SendEmailCaptchaService sendEmailCaptchaService;
     //发送人机验证码
     @AccessRestriction(message = "验证码请求过于频繁,1分钟后再试")
     @GetMapping("/sendBotCaptcha")
@@ -137,23 +137,31 @@ public class UserController {
         if (!(operationType.equals("register")||operationType.equals("forgot"))) {
             //抛出400错误,前端使用try-catch配合element-plus处理
             return new ApiResponse<>(400,"非法请求",new GenaralDataResponse(false,null));
-        }else {
-            return sendEmailCaptcha.send(email,redisKey);
         }
+            return sendEmailCaptchaService.send(email,redisKey);
     }
-    //注册接口包含验证绑定邮箱验证码
+    //注册接口包含验证邮箱验证码
     @AccessRestriction(limit = 5,message = "注册过于频繁,1分钟后再试",limitKey = false)
     @PostMapping("/getRegisterResponse")
     public ApiResponse<GenaralDataResponse> getRegisterResponse(
             @RequestParam String username,
             @RequestParam String password,
-            @RequestParam String passwordConfirm,
+            @RequestParam String confirmPassword,
             @RequestParam String email,
             @RequestParam String emailCaptcha,
             @RequestParam String operationType,
             HttpServletRequest request
     ){
-
+        if(!operationType.equals("register")){
+            return new ApiResponse<>(400,"非法请求",new GenaralDataResponse(false,null));
+        }
+        System.out.println("username:"+username);
+        System.out.println("password:"+password);
+        System.out.println("confirmPassword:"+confirmPassword);
+        System.out.println("email:"+email);
+        System.out.println("emailCaptcha:"+emailCaptcha);
+        System.out.println("operationType:"+operationType);
+        System.out.println(request.getHeader("X-Forwarded-For"));
         return userRegisterService.userRegister(null);
     }
 

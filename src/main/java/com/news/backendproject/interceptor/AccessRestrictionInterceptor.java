@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class AccessRestrictionInterceptor implements HandlerInterceptor {
 
-    // Redis 模板：用于存储访问计数（分布式环境推荐）
+    // Redis 模板：用于存储访问计数
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
@@ -96,7 +96,7 @@ public class AccessRestrictionInterceptor implements HandlerInterceptor {
     }
 
     /**
-     * 获取客户端真实IP（处理反向代理场景，如Nginx）
+     * 获取客户端真实IP（处理反向代理场景）
      */
     private String getClientIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");

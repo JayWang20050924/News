@@ -1,4 +1,4 @@
-package com.news.backendproject.annotation; // 替换为你的项目包名
+package com.news.backendproject.annotation;
 
 import java.lang.annotation.*;
 
