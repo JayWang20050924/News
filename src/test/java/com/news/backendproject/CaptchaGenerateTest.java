@@ -9,6 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class CaptchaGenerateTest {
     @Test
     public void generateCaptcha() {
-        System.out.println(RadomCaptchaUtil.generate6DigitCaptcha());
+        System.out.println(RadomCaptchaUtil.generate8DigitCaptcha());
     }
 }

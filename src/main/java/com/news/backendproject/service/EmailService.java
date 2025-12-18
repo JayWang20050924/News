@@ -26,9 +26,9 @@ public class EmailService {
      * 发送邮箱验证码（HTML格式）
      * @param toEmail 接收方邮箱
      * @param code 验证码
-     * @throws MessagingException 邮件发送异常
      */
-    public void sendCaptcha(String toEmail, String code) throws MessagingException {
+    public boolean sendCaptcha(String toEmail, String code){
+        try{
         // 1. 创建MimeMessage对象（支持HTML、附件）
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
@@ -51,8 +51,12 @@ public class EmailService {
         );
         // 第二个参数为true，表示内容是HTML格式
         helper.setText(emailContent, true);
-
         // 5. 发送邮件
         javaMailSender.send(mimeMessage);
+        return true;
+        }catch (MessagingException e){
+            e.printStackTrace();
+            return false;
+        }
     }
 }

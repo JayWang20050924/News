@@ -12,6 +12,6 @@ public class SendEmailCaptchaTest {
     private EmailService emailService;
     @Test
     public void test() throws Exception {
-        emailService.sendCaptcha("wp18054404921@163.com","54ly88");
+        emailService.sendCaptcha("wp18054404921@163.com","ly45son");
     }
 }

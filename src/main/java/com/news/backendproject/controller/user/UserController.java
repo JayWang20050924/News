@@ -2,8 +2,9 @@ package com.news.backendproject.controller.user;
 
 import com.google.code.kaptcha.Producer;
 import com.news.backendproject.annotation.AccessRestriction;
+import com.news.backendproject.domain.User;
 import com.news.backendproject.entity.ApiResponse;
-import com.news.backendproject.entity.GenaralDataResponse;
+import com.news.backendproject.entity.GeneralDataResponse;
 import com.news.backendproject.service.SendEmailCaptchaService;
 import com.news.backendproject.service.UserGetLoginStatusService;
 import com.news.backendproject.service.UserLoginService;
@@ -13,16 +14,13 @@ import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -86,7 +84,7 @@ public class UserController {
 
     //人机验证码的验证接口
     @GetMapping("/botCheck")
-    public ApiResponse<GenaralDataResponse>botCheck(
+    public ApiResponse<GeneralDataResponse>botCheck(
             //限制验证码格式
             @RequestParam @Pattern(regexp = "^[0-9a-z]{4}$") String captcha,
             @RequestParam String operationType,
@@ -94,7 +92,7 @@ public class UserController {
         System.out.println(operationType);
         if (!(operationType.equals("register") || operationType.equals("forgot"))) {
             //抛出400错误,前端使用try-catch配合element-plus处理
-            return new ApiResponse<>(400,"非法请求",new GenaralDataResponse(false,null));
+            return new ApiResponse<>(400,"非法请求",new GeneralDataResponse(false,null));
         }
         String redisKey =operationType+request.getSession().getId();
        return botCaptchaVerification.verify(captcha,redisKey);
@@ -102,13 +100,13 @@ public class UserController {
 
     @AccessRestriction(limit =30,message = "获取登录状态过于频繁")
     @GetMapping("/getLoginStatus")
-    public ApiResponse<GenaralDataResponse> getLoginStatus(HttpServletRequest request){
+    public ApiResponse<GeneralDataResponse> getLoginStatus(HttpServletRequest request){
         return userGetLoginStatusService.getLoginStatus(request);
     }
 
     @AccessRestriction(limit = 5,message = "登录过于频繁,1分钟后再试",limitKey = false)
     @PostMapping("/getLoginResponse")
-    public ApiResponse<GenaralDataResponse> getLoginResponse(
+    public ApiResponse<GeneralDataResponse> getLoginResponse(
             //@RequestParam定义的参数必须传入，否则400错误
             @RequestParam String username,
             @RequestParam String password,
@@ -118,7 +116,7 @@ public class UserController {
         //限制访问携带的验证码来自登录业务
         if (!operationType.equals("login")) {
             //抛出400错误,前端使用try-catch配合element-plus处理
-            return new ApiResponse<>(400,"非法验证请求",new GenaralDataResponse(false,null));
+            return new ApiResponse<>(400,"非法验证请求",new GeneralDataResponse(false,null));
         }
         String redisKey =operationType+request.getSession().getId();
         return userLoginService.userLogin(username,password,captcha,redisKey);
@@ -128,7 +126,7 @@ public class UserController {
     //发送邮箱验证码
     @AccessRestriction(limit = 1,message = "验证码请求过于频繁,1分钟后再试",limitKey = false)
     @GetMapping("/sendEmailCaptcha")
-    public  ApiResponse<GenaralDataResponse> sendEmailCaptcha(
+    public  ApiResponse<GeneralDataResponse> sendEmailCaptcha(
             @RequestParam String email,
             @RequestParam String operationType,
             HttpServletRequest request
@@ -136,39 +134,28 @@ public class UserController {
         String redisKey = operationType + request.getSession().getId();
         if (!(operationType.equals("register")||operationType.equals("forgot"))) {
             //抛出400错误,前端使用try-catch配合element-plus处理
-            return new ApiResponse<>(400,"非法请求",new GenaralDataResponse(false,null));
+            return new ApiResponse<>(400,"非法请求",new GeneralDataResponse(false,null));
         }
             return sendEmailCaptchaService.send(email,redisKey);
     }
     //注册接口包含验证邮箱验证码
     @AccessRestriction(limit = 5,message = "注册过于频繁,1分钟后再试",limitKey = false)
     @PostMapping("/getRegisterResponse")
-    public ApiResponse<GenaralDataResponse> getRegisterResponse(
-            @RequestParam String username,
-            @RequestParam String password,
-            @RequestParam String confirmPassword,
-            @RequestParam String email,
-            @RequestParam String emailCaptcha,
-            @RequestParam String operationType,
+    public ApiResponse<GeneralDataResponse> getRegisterResponse(
+            @RequestBody User user,
             HttpServletRequest request
     ){
-        if(!operationType.equals("register")){
-            return new ApiResponse<>(400,"非法请求",new GenaralDataResponse(false,null));
+        if (!user.getOperationType().equals("register")) {
+            return new ApiResponse<>(400,"非法请求",new GeneralDataResponse(false,null));
         }
-        System.out.println("username:"+username);
-        System.out.println("password:"+password);
-        System.out.println("confirmPassword:"+confirmPassword);
-        System.out.println("email:"+email);
-        System.out.println("emailCaptcha:"+emailCaptcha);
-        System.out.println("operationType:"+operationType);
-        System.out.println(request.getHeader("X-Forwarded-For"));
-        return userRegisterService.userRegister(null);
+        System.out.println(user);
+        return userRegisterService.userRegister(user);
     }
 
 
     @GetMapping("/getUserProfile")
-    public ApiResponse<GenaralDataResponse> getUserProfile(){
-        GenaralDataResponse data = new GenaralDataResponse(false,null);
+    public ApiResponse<GeneralDataResponse> getUserProfile(){
+        GeneralDataResponse data = new GeneralDataResponse(false,null);
         return new ApiResponse<>(200,"获取信息",data);
     }
 }

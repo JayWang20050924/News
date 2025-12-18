@@ -5,10 +5,10 @@ public class RadomCaptchaUtil {
     /**
      * 生成6位数字验证码（常用）
      */
-    public static String generate6DigitCaptcha() {
+    public static String generate8DigitCaptcha() {
         Random random = new Random();
         // 生成100000~999999的随机数，确保是6位
-        return String.format("%06d", random.nextInt(900000) + 100000);
+        return String.format("%08d", random.nextInt(900000) + 100000);
     }
 
     /**

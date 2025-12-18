@@ -3,7 +3,7 @@ package com.news.backendproject.service;
 import com.news.backendproject.dao.Imp.UserDaoImp;
 import com.news.backendproject.domain.User;
 import com.news.backendproject.entity.ApiResponse;
-import com.news.backendproject.entity.GenaralDataResponse;
+import com.news.backendproject.entity.GeneralDataResponse;
 import com.news.backendproject.utils.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ public class UserGetLoginStatusService {
         this.userDaoImp = userDaoImp;
     }
 
-    public ApiResponse<GenaralDataResponse> getLoginStatus(HttpServletRequest request){
+    public ApiResponse<GeneralDataResponse> getLoginStatus(HttpServletRequest request){
         // 读取请求头中的 token
         String authHeader = request.getHeader("Authorization");
         String currentUsername = null;
@@ -31,19 +31,19 @@ public class UserGetLoginStatusService {
                 User user = new User();//新建user类进行用户存在性判断
                 user.setUsername(currentUsername);
                 if(userDaoImp.verifyUserExistenceService(user)!=0){
-                    GenaralDataResponse data = new GenaralDataResponse(true, null);
-                    return new ApiResponse<GenaralDataResponse>(200, "已登录", data);
+                    GeneralDataResponse data = new GeneralDataResponse(true, null);
+                    return new ApiResponse<GeneralDataResponse>(200, "已登录", data);
                 }
-                GenaralDataResponse data = new GenaralDataResponse(false, null);
-                return new ApiResponse<GenaralDataResponse>(401, "用户失效", data);
+                GeneralDataResponse data = new GeneralDataResponse(false, null);
+                return new ApiResponse<GeneralDataResponse>(401, "用户失效", data);
             } catch (JwtException e) {
                 // 解析失败（签名无效/过期等），视为未登录
-                GenaralDataResponse data = new GenaralDataResponse(false, null);
-                return new ApiResponse<GenaralDataResponse>(401, "未登录", data);
+                GeneralDataResponse data = new GeneralDataResponse(false, null);
+                return new ApiResponse<GeneralDataResponse>(401, "未登录", data);
             }
         }
         //没有token
-        GenaralDataResponse data = new GenaralDataResponse(false, null);
+        GeneralDataResponse data = new GeneralDataResponse(false, null);
         System.err.println("无token");
         return new ApiResponse<>(401,"未登录",data);
     }

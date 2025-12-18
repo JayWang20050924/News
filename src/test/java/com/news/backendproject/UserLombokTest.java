@@ -1,6 +1,7 @@
 package com.news.backendproject;
 
 import com.news.backendproject.domain.User;
+import com.news.backendproject.domain.UserProfie;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -12,57 +13,55 @@ public class UserLombokTest {
     void testGetterSetter() {
         // 初始化对象并设置字段
         User user = new User();
-        user.setId(1L);
+        UserProfie userProfie = new UserProfie();
         user.setUsername("testUser");
         user.setPassword("testPass");
-        user.setGender("male");
-        user.setAddress("Beijing");
-        user.setBirthday(LocalDate.of(2000, 1, 1));
+        userProfie.setGender("male");
+        userProfie.setAddress("Beijing");
+        userProfie.setBirthday(LocalDate.of(2000, 1, 1));
         System.out.println(user);
         // 断言getter获取的值与setter设置的值一致
-        assertThat(user.getId()).isEqualTo(1L);
         assertThat(user.getUsername()).isEqualTo("testUser");
         assertThat(user.getPassword()).isEqualTo("testPass");
-        assertThat(user.getGender()).isEqualTo("male");
-        assertThat(user.getAddress()).isEqualTo("Beijing");
-        assertThat(user.getBirthday()).isEqualTo(LocalDate.of(2000, 1, 1));
+        assertThat(userProfie.getGender()).isEqualTo("male");
+        assertThat(userProfie.getAddress()).isEqualTo("Beijing");
+        assertThat(userProfie.getBirthday()).isEqualTo(LocalDate.of(2000, 1, 1));
     }
     @Test
     void testToString() {
         User user = new User();
-        user.setId(99L); // toString应忽略id
-        user.setUsername("toStringTest");
-        user.setPassword("123");
-        user.setGender("female");
-        user.setAddress("Shanghai");
-        user.setBirthday(LocalDate.now()); // toString应忽略birthday
+        UserProfie userProfie = new UserProfie();
+        userProfie.setUsername("toStringTest");
+        userProfie.setGender("female");
+        userProfie.setAddress("Shanghai");
+        userProfie.setBirthday(LocalDate.now()); // toString应忽略birthday
 
-        String toStringResult = user.toString();
+        String toStringResult = userProfie.toString();
         System.out.println(toStringResult);
         // 断言toString包含指定字段
-        assertThat(toStringResult).contains("username=toStringTest", "password=123", "gender=female", "address=Shanghai");
+        assertThat(toStringResult).contains("username=toStringTest", "gender=female", "address=Shanghai");
         // 断言toString不包含未指定的字段
-        assertThat(toStringResult).doesNotContain("id=99", "birthday");
+        assertThat(toStringResult).doesNotContain("id", "birthday");
     }
 
     @Test
     void testEqualsAndHashCode() {
         // 两个字段完全相同的对象
         User user1 = new User();
-        user1.setId(1L);
+        UserProfie userProfie1 = new UserProfie();
+
         user1.setUsername("same");
         user1.setPassword("pwd");
-        user1.setGender("other");
-        user1.setAddress("addr");
-        user1.setBirthday(LocalDate.of(2023, 1, 1));
+        userProfie1.setGender("other");
+        userProfie1.setAddress("addr");
+        userProfie1.setBirthday(LocalDate.of(2023, 1, 1));
 
         User user2 = new User();
-        user2.setId(1L);
         user2.setUsername("same");
         user2.setPassword("pwd");
-        user2.setGender("other");
-        user2.setAddress("addr");
-        user2.setBirthday(LocalDate.of(2023, 1, 1));
+        userProfie1.setGender("other");
+        userProfie1.setAddress("addr");
+        userProfie1.setBirthday(LocalDate.of(2023, 1, 1));
 
         // 断言equals和hashCode一致
         assertThat(user1).isEqualTo(user2);

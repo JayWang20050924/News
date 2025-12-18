@@ -2,12 +2,11 @@ package com.news.backendproject.interceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.news.backendproject.annotation.AccessRestriction;
 import com.news.backendproject.entity.ApiResponse;
-import com.news.backendproject.entity.GenaralDataResponse;
+import com.news.backendproject.entity.GeneralDataResponse;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -77,8 +76,8 @@ public class AccessRestrictionInterceptor implements HandlerInterceptor {
         // 判断是否超限
         if (count != null&&count > limit) {
             // 超限：返回提示信息
-            GenaralDataResponse data = new GenaralDataResponse(false,null);
-            ApiResponse<GenaralDataResponse> apiResponse = new ApiResponse<>(429, message, data);
+            GeneralDataResponse data = new GeneralDataResponse(false,null);
+            ApiResponse<GeneralDataResponse> apiResponse = new ApiResponse<>(429, message, data);
             //自定义错误频率响应头
             response.setHeader("X-Error-Type", "rate-limit");
             // 设置响应头（JSON格式+Retry-After）
