@@ -160,11 +160,17 @@
       <!-- 卡片底部 -->
       <div class="bg-gray-800 px-6 py-4 text-center flex-shrink-0">
         <span class="text-gray-300 text-sm">
-          <a href="/RegisterPage" target="_blank" class="text-gray-100 hover:underline">立即注册</a>
+          <RouterLinkBlank to="/RegisterPage" class="text-gray-100 hover:underline"
+            >立即注册</RouterLinkBlank
+          >
           &emsp;|&emsp;
-          <a href="/ForgotPage" target="_blank" class="text-gray-100 hover:underline">忘记密码</a>
+          <RouterLinkBlank to="/ForgotPage" class="text-gray-100 hover:underline"
+            >忘记密码</RouterLinkBlank
+          >
           &emsp;|&emsp;
-          <a href="#" target="_blank" class="text-gray-100 hover:underline">后台登录</a>
+          <RouterLinkBlank to="/AdminLoginPage" class="text-gray-100 hover:underline"
+            >后台登录</RouterLinkBlank
+          >
         </span>
       </div>
     </div>

@@ -199,7 +199,9 @@
             >立即登录</RouterLinkBlank
           >
           &emsp;|&emsp;
-          <a href="/ForgotPage" target="_blank" class="text-gray-100 hover:underline">忘记密码</a>
+          <RouterLinkBlank to="/ForgotPage" class="text-gray-100 hover:underline"
+            >忘记密码</RouterLinkBlank
+          >
         </span>
       </div>
     </div>
@@ -267,6 +269,19 @@ const showBotCheck = async () => {
   if (validatePatternEmail.test(bindEmail.value.trim())) {
     // 避免重复点击：如果已禁用，直接返回
     if (isDisabled.value) return
+    if (
+      username.value.trim() == '' ||
+      password.value.trim() == '' ||
+      confirmPassword.value.trim() == ''
+    ) {
+      ElMessage({
+        message: '请先填写用户名和密码',
+        type: 'error',
+        customClass: 'custom-message',
+        duration: MESSAGE_DURATION,
+      })
+      return
+    }
     // 显示人机验证组件
     botChecModuleVisible.value = true
   } else {
