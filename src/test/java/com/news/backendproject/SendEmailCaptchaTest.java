@@ -1,7 +1,6 @@
 package com.news.backendproject;
 
-import com.news.backendproject.service.EmailService;
-import jakarta.mail.MessagingException;
+import com.news.backendproject.service.EmailGenerateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,9 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class SendEmailCaptchaTest {
     @Autowired
-    private EmailService emailService;
+    private EmailGenerateService emailGenerateService;
     @Test
     public void test() throws Exception {
-        emailService.sendCaptcha("wp18054404921@163.com","ly45son");
+        emailGenerateService.sendCaptcha("wp18054404921@163.com","ly45son","register");
     }
 }

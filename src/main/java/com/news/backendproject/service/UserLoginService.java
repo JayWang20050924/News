@@ -5,19 +5,17 @@ import com.news.backendproject.domain.User;
 import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.GeneralDataResponse;
 import com.news.backendproject.utils.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-
+@RequiredArgsConstructor
 public  class UserLoginService {
-    @Autowired
-    private JwtUtil jwtUtil;
-    @Autowired
-    private UserDaoImp userDaoImp;
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private final JwtUtil jwtUtil;
+    private final UserDaoImp userDaoImp;
+    private final StringRedisTemplate stringRedisTemplate;
 
     public ApiResponse<GeneralDataResponse> userLogin(
             String username,

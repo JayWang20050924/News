@@ -7,17 +7,14 @@ import com.news.backendproject.entity.GeneralDataResponse;
 import com.news.backendproject.utils.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserGetLoginStatusService {
     private final JwtUtil jwtUtil;
     private final UserDaoImp userDaoImp;
-
-    public UserGetLoginStatusService(JwtUtil jwtUtil, UserDaoImp userDaoImp) {
-        this.jwtUtil = jwtUtil;
-        this.userDaoImp = userDaoImp;
-    }
 
     public ApiResponse<GeneralDataResponse> getLoginStatus(HttpServletRequest request){
         // 读取请求头中的 token

@@ -11,6 +11,7 @@ import com.news.backendproject.service.UserLoginService;
 import com.news.backendproject.service.UserRegisterService;
 import com.news.backendproject.verify.BotCaptchaVerification;
 import jakarta.validation.constraints.Pattern;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.annotation.Validated;
@@ -29,22 +30,18 @@ import java.util.concurrent.TimeUnit;
  * UserController:控制所有用户关联的行为
  */
 @RestController
+//Lombok自动生成包含final字段的构造函数
+@RequiredArgsConstructor
 @Validated//启用参数验证
 public class UserController {
-    @Autowired
-    private Producer kaptchaProducer;
-    @Autowired
-    private UserLoginService userLoginService;
-    @Autowired
-    private UserGetLoginStatusService userGetLoginStatusService;
-    @Autowired
-    private UserRegisterService userRegisterService;
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
-    @Autowired
-    private BotCaptchaVerification botCaptchaVerification;
-    @Autowired
-    private SendEmailCaptchaService sendEmailCaptchaService;
+    private final Producer kaptchaProducer;
+    private final UserLoginService userLoginService;
+    private final UserGetLoginStatusService userGetLoginStatusService;
+    private final UserRegisterService userRegisterService;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final BotCaptchaVerification botCaptchaVerification;
+    private final SendEmailCaptchaService sendEmailCaptchaService;
+
     //发送人机验证码
     @AccessRestriction(message = "验证码请求过于频繁,1分钟后再试")
     @GetMapping("/sendBotCaptcha")
@@ -136,7 +133,7 @@ public class UserController {
             //抛出400错误,前端使用try-catch配合element-plus处理
             return new ApiResponse<>(400,"非法请求",new GeneralDataResponse(false,null));
         }
-            return sendEmailCaptchaService.send(email,redisKey);
+            return sendEmailCaptchaService.send(email,redisKey,operationType);
     }
     //注册接口包含验证邮箱验证码
     @AccessRestriction(limit = 5,message = "注册过于频繁,1分钟后再试",limitKey = false)

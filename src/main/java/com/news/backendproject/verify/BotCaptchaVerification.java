@@ -2,13 +2,15 @@ package com.news.backendproject.verify;
 
 import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.GeneralDataResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class BotCaptchaVerification {
-    @Autowired private StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
     public ApiResponse<GeneralDataResponse> verify(String captcha, String redisKey) {
         String redisValue = null;
         redisValue = stringRedisTemplate.opsForValue().get(redisKey);

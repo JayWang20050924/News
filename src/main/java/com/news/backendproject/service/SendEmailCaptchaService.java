@@ -3,7 +3,7 @@ package com.news.backendproject.service;
 import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.GeneralDataResponse;
 import com.news.backendproject.utils.RadomCaptchaUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -11,15 +11,15 @@ import java.util.concurrent.TimeUnit;
 
 //todo:完成邮箱验证码的发送与存储
 @Service
+@RequiredArgsConstructor
 public class SendEmailCaptchaService {
-    @Autowired
-    private EmailService emailService;
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
-    public ApiResponse<GeneralDataResponse> send(String toEmail, String redisKey) {
+    private final EmailGenerateService emailGenerateService;
+    private final StringRedisTemplate stringRedisTemplate;
+
+    public ApiResponse<GeneralDataResponse> send(String toEmail, String redisKey,String operationType) {
         String emailCaptcha=RadomCaptchaUtil.generate8DigitCaptcha();
 
-        boolean result= emailService.sendCaptcha(toEmail,emailCaptcha);
+        boolean result= emailGenerateService.sendCaptcha(toEmail,emailCaptcha,operationType);
         if (result){
             //发送成功后存储验证码到redis
             stringRedisTemplate.opsForValue().set(
