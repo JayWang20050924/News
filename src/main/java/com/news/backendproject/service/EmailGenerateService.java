@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class EmailGenerateService {
     private final JavaMailSender javaMailSender;
 
-    // 发送方邮箱（与配置文件中的spring.mail.username一致）
+    // 发送方邮箱
     @Value("${spring.mail.username}")
     private String fromEmail;
 
@@ -36,6 +36,9 @@ public class EmailGenerateService {
         // 创建MimeMessage对象（支持HTML、附件）
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
+        // 操作代理——MimeMessageHelper
+        // 后续通过helper调用的setFrom()、setTo()、setText()等所有方法
+        // 最终都会同步修改这个绑定的mimeMessage对象的属性
         // 使用MimeMessageHelper简化配置（true表示支持多部分内容，UTF-8解决中文乱码）
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
@@ -48,7 +51,7 @@ public class EmailGenerateService {
         String emailContent = String.format(
                 "<div style='font-family: Arial, sans-serif;'>" +
                         "<h3>您好</h3>" +
-                        "<p>您正在进行<span style='color: #0066cc; font-weight: bold;'>%s</span>操作，您的邮箱验证码为：</p>"+
+                        "<p>您正在进行<span style='color: #0066cc; font-weight: bold;'>%s</span>，您的邮箱验证码为：</p>"+
                         "<p><span style='color: #ff0000; font-size: 18px; font-weight: bold;'>%s</span></p>" +
                         "<p>该验证码有效期为10分钟，请及时验证。</p>" +
                         "<p>如非本人操作，请忽略此邮件。</p>" +

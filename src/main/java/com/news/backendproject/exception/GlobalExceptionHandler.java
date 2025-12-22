@@ -2,16 +2,20 @@ package com.news.backendproject.exception;
 
 import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.GeneralDataResponse;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 全局异常处理器：统一捕获并处理所有Controller层异常
@@ -37,6 +41,22 @@ public class GlobalExceptionHandler {
         log.error("参数类型不匹配异常：", e);
         String errorMsg = "参数类型错误：" + e.getName() + "需为" + e.getRequiredType().getSimpleName();
         return new ApiResponse<>(400, errorMsg, new GeneralDataResponse(false, null));
+    }
+    /**
+     *处理参数格式异常
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ApiResponse<GeneralDataResponse> handleConstraintViolationException(ConstraintViolationException e) {
+        log.error("用户传入了异常参数", e);
+        return new ApiResponse<>(400, "异常参数", new GeneralDataResponse(false, null));
+    }
+    /**
+     * 处理@RequestBody + @Valid 实体类验证失败的异常（MethodArgumentNotValidException）
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ApiResponse<GeneralDataResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.error("用户传入了异常参数", e);
+        return new ApiResponse<>(400, "异常参数", new GeneralDataResponse(false, null));
     }
 
     // ======================第三方服务异常 ======================
@@ -76,14 +96,7 @@ public class GlobalExceptionHandler {
         return new ApiResponse<>(500, "IO操作异常，请稍后重试", new GeneralDataResponse(false, null));
     }
 
-    /**
-     *处理参数格式异常
-     */
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ApiResponse<GeneralDataResponse> handleConstraintViolationException(ConstraintViolationException e) {
-        log.error("参数格式异常", e);
-        return new ApiResponse<>(500, "参数格式异常", new GeneralDataResponse(false, null));
-    }
+
     // ====================== 兜底异常（所有未捕获的异常） ======================
     @ExceptionHandler(Exception.class)
     public ApiResponse<GeneralDataResponse> handleGlobalException(Exception e) {

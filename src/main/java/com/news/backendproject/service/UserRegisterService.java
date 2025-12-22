@@ -4,16 +4,26 @@ import com.news.backendproject.dao.Imp.UserDaoImp;
 import com.news.backendproject.domain.User;
 import com.news.backendproject.entity.ApiResponse;
 import com.news.backendproject.entity.GeneralDataResponse;
+import com.news.backendproject.verify.EmailCaptchaVerification;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserRegisterService {
     private final UserDaoImp userDaoImp;
-
-    public ApiResponse<GeneralDataResponse> userRegister(User user) {
-        return new ApiResponse<>(400,"注册失败",new GeneralDataResponse(false,null));
+    private final EmailCaptchaVerification emailCaptchaVerification;
+    public ApiResponse<GeneralDataResponse> userRegister(User user,String redisKey) {
+        String emailCaptcha=user.getEmailCaptcha();
+        ApiResponse<GeneralDataResponse> verify = emailCaptchaVerification.verify(emailCaptcha, redisKey);
+        if (verify.getCode()==200){
+            int i = userDaoImp.addUserService(user);
+            if (i!=0){
+                verify.setMsg("注册成功");
+                return verify;
+            }
+            return new ApiResponse<>(500,"服务器升级中稍后再试",new GeneralDataResponse(false,null));
+        }
+        return verify;
     }
 }

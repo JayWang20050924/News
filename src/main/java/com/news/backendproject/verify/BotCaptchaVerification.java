@@ -16,7 +16,7 @@ public class BotCaptchaVerification {
         redisValue = stringRedisTemplate.opsForValue().get(redisKey);
         // 验证码不存在（过期或未生成）
         if (redisValue == null) {
-            return new ApiResponse<>(400, "验证码已过期", new GeneralDataResponse(false, null));
+            return new ApiResponse<>(400, "请重新获取验证码", new GeneralDataResponse(false, null));
         }
         // 验证码匹配校验
         if(redisValue.trim().equals(captcha.trim())){

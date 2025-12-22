@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 
-//todo:完成邮箱验证码的发送与存储
 @Service
 @RequiredArgsConstructor
 public class SendEmailCaptchaService {

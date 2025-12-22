@@ -37,7 +37,7 @@ public  class UserLoginService {
 
         // 验证码过期/不存在
         if (redisKey == null) {
-            return new ApiResponse<>(400, "验证码已过期", new GeneralDataResponse(false, null));
+            return new ApiResponse<>(400, "请重新获取验证码", new GeneralDataResponse(false, null));
         }
 
         // 验证码不匹配
