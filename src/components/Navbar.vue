@@ -59,7 +59,7 @@
           <a
             @click="redirectPage"
             id="forgotBtn"
-            href="#"
+            href="/ForgotPage"
             target="_self"
             :class="[
               'dropdown-item block px-6 py-3 text-gray-100 hover:bg-gray-800 transition-colors duration-200 hover:text-gray-100',
@@ -140,19 +140,19 @@
 
           <!-- 桌面端搜索框 -->
           <div
-            class="search-container-pc hidden md:flex items-center bg-gray-800 border border-gray-500 rounded-lg overflow-hidden"
+            class="search-container-pc hidden md:flex items-center bg-gray-800 border-2 border-gray-400 rounded-lg overflow-hidden"
             style="margin-left: 5rem"
           >
             <input
               ref="searchInput"
               id="searchInput"
               type="text"
-              placeholder="搜索内容..."
+              placeholder="搜索新闻..."
               class="bg-gray-800 text-gray-100 px-4 py-2 outline-none w-40 md:w-56"
               aria-label="搜索输入框"
             />
             <button
-              class="bg-gray-900 text-gray-100 px-3 py-2 border-l border-gray-500 hover:bg-gray-700 transition-colors"
+              class="bg-gray-900 text-gray-100 px-3 py-2 border-l border-gray-400 hover:bg-gray-700 transition-colors"
             >
               <i class="fa fa-search"></i>
             </button>
@@ -220,12 +220,13 @@
           id="mobileEntertainment"
           >娱&nbsp;乐</a
         >
+        <!-- 移动端搜索框 -->
         <div
-          class="search-container-mobile flex items-center bg-gray-800 border border-gray-500 rounded-lg overflow-hidden"
+          class="search-container-mobile flex items-center bg-gray-800 border-2 border-gray-400 rounded-lg overflow-hidden"
         >
           <input
             type="text"
-            placeholder="搜索内容..."
+            placeholder="搜索新闻..."
             class="bg-gray-800 text-gray-100 px-4 py-2 outline-none flex-1"
             aria-label="搜索输入框"
           />

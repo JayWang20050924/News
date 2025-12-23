@@ -190,6 +190,8 @@ import Cookies from 'js-cookie'
 import RouterLinkBlank from '../components/RouterLinkBlank.vue'
 //提示持续时间
 const MESSAGE_DURATION = 2000
+//用户名,密码格式规则
+const validatePatternUserPass = /^[A-Za-z0-9]{8,20}$/
 //人机验证码格式规则
 const validatebotCheckCodePattern = /^[A-Za-z0-9]{4}$/
 //存储倒计时定时器
@@ -273,9 +275,13 @@ const handleSubmit = async () => {
     })
     return
   }
-  if (!isAgree.value) {
+  // 格式验证
+  if (
+    !validatePatternUserPass.test(username.value.trim()) ||
+    !validatePatternUserPass.test(password.value.trim())
+  ) {
     ElMessage({
-      message: '请先同意用户协议和隐私政策',
+      message: '用户名或密码格式错误',
       type: 'error',
       customClass: 'custom-message',
       duration: MESSAGE_DURATION,
@@ -291,6 +297,16 @@ const handleSubmit = async () => {
     })
     return
   }
+  if (!isAgree.value) {
+    ElMessage({
+      message: '请先同意用户协议和隐私政策',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    return
+  }
+
   try {
     const params = new URLSearchParams()
     params.append('username', username.value.trim())
