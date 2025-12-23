@@ -42,6 +42,7 @@
               id="username"
               v-model="username"
               required
+              maxlength="20"
               class="w-full pl-10 pr-4 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
               placeholder="输入8-20位数字和字母的用户名"
             />
@@ -107,7 +108,7 @@
         <!-- 邮箱绑定 -->
         <div class="input-container">
           <label for="bindEmail" class="block text-gray-300 text-sm font-medium mb-2">
-            绑定邮箱 <span style="color: red">*</span>
+            绑定密保邮箱 <span style="color: red">*</span>
           </label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300 text-sm">
@@ -119,7 +120,7 @@
               v-model="bindEmail"
               required
               class="w-full pl-10 pr-4 py-3 border-b-2 border-gray-700 text-gray-100 rounded-t-lg input-focus"
-              placeholder="绑定您的邮箱"
+              placeholder="绑定您的密保邮箱"
             />
             <div class="absolute inset-y-0 right-0 flex items-center pr-3">
               <!-- 根据isDisabled切换光标状态 -->
@@ -282,8 +283,24 @@ const showBotCheck = async () => {
       })
       return
     }
+    if (password.value.trim() !== confirmPassword.value.trim()) {
+      ElMessage({
+        message: '两次输入的密码不一致',
+        type: 'error',
+        customClass: 'custom-message',
+        duration: MESSAGE_DURATION,
+      })
+      return
+    }
     // 显示人机验证组件
     botChecModuleVisible.value = true
+  } else if (bindEmail.value.trim() == '') {
+    ElMessage({
+      message: '请填写邮箱',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
   } else {
     ElMessage({
       message: '邮箱格式错误',
@@ -319,9 +336,11 @@ const resetGetEmailCaptchaBtn = () => {
 //向后端请求发送邮箱验证码
 const getEmailCaptcha = async () => {
   try {
-    const response = await request.get('/sendEmailCaptcha', {
-      params: { email: bindEmail.value.trim(), operationType: 'register' },
-    })
+    const params = {
+      email: bindEmail.value.trim(),
+      operationType: 'register',
+    }
+    const response = await request.post('/sendEmailCaptcha', params)
     if (response.status) {
       ElMessage({
         message: '验证通过,注意查收邮箱',

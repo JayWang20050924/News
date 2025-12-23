@@ -1,9 +1,6 @@
 <template>
   <!-- 导航栏 -->
-  <header
-    id="navbar"
-    class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-5 "
-  >
+  <header id="navbar" class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-5">
     <div class="container mx-auto px-4 md:px-6 flex items-center justify-between">
       <!-- 左上角登录图标下拉组件 -->
       <div class="relative z-50" id="loginDropdownContainer">
@@ -25,7 +22,7 @@
         >
           <!-- router-link -->
           <router-link
-            @click="redirectpPage"
+            @click="redirectPage"
             :class="[
               dontLoginShowDropdownItem,
               'dropdown-item block px-6 py-3 text-gray-100 hover:bg-gray-800 transition-colors duration-200 hover:text-gray-100',
@@ -37,7 +34,7 @@
             <i class="fa fa-sign-in mr-2"></i> 登录账户
           </router-link>
           <a
-            @click="redirectpPage"
+            @click="redirectPage"
             id="centerBtn"
             href="#"
             target="_blank"
@@ -49,7 +46,7 @@
             <i class="fa fa-user-circle-o mr-2"></i>用户中心
           </a>
           <a
-            @click="redirectpPage"
+            @click="redirectPage"
             id="registerBtn"
             href="/RegisterPage"
             target="_self"
@@ -60,7 +57,7 @@
             <i class="fa fa-user-plus mr-2"></i>注册账户
           </a>
           <a
-            @click="redirectpPage"
+            @click="redirectPage"
             id="forgotBtn"
             href="#"
             target="_self"
@@ -71,7 +68,7 @@
             <i class="fa fa-key mr-2"></i>忘记密码
           </a>
           <a
-            @click="exitLogin(),redirectpPage()"
+            @click="(exitLogin(), redirectPage())"
             href="#"
             id="logoutBtn"
             :class="[
@@ -85,15 +82,15 @@
       </div>
 
       <!-- 网站Logo -->
-      <div class="flex items-center md:text-3xl font-bold text-gray-100" style="font-size: 2rem;">
-        <a href="#" style="font-size: 2.5rem;" >
+      <div class="flex items-center md:text-3xl font-bold text-gray-100" style="font-size: 2rem">
+        <a href="#" style="font-size: 2.5rem">
           <i class="fa fa-newspaper-o mr-2"></i>
         </a>
         <span>&nbsp;环&nbsp;球&nbsp;新&nbsp;闻&nbsp;</span>
       </div>
 
       <!-- 桌面端导航菜单 -->
-      <nav class="hidden md:flex items-center">
+      <nav class="hidden md:flex items-center" style="padding-right: 2rem">
         <div :class="['desktop-nav-container flex items-center space-x-8 mr-2']">
           <a
             @click="handleNavItemClick($event)"
@@ -138,17 +135,28 @@
             >娱&nbsp;乐</a
           >
 
-          <!-- 导航下划线指示器 - 移除内联样式 -->
+          <!-- 导航下划线指示器-->
           <div ref="navIndicator" id="navIndicator"></div>
 
-          <a
-            href="#"
-            id="provideAdviceBtnPc"
-            aria-disabled="true"
-            class="bg-gray-900 text-gray-100 px-4 py-2 rounded-lg transition-colors flex items-center border border-2 border-gray-500"
+          <!-- 桌面端搜索框 -->
+          <div
+            class="search-container-pc hidden md:flex items-center bg-gray-800 border border-gray-500 rounded-lg overflow-hidden"
+            style="margin-left: 5rem"
           >
-            &nbsp;<i class="fa fa-edit mr-1"></i>&nbsp;您&nbsp;的&nbsp;建&nbsp;议&nbsp;
-          </a>
+            <input
+              ref="searchInput"
+              id="searchInput"
+              type="text"
+              placeholder="搜索内容..."
+              class="bg-gray-800 text-gray-100 px-4 py-2 outline-none w-40 md:w-56"
+              aria-label="搜索输入框"
+            />
+            <button
+              class="bg-gray-900 text-gray-100 px-3 py-2 border-l border-gray-500 hover:bg-gray-700 transition-colors"
+            >
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -171,55 +179,62 @@
     >
       <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
         <a
-          @click="redirectpPage"
+          @click="redirectPage"
           href="#"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
           id="mobileHome"
           >首&nbsp;页</a
         >
         <a
-          @click="redirectpPage"
+          @click="redirectPage"
           href="#"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
           id="mobileInternational"
           >国&nbsp;际</a
         >
         <a
-          @click="redirectpPage"
+          @click="redirectPage"
           href="#"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
           id="mobileTech"
           >科&nbsp;技</a
         >
         <a
-          @click="redirectpPage"
+          @click="redirectPage"
           href="#"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
           id="mobileFinance"
           >财&nbsp;经</a
         >
         <a
-          @click="redirectpPage"
+          @click="redirectPage"
           href="#"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
           id="mobileSports"
           >体&nbsp;育</a
         >
         <a
-          @click="redirectpPage"
+          @click="redirectPage"
           href="#"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
           id="mobileEntertainment"
           >娱&nbsp;乐</a
         >
-        <a
-          @click="redirectpPage"
-          href="#"
-          id="provideAdviceBtnMobile"
-          class="bg-gray-700 border-gray-500 text-gray-100 px-4 py-3 rounded-lg transition-colors flex items-center justify-center"
+        <div
+          class="search-container-mobile flex items-center bg-gray-800 border border-gray-500 rounded-lg overflow-hidden"
         >
-          <i class="fa fa-edit mr-1"></i> &nbsp;提&nbsp;供&nbsp;建&nbsp;议&nbsp;
-        </a>
+          <input
+            type="text"
+            placeholder="搜索内容..."
+            class="bg-gray-800 text-gray-100 px-4 py-2 outline-none flex-1"
+            aria-label="搜索输入框"
+          />
+          <button
+            class="bg-gray-900 text-gray-100 px-3 py-2 border-l border-gray-500 hover:bg-gray-700 transition-colors"
+          >
+            <i class="fa fa-search" @click="redirectPage"></i>
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -252,15 +267,15 @@ const navItems = ref<HTMLAnchorElement[]>([])
 const handleVisibilityChange = () => {
   // 判断页面是否从不可见变为可见
   if (document.visibilityState === 'visible') {
-      const RefreshUserIcon=async()=> {
-        const data = await getLoginStatus()
-        //图标状态
-        userIco.value = data.status === true ? 'fa-user-o' : 'fa-user'
-        //下拉菜单项显示状态
-        isLoginShowDropdownItem.value = data.status === true ? 'block' : 'hidden'
-        dontLoginShowDropdownItem.value = data.status === true ? 'hidden' : 'block'
-      }
-      RefreshUserIcon();
+    const RefreshUserIcon = async () => {
+      const data = await getLoginStatus()
+      //图标状态
+      userIco.value = data.status === true ? 'fa-user-o' : 'fa-user'
+      //下拉菜单项显示状态
+      isLoginShowDropdownItem.value = data.status === true ? 'block' : 'hidden'
+      dontLoginShowDropdownItem.value = data.status === true ? 'hidden' : 'block'
+    }
+    RefreshUserIcon()
   }
 }
 
@@ -338,23 +353,23 @@ const showDropdownItems = () => {
   })
 }
 //退出登录
-const exitLogin =async () => {
-  localStorage.removeItem('token');
+const exitLogin = async () => {
+  localStorage.removeItem('token')
   //刷新图标等状态
-   // 调用接口函数
-    const data = await getLoginStatus()
-    //图标状态
-    userIco.value = data.status === true ? 'fa-user-o' : 'fa-user'
-    //下拉菜单项显示状态
-    isLoginShowDropdownItem.value = data.status === true ? 'block' : 'hidden'
-    dontLoginShowDropdownItem.value = data.status === true ? 'hidden' : 'block'
-     ElMessage({
-      message: '您已退出登录',
-      type: 'warning',
-      customClass: 'custom-message',
-      duration: 1500,
-    })
-    return
+  // 调用接口函数
+  const data = await getLoginStatus()
+  //图标状态
+  userIco.value = data.status === true ? 'fa-user-o' : 'fa-user'
+  //下拉菜单项显示状态
+  isLoginShowDropdownItem.value = data.status === true ? 'block' : 'hidden'
+  dontLoginShowDropdownItem.value = data.status === true ? 'hidden' : 'block'
+  ElMessage({
+    message: '您已退出登录',
+    type: 'warning',
+    customClass: 'custom-message',
+    duration: 1500,
+  })
+  return
 }
 const resetDropdownItems = () => {
   if (!loginDropdown.value) return
@@ -391,8 +406,8 @@ const handleMobileClickOutside = (e: MouseEvent) => {
   }
 }
 
-// 修复：直接修改状态，关闭菜单
-const redirectpPage = () => {
+// 关闭菜单
+const redirectPage = () => {
   ifShowLoginDropdownPc.value = 'hidden'
   ifShowMobile.value = 'hidden'
   resetDropdownItems()
