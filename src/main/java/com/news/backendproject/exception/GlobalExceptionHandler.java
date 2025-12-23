@@ -2,6 +2,7 @@ package com.news.backendproject.exception;
 
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDataResponse;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 /**
  * 全局异常处理器：统一捕获并处理所有Controller层异常
@@ -45,7 +47,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ApiResponse<GeneralDataResponse> handleConstraintViolationException(ConstraintViolationException e) {
         log.error("用户传入了异常参数", e);
-        return new ApiResponse<>(400, "异常参数", new GeneralDataResponse(false, null));
+        String errorMsg = e.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage) // 拿到@Pattern里的message
+                .collect(Collectors.joining("；")); // 多个错误用分号分隔
+        // 若没有解析到自定义信息，返回默认提示
+        if (errorMsg.isEmpty()) {
+            errorMsg = "参数格式错误";
+        }
+        return new ApiResponse<>(400,errorMsg, new GeneralDataResponse(false, null));
     }
     /**
      * 处理@RequestBody + @Valid 实体类验证失败的异常（MethodArgumentNotValidException）

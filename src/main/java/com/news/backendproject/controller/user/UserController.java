@@ -104,11 +104,11 @@ public class UserController {
     @PostMapping("/getLoginResponse")
     public ApiResponse<GeneralDataResponse> getLoginResponse(
             // 用户名格式验证
-            @RequestParam @Pattern(regexp = REGEX_USER_PASS, message = "用户名需为8-20位数字和字母组合") String username,
+            @RequestParam @Pattern(regexp = REGEX_USER_PASS, message = "用户名错误") String username,
             // 密码格式验证
-            @RequestParam @Pattern(regexp = REGEX_USER_PASS, message = "密码需为8-20位数字和字母组合") String password,
+            @RequestParam @Pattern(regexp = REGEX_USER_PASS, message = "密码错误") String password,
             // 人机验证码格式验证
-            @RequestParam @Pattern(regexp = REGEX_BOT_CAPTCHA, message = "人机验证码需为4位数字或小写字母") String captcha,
+            @RequestParam @Pattern(regexp = REGEX_BOT_CAPTCHA, message = "人机验证码错误") String captcha,
             @RequestParam String operationType,
             HttpServletRequest request) {
         // 限制验证请求为登录业务
@@ -129,20 +129,20 @@ public class UserController {
 
         System.out.println(sendEmailCaptchaDTO.toString());
 
-        //todo:
-        // 发送邮件时验证当前用户名是否存在,验证通过后验证该邮箱是否已被绑定
+
         if (!(sendEmailCaptchaDTO.getOperationType().equals("register") || sendEmailCaptchaDTO.getOperationType().equals("forgot")|| sendEmailCaptchaDTO.getOperationType().equals("resetPassword"))) {
             return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
         }
 
-
+        //todo:
+        // 发送邮件前验证当前用户名是否存在,验证通过后再次验证该邮箱是否已被绑定
         if (sendEmailCaptchaDTO.getOperationType().equals("register")) {
             return sendEmailCaptchaService.sendRegister(sendEmailCaptchaDTO.getEmail(), redisKey, sendEmailCaptchaDTO.getOperationType());
         }
 
 
         if (sendEmailCaptchaDTO.getOperationType().equals("forgot")) {
-            return new ApiResponse<>(400, "您正在进行找回密码操作", new GeneralDataResponse(false, null));
+            return sendEmailCaptchaService.sendForgotPwd(sendEmailCaptchaDTO.getEmail(), redisKey, sendEmailCaptchaDTO.getOperationType());
         }
 
 

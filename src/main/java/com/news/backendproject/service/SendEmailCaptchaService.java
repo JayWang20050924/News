@@ -15,6 +15,7 @@ public class SendEmailCaptchaService {
     private final EmailGenerateService emailGenerateService;
     private final StringRedisTemplate stringRedisTemplate;
 
+    //用于注册时发送邮箱验证码
     public ApiResponse<GeneralDataResponse> sendRegister(String toEmail, String redisKey,String operationType) {
         String emailCaptcha=RadomCaptchaUtil.generate8DigitCaptcha();
 
@@ -31,7 +32,9 @@ public class SendEmailCaptchaService {
         }
         return new ApiResponse<>(500,"邮箱验证码发送失败",new GeneralDataResponse(false,null));
     }
-    public ApiResponse<GeneralDataResponse> sendForForgotPwd(String toEmail, String redisKey,String operationType){
-        return new ApiResponse<>(500,"邮箱验证码发送失败",new GeneralDataResponse(false,null));
+
+    //用于忘记密码时发送邮箱验证码
+    public ApiResponse<GeneralDataResponse> sendForgotPwd(String toEmail, String redisKey,String operationType){
+        return new ApiResponse<>(500,"测试sendForgotPwd函数成功",new GeneralDataResponse(true,null));
     }
 }
