@@ -1,9 +1,9 @@
 package com.news.backendproject.service;
 
 import com.news.backendproject.dao.Imp.UserDaoImp;
-import com.news.backendproject.domain.User;
-import com.news.backendproject.entity.ApiResponse;
-import com.news.backendproject.entity.GeneralDataResponse;
+import com.news.backendproject.dto.UserRegisterDto;
+import com.news.backendproject.dto.ApiResponse;
+import com.news.backendproject.dto.GeneralDataResponse;
 import com.news.backendproject.utils.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +25,7 @@ public class UserGetLoginStatusService {
             String token = authHeader.substring(7);
             try {
                 currentUsername = jwtUtil.extractUsername(token); // 解析成功即代表令牌有效
-                User user = new User();//新建user类进行用户存在性判断
+                UserRegisterDto user = new UserRegisterDto();//新建user类进行用户存在性判断
                 user.setUsername(currentUsername);
                 if(userDaoImp.verifyUserExistenceService(user)!=0){
                     GeneralDataResponse data = new GeneralDataResponse(true, null);
@@ -39,9 +39,6 @@ public class UserGetLoginStatusService {
                 return new ApiResponse<GeneralDataResponse>(401, "未登录", data);
             }
         }
-        //没有token
-        GeneralDataResponse data = new GeneralDataResponse(false, null);
-        System.err.println("无token");
-        return new ApiResponse<>(401,"未登录",data);
+        return new ApiResponse<>(401,"未登录",new GeneralDataResponse(false, null));
     }
 }

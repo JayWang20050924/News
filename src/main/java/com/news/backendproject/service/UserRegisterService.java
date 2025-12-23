@@ -1,9 +1,9 @@
 package com.news.backendproject.service;
 
 import com.news.backendproject.dao.Imp.UserDaoImp;
-import com.news.backendproject.domain.User;
-import com.news.backendproject.entity.ApiResponse;
-import com.news.backendproject.entity.GeneralDataResponse;
+import com.news.backendproject.dto.UserRegisterDto;
+import com.news.backendproject.dto.ApiResponse;
+import com.news.backendproject.dto.GeneralDataResponse;
 import com.news.backendproject.verify.EmailCaptchaVerification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class UserRegisterService {
     private final UserDaoImp userDaoImp;
     private final EmailCaptchaVerification emailCaptchaVerification;
-    public ApiResponse<GeneralDataResponse> userRegister(User user,String redisKey) {
+    public ApiResponse<GeneralDataResponse> userRegister(UserRegisterDto user, String redisKey) {
         String emailCaptcha=user.getEmailCaptcha();
         ApiResponse<GeneralDataResponse> verify = emailCaptchaVerification.verify(emailCaptcha, redisKey);
         if (verify.getCode()==200){

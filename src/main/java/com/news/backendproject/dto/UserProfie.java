@@ -1,4 +1,4 @@
-package com.news.backendproject.domain;
+package com.news.backendproject.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

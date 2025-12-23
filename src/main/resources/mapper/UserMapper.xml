@@ -7,7 +7,7 @@
 <mapper namespace="com.news.backendproject.mapper.UserMapper">
 
     <!-- 1. 新增用户（对应addUser） -->
-    <insert id="addUser" parameterType="com.news.backendproject.domain.User">
+    <insert id="addUser" parameterType="com.news.backendproject.dto.UserRegisterDto">
         INSERT INTO user(username, password, email,status)
         VALUES(#{username}, #{password}, #{email},1)
     </insert>
@@ -25,7 +25,7 @@
 
     <!-- 4. 查询用户信息（对应getUserInfor） -->
     <!-- 结果映射：处理数据库字段与实体属性的映射（如birthday字段类型） -->
-    <resultMap id="UserResultMap" type="com.news.backendproject.domain.User">
+    <resultMap id="UserResultMap" type="com.news.backendproject.dto.UserRegisterDto">
         <result column="username" property="username"/>
         <result column="gender" property="gender"/>
         <result column="address" property="address"/>
@@ -36,7 +36,7 @@
     </select>
 
     <!-- 5. 更新用户信息（对应updateUser） -->
-    <update id="updateBasicInforByUsername" parameterType="com.news.backendproject.domain.User">
+    <update id="updateBasicInforByUsername" parameterType="com.news.backendproject.dto.UserRegisterDto">
         UPDATE user
         SET gender = #{gender},
         birthday = #{birthday},
@@ -44,7 +44,7 @@
         WHERE username = #{username}  AND status = 1
     </update>
     <!-- 6. 更新用户密码（updateByUsername） -->
-    <update id="updatePasswordInforByUsername" parameterType="com.news.backendproject.domain.User">
+    <update id="updatePasswordInforByUsername" parameterType="com.news.backendproject.dto.UserRegisterDto">
         UPDATE user
         SET password = #{password}
         WHERE username = #{username}  AND status = 1

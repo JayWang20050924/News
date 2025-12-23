@@ -1,4 +1,4 @@
-package com.news.backendproject.entity;
+package com.news.backendproject.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

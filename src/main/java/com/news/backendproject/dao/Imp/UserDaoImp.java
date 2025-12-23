@@ -1,6 +1,6 @@
 package com.news.backendproject.dao.Imp;
 
-import com.news.backendproject.domain.User;
+import com.news.backendproject.dto.UserRegisterDto;
 import com.news.backendproject.mapper.UserMapper;
 import com.news.backendproject.dao.UserDao;
 import com.news.backendproject.utils.MyBatisUtil;
@@ -16,34 +16,34 @@ public class UserDaoImp implements UserDao {
     }
 
     @Override
-    public int addUserService(User user) {
+    public int addUserService(UserRegisterDto user) {
         return getUserMapper().addUser(user);
     }
 
     @Override
-    public int verifyUserExistenceService(User user) {
+    public int verifyUserExistenceService(UserRegisterDto user) {
         Integer result = getUserMapper().verifyUserExistence(user.getUsername());
         return result != null ? result : 0;
     }
 
     @Override
-    public int verifyUserPasswordService(User user) {
+    public int verifyUserPasswordService(UserRegisterDto user) {
         Integer result = getUserMapper().verifyUserPassword(user.getUsername(), user.getPassword());
         return result != null ? result : 0;
     }
 
     @Override
-    public User getUserInforService(User user) {
+    public UserRegisterDto getUserInforService(UserRegisterDto user) {
         return getUserMapper().getUserInfor(user.getUsername());
     }
 
     @Override
-    public int updateBasicInforByUsernameService(User user) {
+    public int updateBasicInforByUsernameService(UserRegisterDto user) {
         return getUserMapper().updateBasicInforByUsername(user);
     }
 
     @Override
-    public int updatePasswordInforByUsernameService(User user) {
+    public int updatePasswordInforByUsernameService(UserRegisterDto user) {
         return getUserMapper().updatePasswordInforByUsername(user);
     }
 }

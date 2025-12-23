@@ -1,8 +1,7 @@
 package com.news.backendproject.exception;
 
-import com.news.backendproject.entity.ApiResponse;
-import com.news.backendproject.entity.GeneralDataResponse;
-import jakarta.validation.ConstraintViolation;
+import com.news.backendproject.dto.ApiResponse;
+import com.news.backendproject.dto.GeneralDataResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 全局异常处理器：统一捕获并处理所有Controller层异常

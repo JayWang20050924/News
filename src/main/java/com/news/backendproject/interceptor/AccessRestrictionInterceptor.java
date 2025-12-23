@@ -1,8 +1,8 @@
 package com.news.backendproject.interceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.news.backendproject.annotation.AccessRestriction;
-import com.news.backendproject.entity.ApiResponse;
-import com.news.backendproject.entity.GeneralDataResponse;
+import com.news.backendproject.dto.ApiResponse;
+import com.news.backendproject.dto.GeneralDataResponse;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

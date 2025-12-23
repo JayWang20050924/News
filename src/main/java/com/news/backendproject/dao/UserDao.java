@@ -1,18 +1,18 @@
 package com.news.backendproject.dao;
 
-import com.news.backendproject.domain.User;
+import com.news.backendproject.dto.UserRegisterDto;
 
 public interface UserDao {
     //添加用户
-    int addUserService(User user);
+    int addUserService(UserRegisterDto user);
     //查找用户是否存在
-    int  verifyUserExistenceService(User user);
+    int  verifyUserExistenceService(UserRegisterDto user);
     //登录验证密码
-    int verifyUserPasswordService(User user);
+    int verifyUserPasswordService(UserRegisterDto user);
     //查找用户信息
-    User getUserInforService(User user);
+    UserRegisterDto getUserInforService(UserRegisterDto user);
     //更新用户信息
-    int updateBasicInforByUsernameService(User user);
+    int updateBasicInforByUsernameService(UserRegisterDto user);
     //更新用户密码
-    int updatePasswordInforByUsernameService(User user);
+    int updatePasswordInforByUsernameService(UserRegisterDto user);
 }

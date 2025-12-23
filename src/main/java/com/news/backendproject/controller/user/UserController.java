@@ -2,9 +2,10 @@ package com.news.backendproject.controller.user;
 
 import com.google.code.kaptcha.Producer;
 import com.news.backendproject.annotation.AccessRestriction;
-import com.news.backendproject.domain.User;
-import com.news.backendproject.entity.ApiResponse;
-import com.news.backendproject.entity.GeneralDataResponse;
+import com.news.backendproject.dto.SendEmailCaptchaDTO;
+import com.news.backendproject.dto.UserRegisterDto;
+import com.news.backendproject.dto.ApiResponse;
+import com.news.backendproject.dto.GeneralDataResponse;
 import com.news.backendproject.service.SendEmailCaptchaService;
 import com.news.backendproject.service.UserGetLoginStatusService;
 import com.news.backendproject.service.UserLoginService;
@@ -120,25 +121,40 @@ public class UserController {
 
     // 发送邮箱验证码
     @AccessRestriction(limit = 1, message = "验证码请求过于频繁,1分钟后再试", limitKey = false)
-    @GetMapping("/sendEmailCaptcha")
+    @PostMapping("/sendEmailCaptcha")
     public ApiResponse<GeneralDataResponse> sendEmailCaptcha(
-            // 邮箱格式验证
-            @RequestParam @Pattern(regexp = REGEX_EMAIL, message = "邮箱格式不正确") String email,
-            @RequestParam String operationType,
+            @RequestBody @Valid SendEmailCaptchaDTO sendEmailCaptchaDTO,
             HttpServletRequest request) {
-        String redisKey = operationType + request.getSession().getId();
-        if (!(operationType.equals("register") || operationType.equals("forgot"))) {
+        String redisKey = sendEmailCaptchaDTO.getOperationType() + request.getSession().getId();
+
+        System.out.println(sendEmailCaptchaDTO.toString());
+
+        //todo:
+        // 发送邮件时验证当前用户名是否存在,验证通过后验证该邮箱是否已被绑定
+        if (!(sendEmailCaptchaDTO.getOperationType().equals("register") || sendEmailCaptchaDTO.getOperationType().equals("forgot")|| sendEmailCaptchaDTO.getOperationType().equals("resetPassword"))) {
             return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
         }
-        return sendEmailCaptchaService.send(email, redisKey, operationType);
+
+
+        if (sendEmailCaptchaDTO.getOperationType().equals("register")) {
+            return sendEmailCaptchaService.sendRegister(sendEmailCaptchaDTO.getEmail(), redisKey, sendEmailCaptchaDTO.getOperationType());
+        }
+
+
+        if (sendEmailCaptchaDTO.getOperationType().equals("forgot")) {
+            return new ApiResponse<>(400, "您正在进行找回密码操作", new GeneralDataResponse(false, null));
+        }
+
+
+        return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
     }
 
-    // 注册接口包含验证邮箱验证码
+    //注册接口包含验证邮箱验证码
     @AccessRestriction(limit = 5, message = "注册过于频繁,1分钟后再试", limitKey = false)
     @PostMapping("/getRegisterResponse")
     public ApiResponse<GeneralDataResponse> getRegisterResponse(
             // @Valid 触发User实体类的字段验证
-            @RequestBody @Valid User user,
+            @RequestBody @Valid UserRegisterDto user,
             HttpServletRequest request) {
         if (!user.getOperationType().equals("register")) {
             return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
@@ -146,6 +162,19 @@ public class UserController {
         String redisKey = user.getOperationType() + request.getSession().getId();
         System.out.println(user);
         return userRegisterService.userRegister(user, redisKey);
+    }
+
+    // 找回密码接口
+    @AccessRestriction(limit = 5, message = "找回密码过于频繁,1分钟后再试", limitKey = false)
+    @PostMapping("/getForgotResponse")
+    public ApiResponse<GeneralDataResponse> userForgotPassword(
+            @RequestBody @Valid UserRegisterDto user,
+            HttpServletRequest request
+    ){
+        if (!user.getOperationType().equals("forgot")) {
+            return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
+        }
+        return null;
     }
 
     @GetMapping("/getSelfProfile")

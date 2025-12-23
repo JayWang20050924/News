@@ -1,7 +1,7 @@
 package com.news.backendproject;
 
-import com.news.backendproject.domain.User;
-import com.news.backendproject.domain.UserProfie;
+import com.news.backendproject.dto.UserRegisterDto;
+import com.news.backendproject.dto.UserProfie;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -12,7 +12,7 @@ public class UserLombokTest {
     @Test
     void testGetterSetter() {
         // 初始化对象并设置字段
-        User user = new User();
+        UserRegisterDto user = new UserRegisterDto();
         UserProfie userProfie = new UserProfie();
         user.setUsername("testUser");
         user.setPassword("testPass");
@@ -29,7 +29,7 @@ public class UserLombokTest {
     }
     @Test
     void testToString() {
-        User user = new User();
+        UserRegisterDto user = new UserRegisterDto();
         UserProfie userProfie = new UserProfie();
         userProfie.setUsername("toStringTest");
         userProfie.setGender("female");
@@ -47,7 +47,7 @@ public class UserLombokTest {
     @Test
     void testEqualsAndHashCode() {
         // 两个字段完全相同的对象
-        User user1 = new User();
+        UserRegisterDto user1 = new UserRegisterDto();
         UserProfie userProfie1 = new UserProfie();
 
         user1.setUsername("same");
@@ -56,7 +56,7 @@ public class UserLombokTest {
         userProfie1.setAddress("addr");
         userProfie1.setBirthday(LocalDate.of(2023, 1, 1));
 
-        User user2 = new User();
+        UserRegisterDto user2 = new UserRegisterDto();
         user2.setUsername("same");
         user2.setPassword("pwd");
         userProfie1.setGender("other");

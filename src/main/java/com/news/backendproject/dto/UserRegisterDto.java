@@ -1,19 +1,17 @@
-package com.news.backendproject.domain;
+package com.news.backendproject.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.time.LocalDate;
 
 @Data //自动生成所有字段的getter、setter、equals、hashCode
 @NoArgsConstructor
 @ToString(of = {"username", "password","confirmPassword","email","emailCaptcha","operationType"})
-public class User {
+public class UserRegisterDto {
     @Pattern(regexp = "^[A-Za-z0-9]{8,20}$", message = "用户名需为8-20位数字和字母组合")
     private String username;
 
@@ -31,5 +29,7 @@ public class User {
 
     @Pattern(regexp = "^[0-9]{8}$", message = "邮箱验证码需为8位数字组合")
     private String emailCaptcha;
+
+    @NotBlank(message = "非法请求")
     private String operationType;
 }
