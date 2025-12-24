@@ -337,7 +337,8 @@ const resetGetEmailCaptchaBtn = () => {
 const getEmailCaptcha = async () => {
   try {
     const params = {
-      email: bindEmail.value.trim(),
+      username: username.value.trim(),
+      toEmail: bindEmail.value.trim(),
       operationType: 'register',
     }
     const response = await request.post('/sendEmailCaptcha', params)
@@ -439,13 +440,13 @@ const handleSubmit = () => {
       //request返回结果中data字段数据
       if (data.status) {
         ElMessage({
-          message: '注册成功,即将跳转登录',
+          message: '注册成功,即将回到主页',
           type: 'success',
           customClass: 'custom-message',
           duration: MESSAGE_DURATION,
         })
-        // 注册成功后跳转到登录页
-        router.push('/LoginPage')
+        // 注册成功后回到主页
+        router.push('/')
       } else {
         ElMessage({
           message: '注册失败:' + data.msg,

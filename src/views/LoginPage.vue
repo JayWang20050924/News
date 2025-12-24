@@ -315,6 +315,7 @@ const handleSubmit = async () => {
     params.append('operationType', 'login')
 
     const data = await request.post('/getLoginResponse', params)
+
     if (data.status) {
       ElMessage({
         message: '登录成功，即将跳转',
@@ -324,6 +325,14 @@ const handleSubmit = async () => {
       })
       localStorage.setItem('token', data.token)
       router.push('/')
+    }else{
+      ElMessage({
+        message: data.msg,
+        type: 'error',
+        customClass: 'custom-message',
+        duration: MESSAGE_DURATION,
+      })
+      refreshBotCheckCode()
     }
   } catch (error) {
     ElMessage({

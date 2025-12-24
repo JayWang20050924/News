@@ -324,7 +324,7 @@ const getEmailCaptcha = async () => {
   try {
     const params = {
       username: username.value.trim(),
-      email: bindEmail.value.trim(),
+      toEmail: bindEmail.value.trim(),
       operationType: 'forgot',
     }
     const response = await request.post('/sendEmailCaptcha', params)
