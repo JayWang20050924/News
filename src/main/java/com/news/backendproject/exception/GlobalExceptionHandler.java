@@ -2,11 +2,13 @@ package com.news.backendproject.exception;
 
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDataResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.stream.Collectors;
 
 /**
@@ -65,6 +69,16 @@ public class GlobalExceptionHandler {
         return new ApiResponse<>(400, "异常参数", new GeneralDataResponse(false, null));
     }
 
+    /**
+     *
+     * 处理operationType等参数被非法传入的情况
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ApiResponse<GeneralDataResponse> handleIllegalArgumentException(IllegalArgumentException e, HttpServletResponse response) {
+        log.error("客户端非法操作：", e);
+        return new ApiResponse<>(400, "客户端非法操作", new GeneralDataResponse(false, null));
+    }
+
     // ======================第三方服务异常 ======================
     /**
      * 处理Redis连接/操作异常
@@ -72,7 +86,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({RedisConnectionFailureException.class, DataAccessException.class})
     public ApiResponse<GeneralDataResponse> handleRedisException(Exception e) {
         log.error("Redis操作异常：", e);
-        return new ApiResponse<>(500, "缓存服务异常，请稍后重试", new GeneralDataResponse(false, null));
+        return new ApiResponse<>(500, "Redis升级中，请稍后重试", new GeneralDataResponse(false, null));
+    }
+
+    /**
+     *
+     * 捕捉数据库异常
+     */
+
+    @ExceptionHandler(SQLException.class)
+    public ApiResponse<GeneralDataResponse> handleSQLException(SQLException e) {
+        log.error("数据库服务异常", e);
+        return new ApiResponse<>(500, "数据库升级中，请稍后重试", new GeneralDataResponse(false, null));
     }
     /**
      * 处理邮件发送异常
@@ -101,6 +126,7 @@ public class GlobalExceptionHandler {
         log.error("IO异常：", e);
         return new ApiResponse<>(500, "IO操作异常，请稍后重试", new GeneralDataResponse(false, null));
     }
+
 
 
     // ====================== 兜底异常（所有未捕获的异常） ======================

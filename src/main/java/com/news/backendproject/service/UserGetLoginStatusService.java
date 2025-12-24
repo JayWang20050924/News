@@ -1,7 +1,7 @@
 package com.news.backendproject.service;
 
 import com.news.backendproject.dao.Imp.UserDaoImp;
-import com.news.backendproject.dto.UserRegisterDto;
+import com.news.backendproject.entity.User;
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDataResponse;
 import com.news.backendproject.utils.JwtUtil;
@@ -25,7 +25,7 @@ public class UserGetLoginStatusService {
             String token = authHeader.substring(7);
             try {
                 currentUsername = jwtUtil.extractUsername(token); // 解析成功即代表令牌有效
-                UserRegisterDto user = new UserRegisterDto();//新建user类进行用户存在性判断
+                User user = new User();//新建user类进行用户存在性判断
                 user.setUsername(currentUsername);
                 if(userDaoImp.verifyUserExistenceService(user)!=0){
                     GeneralDataResponse data = new GeneralDataResponse(true, null);

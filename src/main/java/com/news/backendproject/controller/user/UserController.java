@@ -4,17 +4,20 @@ import com.google.code.kaptcha.Producer;
 import com.news.backendproject.annotation.AccessRestriction;
 import com.news.backendproject.dto.SendEmailCaptchaDTO;
 import com.news.backendproject.dto.UserRegisterDto;
+import com.news.backendproject.entity.User;
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDataResponse;
 import com.news.backendproject.service.SendEmailCaptchaService;
 import com.news.backendproject.service.UserGetLoginStatusService;
 import com.news.backendproject.service.UserLoginService;
 import com.news.backendproject.service.UserRegisterService;
-import com.news.backendproject.verify.BotCaptchaVerification;
+import com.news.backendproject.verify.BotCaptchaVerify;
+import com.news.backendproject.verify.OperationTypeVerify;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -38,7 +41,7 @@ public class UserController {
     private final UserGetLoginStatusService userGetLoginStatusService;
     private final UserRegisterService userRegisterService;
     private final StringRedisTemplate stringRedisTemplate;
-    private final BotCaptchaVerification botCaptchaVerification;
+    private final BotCaptchaVerify botCaptchaVerify;
     private final SendEmailCaptchaService sendEmailCaptchaService;
 
     // 正则常量（抽离便于维护）
@@ -52,7 +55,15 @@ public class UserController {
     public void generateCaptcha(
             HttpServletRequest request,
             HttpServletResponse response,
-            @RequestParam String operationType) throws IOException {
+            @RequestParam  @NotBlank String operationType) throws IOException {
+        //使用枚举类限制接口请求
+        if (    !(operationType.equals(OperationTypeVerify.LOGIN.getCode()))&&
+                !(operationType.equals(OperationTypeVerify.FORGOT_PASSWORD.getCode())) &&
+                !(operationType.equals(OperationTypeVerify.REGISTER.getCode()))
+        ) {
+          throw new IllegalArgumentException("非法参数");
+        }
+
         // 禁用缓存
         response.setDateHeader("Expires", 0);
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
@@ -85,13 +96,17 @@ public class UserController {
     public ApiResponse<GeneralDataResponse> botCheck(
             // 人机验证码格式验证
             @RequestParam @Pattern(regexp = REGEX_BOT_CAPTCHA, message = "人机验证码格式错误") String captcha,
-            @RequestParam String operationType,
+            @RequestParam @NotBlank String operationType,
             HttpServletRequest request) {
-        if (!(operationType.equals("register") || operationType.equals("forgot"))) {
+        //使用枚举类限制接口请求
+        if (!(operationType.equals(OperationTypeVerify.LOGIN.getCode())) &&
+                !(operationType.equals(OperationTypeVerify.FORGOT_PASSWORD.getCode())) &&
+                !(operationType.equals(OperationTypeVerify.REGISTER.getCode()))
+        ) {
             return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
         }
         String redisKey = operationType + request.getSession().getId();
-        return botCaptchaVerification.verify(captcha, redisKey);
+        return botCaptchaVerify.verify(captcha, redisKey);
     }
 
     @AccessRestriction(limit = 30, message = "获取登录状态过于频繁")
@@ -109,10 +124,10 @@ public class UserController {
             @RequestParam @Pattern(regexp = REGEX_USER_PASS, message = "密码错误") String password,
             // 人机验证码格式验证
             @RequestParam @Pattern(regexp = REGEX_BOT_CAPTCHA, message = "人机验证码错误") String captcha,
-            @RequestParam String operationType,
+            @RequestParam @NotBlank String operationType,
             HttpServletRequest request) {
         // 限制验证请求为登录业务
-        if (!operationType.equals("login")) {
+        if (!operationType.equals(OperationTypeVerify.LOGIN.getCode())) {
             return new ApiResponse<>(400, "非法验证请求", new GeneralDataResponse(false, null));
         }
         String redisKey = operationType + request.getSession().getId();
@@ -120,33 +135,29 @@ public class UserController {
     }
 
     // 发送邮箱验证码
-    @AccessRestriction(limit = 1, message = "验证码请求过于频繁,1分钟后再试", limitKey = false)
+    @AccessRestriction(limit = 1, message = "验证码请求过于频繁,稍后再试", limitKey = false)
     @PostMapping("/sendEmailCaptcha")
     public ApiResponse<GeneralDataResponse> sendEmailCaptcha(
-            @RequestBody @Valid SendEmailCaptchaDTO sendEmailCaptchaDTO,
+            @RequestBody @Valid SendEmailCaptchaDTO dto,
             HttpServletRequest request) {
-        String redisKey = sendEmailCaptchaDTO.getOperationType() + request.getSession().getId();
-
-        System.out.println(sendEmailCaptchaDTO.toString());
-
-
-        if (!(sendEmailCaptchaDTO.getOperationType().equals("register") || sendEmailCaptchaDTO.getOperationType().equals("forgot")|| sendEmailCaptchaDTO.getOperationType().equals("resetPassword"))) {
-            return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
-        }
-
+        String redisKey = dto.getOperationType() + request.getSession().getId();
+        //通过枚举类获得当前操作类型
+        OperationTypeVerify operationType = OperationTypeVerify.getByCode(dto.getOperationType());
+        System.out.println(dto.toString());
         //todo:
         // 发送邮件前验证当前用户名是否存在,验证通过后再次验证该邮箱是否已被绑定
-        if (sendEmailCaptchaDTO.getOperationType().equals("register")) {
-            return sendEmailCaptchaService.sendRegister(sendEmailCaptchaDTO.getEmail(), redisKey, sendEmailCaptchaDTO.getOperationType());
+        switch (operationType) {
+            case REGISTER -> {
+                return sendEmailCaptchaService.sendRegister(dto, redisKey);
+            }
+            case FORGOT_PASSWORD -> {
+                return sendEmailCaptchaService.sendForgotPwd(dto, redisKey);
+            }
+            default -> {
+                return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
+            }
         }
 
-
-        if (sendEmailCaptchaDTO.getOperationType().equals("forgot")) {
-            return sendEmailCaptchaService.sendForgotPwd(sendEmailCaptchaDTO.getEmail(), redisKey, sendEmailCaptchaDTO.getOperationType());
-        }
-
-
-        return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
     }
 
     //注册接口包含验证邮箱验证码
@@ -154,24 +165,24 @@ public class UserController {
     @PostMapping("/getRegisterResponse")
     public ApiResponse<GeneralDataResponse> getRegisterResponse(
             // @Valid 触发User实体类的字段验证
-            @RequestBody @Valid UserRegisterDto user,
+            @RequestBody @Valid UserRegisterDto dto,
             HttpServletRequest request) {
-        if (!user.getOperationType().equals("register")) {
+        if (!dto.getOperationType().equals("register")) {
             return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
         }
-        String redisKey = user.getOperationType() + request.getSession().getId();
-        System.out.println(user);
-        return userRegisterService.userRegister(user, redisKey);
+        String redisKey = dto.getOperationType() + request.getSession().getId();
+        System.out.println(dto);
+        return userRegisterService.userRegister(dto, redisKey);
     }
 
     // 找回密码接口
     @AccessRestriction(limit = 5, message = "找回密码过于频繁,1分钟后再试", limitKey = false)
     @PostMapping("/getForgotResponse")
     public ApiResponse<GeneralDataResponse> userForgotPassword(
-            @RequestBody @Valid UserRegisterDto user,
+            @RequestBody @Valid UserRegisterDto dto,
             HttpServletRequest request
     ){
-        if (!user.getOperationType().equals("forgot")) {
+        if (!dto.getOperationType().equals("forgot")) {
             return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
         }
         return null;

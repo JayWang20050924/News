@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<!-- namespace必须与UserMapper接口全类名一致 -->
+<!-- namespace必须与UserMapper接口全类名一致(UserMapper与xml文件关联的核心) -->
 <mapper namespace="com.news.backendproject.mapper.UserMapper">
 
     <!-- 1. 新增用户（对应addUser） -->
@@ -25,7 +25,7 @@
 
     <!-- 4. 查询用户信息（对应getUserInfor） -->
     <!-- 结果映射：处理数据库字段与实体属性的映射（如birthday字段类型） -->
-    <resultMap id="UserResultMap" type="com.news.backendproject.dto.UserRegisterDto">
+    <resultMap id="UserResultMap" type="com.news.backendproject.entity.User">
         <result column="username" property="username"/>
         <result column="gender" property="gender"/>
         <result column="address" property="address"/>
@@ -36,7 +36,7 @@
     </select>
 
     <!-- 5. 更新用户信息（对应updateUser） -->
-    <update id="updateBasicInforByUsername" parameterType="com.news.backendproject.dto.UserRegisterDto">
+    <update id="updateBasicInforByUsername" parameterType="com.news.backendproject.entity.User">
         UPDATE user
         SET gender = #{gender},
         birthday = #{birthday},
@@ -44,7 +44,7 @@
         WHERE username = #{username}  AND status = 1
     </update>
     <!-- 6. 更新用户密码（updateByUsername） -->
-    <update id="updatePasswordInforByUsername" parameterType="com.news.backendproject.dto.UserRegisterDto">
+    <update id="updatePasswordInforByUsername" parameterType="com.news.backendproject.entity.User">
         UPDATE user
         SET password = #{password}
         WHERE username = #{username}  AND status = 1

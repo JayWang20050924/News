@@ -23,9 +23,9 @@ public class EmailGenerateService {
     /**
      * 发送邮箱验证码（HTML格式）
      * @param toEmail 接收方邮箱
-     * @param code 验证码
+     * @param captcha 验证码
      */
-    public boolean sendCaptcha(String toEmail, String code,String operationType){
+    public boolean sendCaptcha(String toEmail, String captcha,String operationType){
         String oT = switch (operationType) {
             case "register" -> "注册操作";
             case "resetPassword" -> "重置密码操作";
@@ -57,7 +57,7 @@ public class EmailGenerateService {
                         "<p>如非本人操作，请忽略此邮件。</p>" +
                         "</div>",
                         oT,
-                        code
+                        captcha
         );
         // 第二个参数为true，表示内容是HTML格式
         helper.setText(emailContent, true);

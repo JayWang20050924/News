@@ -1,20 +1,24 @@
 package com.news.backendproject.verify;
 
-public enum OperationTypeVerification {
+import lombok.Getter;
+
+@Getter
+public enum OperationTypeVerify {
+    LOGIN("login","登录"),
     REGISTER("register", "注册"),
     FORGOT_PASSWORD("forgot", "找回密码"),
-    RESET_PASSWORD("resetPassword", "重置密码");
+    GET_SELF_PROFILE("getSelfProfile", "获取个人信息");
 
     private final String code;
     private final String desc;
 
-    OperationTypeVerification(String code, String desc) {
+    OperationTypeVerify(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
-    public static OperationTypeVerification getByCode(String code) {
-        for (OperationTypeVerification type : values()) {
+    public static OperationTypeVerify getByCode(String code) {
+        for (OperationTypeVerify type : values()) {
             if (type.code.equals(code)) {
                 return type;
             }

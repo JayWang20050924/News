@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class BotCaptchaVerification {
+public class BotCaptchaVerify {
     private final StringRedisTemplate stringRedisTemplate;
     public ApiResponse<GeneralDataResponse> verify(String captcha, String redisKey) {
         String redisValue = null;

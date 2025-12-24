@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class EmailCaptchaVerification {
+public class EmailCaptchaVerify {
     private final StringRedisTemplate stringRedisTemplate;
     public ApiResponse<GeneralDataResponse> verify(String emailCaptcha, String redisKey) {
         String redisValue=null;
