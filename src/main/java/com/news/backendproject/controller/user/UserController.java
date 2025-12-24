@@ -144,8 +144,6 @@ public class UserController {
         //通过枚举类获得当前操作类型
         OperationTypeVerify operationType = OperationTypeVerify.getByCode(dto.getOperationType());
         System.out.println(dto.toString());
-        //todo:
-        // 发送邮件前验证当前用户名是否存在,验证通过后再次验证该邮箱是否已被绑定
         switch (operationType) {
             case REGISTER -> {
                 return sendEmailCaptchaService.sendRegister(dto, redisKey);
@@ -167,7 +165,7 @@ public class UserController {
             // @Valid 触发User实体类的字段验证
             @RequestBody @Valid UserRegisterDto dto,
             HttpServletRequest request) {
-        if (!dto.getOperationType().equals("register")) {
+        if (!dto.getOperationType().equals(OperationTypeVerify.REGISTER.getCode())) {
             return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
         }
         String redisKey = dto.getOperationType() + request.getSession().getId();
@@ -182,7 +180,7 @@ public class UserController {
             @RequestBody @Valid UserRegisterDto dto,
             HttpServletRequest request
     ){
-        if (!dto.getOperationType().equals("forgot")) {
+        if (!dto.getOperationType().equals(OperationTypeVerify.FORGOT_PASSWORD.getCode())) {
             return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
         }
         return null;

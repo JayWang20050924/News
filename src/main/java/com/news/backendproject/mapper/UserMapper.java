@@ -5,20 +5,23 @@ import com.news.backendproject.entity.User;
 import org.apache.ibatis.annotations.Param;
 
 public interface UserMapper {
-    // 1. 新增用户
+    // 新增用户
     int addUser(UserRegisterDto dto);
 
-    // 2. 验证用户名是否存在
+    // 验证用户名是否存在
     Integer verifyUserExistence(@Param("username") String username);
 
-    // 3. 验证用户名密码是否匹配
+    // 验证邮箱是否已存在绑定关系
+    Integer verifyEmailExistence(@Param("email") String email);
+
+    // 验证用户名密码是否匹配
     Integer verifyUserPassword(@Param("username") String username, @Param("password") String password);
 
-    // 4. 根据用户名查询用户信息
+    // 根据用户名查询用户信息
     User getUserInfor(@Param("username") String username);
 
-    // 5. 更新用户信息
+    // 更新用户信息
     int updateBasicInforByUsername(User user);
-    // 6.修改密码
+    // 修改密码
     int updatePasswordInforByUsername(User user);
 }

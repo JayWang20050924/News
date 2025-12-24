@@ -8,6 +8,8 @@ public interface UserDao {
     int addUserService(UserRegisterDto dto);
     //查找用户是否存在
     int  verifyUserExistenceService(User user);
+    //查找邮箱是否已存在
+    int  verifyEmailExistenceService(User user);
     //登录验证密码
     int verifyUserPasswordService(User user);
     //查找用户信息

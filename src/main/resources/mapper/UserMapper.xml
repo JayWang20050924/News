@@ -6,24 +6,32 @@
 <!-- namespace必须与UserMapper接口全类名一致(UserMapper与xml文件关联的核心) -->
 <mapper namespace="com.news.backendproject.mapper.UserMapper">
 
-    <!-- 1. 新增用户（对应addUser） -->
+    <!--  新增用户（对应addUser） -->
     <insert id="addUser" parameterType="com.news.backendproject.dto.UserRegisterDto">
         INSERT INTO user(username, password, email,status)
         VALUES(#{username}, #{password}, #{email},1)
     </insert>
 
-    <!-- 2. 验证用户是否存在（对应verifyUserExistence） -->
+    <!--  验证用户是否已经存在 -->
     <select id="verifyUserExistence" parameterType="String" resultType="Integer">
+        SELECT EXISTS(
         SELECT 1 FROM user WHERE username = #{username} AND status = 1
-        <!-- 若存在返回1，否则返回null（MyBatis会自动转为0） -->
+        ) AS exist_flag
     </select>
 
-    <!-- 3. 验证用户名和密码（对应verifyUserPassword） -->
+    <!-- 验证邮箱是否已经被绑定 -->
+    <select id="verifyEmailExistence" parameterType="String" resultType="Integer">
+        SELECT EXISTS(
+        SELECT 1 FROM user WHERE email = #{email} AND status = 1
+        ) AS exist_flag
+    </select>
+
+    <!--  验证用户名和密码 -->
     <select id="verifyUserPassword" resultType="Integer">
         SELECT 1 FROM user WHERE username = #{username} AND password = #{password} AND status = 1
     </select>
 
-    <!-- 4. 查询用户信息（对应getUserInfor） -->
+    <!--  查询用户信息 -->
     <!-- 结果映射：处理数据库字段与实体属性的映射（如birthday字段类型） -->
     <resultMap id="UserResultMap" type="com.news.backendproject.entity.User">
         <result column="username" property="username"/>
@@ -35,7 +43,7 @@
         SELECT username, gender, birthday, address FROM user WHERE username = #{username}  AND status = 1
     </select>
 
-    <!-- 5. 更新用户信息（对应updateUser） -->
+    <!--  更新用户信息 -->
     <update id="updateBasicInforByUsername" parameterType="com.news.backendproject.entity.User">
         UPDATE user
         SET gender = #{gender},
@@ -43,7 +51,7 @@
         address = #{address}
         WHERE username = #{username}  AND status = 1
     </update>
-    <!-- 6. 更新用户密码（updateByUsername） -->
+    <!-- 更新用户密码 -->
     <update id="updatePasswordInforByUsername" parameterType="com.news.backendproject.entity.User">
         UPDATE user
         SET password = #{password}
