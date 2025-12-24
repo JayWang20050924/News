@@ -197,9 +197,10 @@
     </div>
   </div>
   <!-- 人机验证组件 -->
+   <!-- @close="botCheckModuleVisible = false"自动映射到.value=false -->
   <BotCheckModule
-    :visible="botChecModuleVisible"
-    @close="botChecModuleVisible = false"
+    :visible="botCheckModuleVisible"
+    @close="botCheckModuleVisible = false"
     @success="getEmailCaptcha"
     :operationType="'forgot'"
   />
@@ -231,7 +232,7 @@ const isDisabled = ref(false)
 const textGray = ref('text-gray-100')
 
 // 人机验证相关
-const botChecModuleVisible = ref(false)
+const botCheckModuleVisible = ref(false)
 
 // 密码显隐相关
 const passwordType = ref('password')
@@ -292,7 +293,7 @@ const showBotCheck = async () => {
     return
   }
   // 显示人机验证组件
-  botChecModuleVisible.value = true
+  botCheckModuleVisible.value = true
 }
 
 // 开始倒计时
