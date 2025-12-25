@@ -1,10 +1,8 @@
 package com.news.backendproject.service;
 
-import com.news.backendproject.dao.Imp.UserDaoImp;
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDataResponse;
 import com.news.backendproject.dto.SendEmailCaptchaDTO;
-import com.news.backendproject.entity.User;
 import com.news.backendproject.utils.RadomCaptchaUtil;
 import com.news.backendproject.verify.ExistenceVerify;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +29,7 @@ public class SendEmailCaptchaService {
             return new ApiResponse<>(409,"当前账户被注册了,换一个吧~",new GeneralDataResponse(false,null));
         }
         //邮箱是否被绑定过
-        if (existenceVerify.emailExistenceVerify(dto)){
+        if (existenceVerify.emailExistenceVerifyRegister(dto)){
             return new ApiResponse<>(409,"当前邮箱被绑定了,换一个吧~",new GeneralDataResponse(false,null));
         }
         String emailCaptchaGenerated=RadomCaptchaUtil.generate8DigitCaptcha();
@@ -45,6 +43,7 @@ public class SendEmailCaptchaService {
                     600,
                     TimeUnit.SECONDS
             );
+            System.err.println("存储验证码--->"+"KEY->"+redisKey+"VALUE->"+emailCaptchaGenerated+":"+redisKey);
             return new ApiResponse<>(200,"发送成功",new GeneralDataResponse(true,null));
         }
         return new ApiResponse<>(500,"邮箱验证码发送失败",new GeneralDataResponse(false,null));
@@ -56,10 +55,11 @@ public class SendEmailCaptchaService {
         if (!existenceVerify.usernameExistenceVerify(dto)){
             return new ApiResponse<>(409,"用户不存在",new GeneralDataResponse(false,null));
         }
-        //邮箱是否被绑定过
-        if (!existenceVerify.emailExistenceVerify(dto)){
+        //是否用于找回密码的对象不存在
+        if (existenceVerify.emailExistenceVerifyForgot(dto)){
             return new ApiResponse<>(409,"无效的密保邮箱",new GeneralDataResponse(false,null));
         }
+
         String emailCaptchaGenerated=RadomCaptchaUtil.generate8DigitCaptcha();
         boolean result= emailGenerateService.sendCaptcha(dto.getToEmail(),emailCaptchaGenerated,dto.getOperationType());
         if (result){
@@ -70,6 +70,7 @@ public class SendEmailCaptchaService {
                     600,
                     TimeUnit.SECONDS
             );
+            System.err.println("存储验证码redisValue->"+"KEY>"+redisKey+"VALUE>"+emailCaptchaGenerated);
             return new ApiResponse<>(200,"发送成功",new GeneralDataResponse(true,null));
         }
         return new ApiResponse<>(500,"邮箱验证码发送失败",new GeneralDataResponse(false,null));

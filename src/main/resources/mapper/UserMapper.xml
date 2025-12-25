@@ -19,10 +19,17 @@
         ) AS exist_flag
     </select>
 
-    <!-- 验证邮箱是否已经被绑定 -->
-    <select id="verifyEmailExistence" parameterType="String" resultType="Integer">
+    <!-- 验证邮箱是否已经被绑定(找回密码使用) -->
+    <select id="verifyEmailExistenceForgot" parameterType="String" resultType="Integer">
         SELECT EXISTS(
         SELECT 1 FROM user WHERE email = #{email} AND username=#{username} AND status = 1
+        ) AS exist_flag
+    </select>
+
+    <!-- 验证邮箱是否已经被绑定(注册使用) -->
+    <select id="verifyEmailExistenceRegister" parameterType="String" resultType="Integer">
+        SELECT EXISTS(
+        SELECT 1 FROM user WHERE email = #{email} AND status = 1
         ) AS exist_flag
     </select>
 

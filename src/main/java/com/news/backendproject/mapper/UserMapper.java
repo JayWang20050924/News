@@ -11,9 +11,10 @@ public interface UserMapper {
     // 验证用户名是否存在
     Integer verifyUserExistence(@Param("username") String username);
 
-    // 验证邮箱是否已存在绑定关系
-    Integer verifyEmailExistence(@Param("email") String email,@Param("username") String username);
-
+    // 验证邮箱是否已存在绑定关系(忘记密码业务)
+    Integer verifyEmailExistenceForgot(@Param("email") String email,@Param("username") String username);
+    // 验证邮箱是否已存在绑定关系(注册业务)
+    Integer verifyEmailExistenceRegister(@Param("email") String email);
     // 验证用户名密码是否匹配
     Integer verifyUserPassword(@Param("username") String username, @Param("password") String password);
 

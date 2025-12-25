@@ -29,8 +29,14 @@ public class UserDaoImp implements UserDao {
     }
 
     @Override
-    public int verifyEmailExistenceService(User user) {
-        Integer result = getUserMapper().verifyEmailExistence(user.getEmail(),user.getUsername());
+    public int verifyEmailExistenceForgotService(User user) {
+        Integer result = getUserMapper().verifyEmailExistenceForgot(user.getEmail(),user.getUsername());
+        return result != null ? result : 0;
+    }
+
+    @Override
+    public int verifyEmailExistenceRegisterService(User user) {
+        Integer result = getUserMapper().verifyEmailExistenceRegister(user.getEmail());
         return result != null ? result : 0;
     }
 

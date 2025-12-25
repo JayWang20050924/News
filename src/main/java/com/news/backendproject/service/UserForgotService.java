@@ -18,19 +18,26 @@ public class UserForgotService {
     private final UserDaoImp userDaoImp;
 
     public ApiResponse<GeneralDataResponse> forgot(UserForgotDto dto, String redisKey){
+        if (dto.getUsername().equals(dto.getPasswordReset())){
+            return new ApiResponse<>(409,"新密码不能与用户名相同",new GeneralDataResponse(false,null));
+        }
+
         if (!dto.getPasswordReset().equals(dto.getConfirmPwdReset())) {
             return new ApiResponse<>(409,"两次密码不一致",new GeneralDataResponse(false,null));
         }
         if (!existenceVerify.usernameExistenceVerify(dto)){
             return new ApiResponse<>(409,"用户不存在",new GeneralDataResponse(false,null));
         }
-        if (!existenceVerify.emailExistenceVerify(dto)){
+        //返回值为是否用于找回密码的对象不存在
+        if (existenceVerify.emailExistenceVerifyForgot(dto)){
             return new ApiResponse<>(409,"无效的密保邮箱",new GeneralDataResponse(false,null));
         }
+
         String emailCaptcha = dto.getEmailCaptcha();
         ApiResponse<GeneralDataResponse> verify = emailCaptchaVerify.verify(emailCaptcha, redisKey);
 
         if (verify.getCode()==200){
+
             User user = new User();
             user.setUsername(dto.getUsername());
             user.setEmail(dto.getEmail());

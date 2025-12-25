@@ -135,7 +135,7 @@ public class UserController {
     public ApiResponse<GeneralDataResponse> sendEmailCaptcha(
             @RequestBody @Valid SendEmailCaptchaDTO dto,
             HttpServletRequest request) {
-        String redisKey = dto.getOperationType() + request.getSession().getId();
+        String redisKey = dto.getOperationType()+dto.getUsername() + request.getSession().getId();
         //通过枚举类获得当前操作类型
         OperationTypeVerify operationType = OperationTypeVerify.getByCode(dto.getOperationType());
         System.out.println(dto.toString());
@@ -163,12 +163,12 @@ public class UserController {
         if (!dto.getOperationType().equals(OperationTypeVerify.REGISTER.getCode())) {
             return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
         }
-        String redisKey = dto.getOperationType() + request.getSession().getId();
+        String redisKey = dto.getOperationType()+dto.getUsername() + request.getSession().getId();
         System.out.println(dto);
         return userRegisterService.userRegister(dto, redisKey);
     }
-
     // 找回密码接口
+    //todo:验证修改密码不能与旧密码重复
     @AccessRestriction(limit = 5, message = "找回密码过于频繁,1分钟后再试", limitKey = false)
     @PostMapping("/getForgotResponse")
     public ApiResponse<GeneralDataResponse> userForgotPassword(
@@ -178,8 +178,7 @@ public class UserController {
         if (!dto.getOperationType().equals(OperationTypeVerify.FORGOT_PASSWORD.getCode())) {
             return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
         }
-        System.out.println(dto);
-        String redisKey = dto.getOperationType() + request.getSession().getId();
+        String redisKey = dto.getOperationType() +dto.getUsername()+ request.getSession().getId();
         return userForgotService.forgot(dto,redisKey);
     }
 

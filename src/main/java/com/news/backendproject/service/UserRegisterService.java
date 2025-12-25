@@ -19,13 +19,16 @@ public class UserRegisterService {
 
 
     public ApiResponse<GeneralDataResponse> userRegister(UserRegisterDto dto, String redisKey) {
+        if (dto.getUsername().equals(dto.getPassword())){
+            return new ApiResponse<>(409,"用户名与密码不能相同",new GeneralDataResponse(false,null));
+        }
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
             return new ApiResponse<>(409,"两次密码不一致",new GeneralDataResponse(false,null));
         }
         if (existenceVerify.usernameExistenceVerify(dto)){
             return new ApiResponse<>(409,"当前账户被注册了,换一个吧~",new GeneralDataResponse(false,null));
         }
-        if (existenceVerify.emailExistenceVerify(dto)){
+        if (existenceVerify.emailExistenceVerifyRegister(dto)){
             return new ApiResponse<>(409,"当前邮箱被绑定了,换一个吧~",new GeneralDataResponse(false,null));
         }
         String emailCaptcha=dto.getEmailCaptcha();
