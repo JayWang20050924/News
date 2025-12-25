@@ -6,6 +6,7 @@ import com.news.backendproject.entity.User;
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDataResponse;
 import com.news.backendproject.verify.EmailCaptchaVerify;
+import com.news.backendproject.verify.ExistenceVerify;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,19 @@ import org.springframework.stereotype.Service;
 public class UserRegisterService {
     private final UserDaoImp userDaoImp;
     private final EmailCaptchaVerify emailCaptchaVerify;
+    private final ExistenceVerify existenceVerify;
+
+
     public ApiResponse<GeneralDataResponse> userRegister(UserRegisterDto dto, String redisKey) {
+        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+            return new ApiResponse<>(409,"两次密码不一致",new GeneralDataResponse(false,null));
+        }
+        if (existenceVerify.usernameExistenceVerify(dto)){
+            return new ApiResponse<>(409,"当前账户被注册了,换一个吧~",new GeneralDataResponse(false,null));
+        }
+        if (existenceVerify.emailExistenceVerify(dto)){
+            return new ApiResponse<>(409,"当前邮箱被绑定了,换一个吧~",new GeneralDataResponse(false,null));
+        }
         String emailCaptcha=dto.getEmailCaptcha();
         ApiResponse<GeneralDataResponse> verify = emailCaptchaVerify.verify(emailCaptcha, redisKey);
         if (verify.getCode()==200){

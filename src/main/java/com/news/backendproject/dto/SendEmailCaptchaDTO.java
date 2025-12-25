@@ -2,9 +2,13 @@ package com.news.backendproject.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import lombok.ToString;
+
+import java.io.Serializable;
 
 @Data
-public class SendEmailCaptchaDTO {
+@ToString(of = {"username","toEmail","operationType"})
+public class SendEmailCaptchaDTO implements ExistenceVerifyDto{
     private String username;
 
     // 邮箱非空 + 格式验证（仅保留当前接口需要的验证）
@@ -14,4 +18,15 @@ public class SendEmailCaptchaDTO {
 
     @NotBlank(message = "非法请求")
     private String operationType;
+
+
+    //显式重写ExistenceVerifyDto,用于用户信息存在性判断
+    @Override
+    public String getUsername() {
+        return this.username;
+    }
+    @Override
+    public String getEmail() {
+        return this.toEmail;
+    }
 }

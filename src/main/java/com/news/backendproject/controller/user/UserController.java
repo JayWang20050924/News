@@ -2,15 +2,9 @@ package com.news.backendproject.controller.user;
 
 import com.google.code.kaptcha.Producer;
 import com.news.backendproject.annotation.AccessRestriction;
-import com.news.backendproject.dto.SendEmailCaptchaDTO;
-import com.news.backendproject.dto.UserRegisterDto;
+import com.news.backendproject.dto.*;
 import com.news.backendproject.entity.User;
-import com.news.backendproject.dto.ApiResponse;
-import com.news.backendproject.dto.GeneralDataResponse;
-import com.news.backendproject.service.SendEmailCaptchaService;
-import com.news.backendproject.service.UserGetLoginStatusService;
-import com.news.backendproject.service.UserLoginService;
-import com.news.backendproject.service.UserRegisterService;
+import com.news.backendproject.service.*;
 import com.news.backendproject.verify.BotCaptchaVerify;
 import com.news.backendproject.verify.OperationTypeVerify;
 import jakarta.servlet.ServletOutputStream;
@@ -40,6 +34,7 @@ public class UserController {
     private final UserLoginService userLoginService;
     private final UserGetLoginStatusService userGetLoginStatusService;
     private final UserRegisterService userRegisterService;
+    private final UserForgotService userForgotService;
     private final StringRedisTemplate stringRedisTemplate;
     private final BotCaptchaVerify botCaptchaVerify;
     private final SendEmailCaptchaService sendEmailCaptchaService;
@@ -177,13 +172,15 @@ public class UserController {
     @AccessRestriction(limit = 5, message = "找回密码过于频繁,1分钟后再试", limitKey = false)
     @PostMapping("/getForgotResponse")
     public ApiResponse<GeneralDataResponse> userForgotPassword(
-            @RequestBody @Valid UserRegisterDto dto,
+            @RequestBody @Valid UserForgotDto dto,
             HttpServletRequest request
     ){
         if (!dto.getOperationType().equals(OperationTypeVerify.FORGOT_PASSWORD.getCode())) {
             return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
         }
-        return null;
+        System.out.println(dto);
+        String redisKey = dto.getOperationType() + request.getSession().getId();
+        return userForgotService.forgot(dto,redisKey);
     }
 
     @GetMapping("/getSelfProfile")

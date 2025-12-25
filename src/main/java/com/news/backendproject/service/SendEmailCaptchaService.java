@@ -46,6 +46,7 @@ public class SendEmailCaptchaService {
     }
     //用于忘记密码时发送邮箱验证码
     public ApiResponse<GeneralDataResponse> sendForgotPwd(SendEmailCaptchaDTO dto, String redisKey){
+        //用户是否存在
         if (!existenceVerify.usernameExistenceVerify(dto)){
             return new ApiResponse<>(409,"当前账户未被注册",new GeneralDataResponse(false,null));
         }

@@ -10,19 +10,19 @@ import lombok.ToString;
 
 @Data //自动生成所有字段的getter、setter、equals、hashCode
 @NoArgsConstructor
-@ToString(of = {"username", "password","confirmPassword","email","emailCaptcha","operationType"})
-public class UserRegisterDto implements ExistenceVerifyDto {
+@ToString(of = {"username", "passwordReset","confirmPwdReset","email","emailCaptcha","operationType"})
+public class UserForgotDto implements ExistenceVerifyDto {
     @Pattern(regexp = "^[A-Za-z0-9]{8,20}$", message = "用户名需为8-20位数字和字母组合")
     private String username;
 
     @Pattern(regexp = "^[A-Za-z0-9]{8,20}$", message = "密码需为8-20位数字和字母组合")
     //确保向前端传输user对象时不包含密码
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
+    private String passwordReset;
 
     @Pattern(regexp = "^[A-Za-z0-9]{8,20}$", message = "密码需为8-20位数字和字母组合")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String confirmPassword;
+    private String confirmPwdReset;
 
     @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "邮箱格式不正确")
     private String email;
@@ -38,6 +38,7 @@ public class UserRegisterDto implements ExistenceVerifyDto {
     public String getUsername() {
         return this.username;
     }
+
     @Override
     public String getEmail() {
         return this.email;
