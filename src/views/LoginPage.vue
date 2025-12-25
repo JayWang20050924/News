@@ -318,7 +318,7 @@ const handleSubmit = async () => {
 
     if (data.status) {
       ElMessage({
-        message: '登录成功，即将跳转',
+        message: '登录成功，即将跳转主页',
         type: 'success',
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,

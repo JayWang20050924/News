@@ -36,7 +36,7 @@
           <a
             @click="redirectPage"
             id="centerBtn"
-            href="#"
+            href="/UserSelfProfilePage"
             target="_blank"
             :class="[
               isLoginShowDropdownItem,

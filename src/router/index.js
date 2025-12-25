@@ -31,6 +31,11 @@ const routes = [
     name: 'AdminLoginPage',
     component: () => import('../views/AdminLoginPage.vue'), // 懒加载管理员页面组件
   },
+  {
+    path: '/UserSelfProfilePage',
+    name: 'UserSelfProfilePage',
+    component: () => import('../views/UserSelfProfilePage.vue'), // 懒加载用户个人资料页面组件
+  },
 ]
 
 // 创建路由实例

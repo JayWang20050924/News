@@ -29,7 +29,7 @@
           </RouterLinkBlank>
         </div>
 
-         <!-- 用户名输入 -->
+        <!-- 用户名输入 -->
         <div class="input-container">
           <label for="username" class="block text-gray-300 text-sm font-medium mb-2">
             用户名 <span style="color: red">*</span>
@@ -54,7 +54,7 @@
         <!-- 绑定邮箱输入框 -->
         <div class="input-container">
           <label for="bindEmail" class="block text-gray-300 text-sm font-medium mb-2">
-          密保邮箱 <span style="color: red">*</span>
+            密保邮箱 <span style="color: red">*</span>
           </label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300 text-sm">
@@ -197,7 +197,7 @@
     </div>
   </div>
   <!-- 人机验证组件 -->
-   <!-- @close="botCheckModuleVisible = false"自动映射到.value=false -->
+  <!-- @close="botCheckModuleVisible = false"自动映射到.value=false -->
   <BotCheckModule
     :visible="botCheckModuleVisible"
     @close="botCheckModuleVisible = false"
@@ -282,7 +282,7 @@ const showBotCheck = async () => {
     })
     return
   }
-  if(username.value.trim()==''){
+  if (username.value.trim() == '') {
     ElMessage({
       message: '请输入用户名',
       type: 'error',
@@ -350,7 +350,7 @@ const getEmailCaptcha = async () => {
 // 处理重置密码提交
 const handleSubmit = async () => {
   // 1. 空值验证
-  const usernameValue=username.value.trim()
+  const usernameValue = username.value.trim()
   const emailValue = bindEmail.value.trim()
   const emailCaptchaValue = emailCaptcha.value.trim()
   const passwordValue = newPassword.value.trim()
@@ -432,15 +432,13 @@ const handleSubmit = async () => {
 
     if (data.status) {
       ElMessage({
-        message: '密码找回成功，即将跳转登录页',
+        message: '密码重置成功，即将跳转登录页',
         type: 'success',
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,
       })
       // 跳转登录页
-      setTimeout(() => {
-        router.push('/LoginPage')
-      }, MESSAGE_DURATION)
+      router.push('/LoginPage')
     } else {
       ElMessage({
         message: '密码重置失败：' + data.msg,
