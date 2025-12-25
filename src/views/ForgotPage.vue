@@ -417,6 +417,15 @@ const handleSubmit = async () => {
     })
     return
   }
+  if(passwordValue===usernameValue){
+    ElMessage({
+      message: '新密码不能与用户名相同',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    return
+  }
 
   //  发送重置密码请求
   try {
@@ -449,7 +458,7 @@ const handleSubmit = async () => {
     }
   } catch (error) {
     ElMessage({
-      message: '密码重置失败：' + (error as Error).message,
+      message: '密码重置失败：' + error,
       type: 'error',
       customClass: 'custom-message',
       duration: MESSAGE_DURATION,

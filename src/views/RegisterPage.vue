@@ -381,6 +381,15 @@ const handleSubmit = () => {
     })
     return
   }
+  if(username.value.trim()===password.value.trim()){
+    ElMessage({
+      message: '用户名和密码不能相同',
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    return
+  }
   // 格式验证
   if (
     !validatePatternUserPass.test(username.value.trim()) ||
@@ -424,6 +433,7 @@ const handleSubmit = () => {
     })
     return
   }
+
   // 异步函数处理注册请求
   async function getRegisterResponse() {
     try {
