@@ -24,13 +24,13 @@ public class MybatisTest {
         userProfieDto.setGender("female");
         userProfieDto.setBirthday(LocalDate.now());
         userProfieDto.setAddress("woshinibaba");
-        System.out.println(new UserDaoImp().updateBasicInforByUsernameService(user));
+        System.out.println(new UserDaoImp().updateBasicInforByUsernameAndEmailService(user));
     }
     @Test
     public void updatePassword() {
         User user = new User();
         user.setUsername("wangpeng");
         user.setPassword("wangpeng666.");
-        System.out.println(new UserDaoImp().updatePasswordInforByUsernameService(user));
+        System.out.println(new UserDaoImp().updatePasswordInforByUsernameAndEmailService(user));
     }
 }

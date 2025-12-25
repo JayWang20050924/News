@@ -36,7 +36,7 @@ public class UserRegisterService {
                 verify.setMsg("注册成功");
                 return verify;
             }
-            return new ApiResponse<>(500,"服务器升级中稍后再试",new GeneralDataResponse(false,null));
+            return new ApiResponse<>(500,"密码重置失败",new GeneralDataResponse(false,null));
         }
         return verify;
     }

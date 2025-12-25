@@ -12,7 +12,7 @@ public interface UserMapper {
     Integer verifyUserExistence(@Param("username") String username);
 
     // 验证邮箱是否已存在绑定关系
-    Integer verifyEmailExistence(@Param("email") String email);
+    Integer verifyEmailExistence(@Param("email") String email,@Param("username") String username);
 
     // 验证用户名密码是否匹配
     Integer verifyUserPassword(@Param("username") String username, @Param("password") String password);
@@ -21,7 +21,7 @@ public interface UserMapper {
     User getUserInfor(@Param("username") String username);
 
     // 更新用户信息
-    int updateBasicInforByUsername(User user);
+    int updateBasicInforByUsernameAndEmail(User user);
     // 修改密码
-    int updatePasswordInforByUsername(User user);
+    int updatePasswordInforByUsernameAndEmail(User user);
 }

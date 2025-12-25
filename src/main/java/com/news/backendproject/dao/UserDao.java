@@ -15,7 +15,7 @@ public interface UserDao {
     //查找用户信息
     User getUserInforService(User user);
     //更新用户信息
-    int updateBasicInforByUsernameService(User user);
+    int updateBasicInforByUsernameAndEmailService(User user);
     //更新用户密码
-    int updatePasswordInforByUsernameService(User user);
+    int updatePasswordInforByUsernameAndEmailService(User user);
 }

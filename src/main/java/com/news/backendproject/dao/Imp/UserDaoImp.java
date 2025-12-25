@@ -30,7 +30,7 @@ public class UserDaoImp implements UserDao {
 
     @Override
     public int verifyEmailExistenceService(User user) {
-        Integer result = getUserMapper().verifyEmailExistence(user.getEmail());
+        Integer result = getUserMapper().verifyEmailExistence(user.getEmail(),user.getUsername());
         return result != null ? result : 0;
     }
 
@@ -46,12 +46,12 @@ public class UserDaoImp implements UserDao {
     }
 
     @Override
-    public int updateBasicInforByUsernameService(User user) {
-        return getUserMapper().updateBasicInforByUsername(user);
+    public int updateBasicInforByUsernameAndEmailService(User user) {
+        return getUserMapper().updateBasicInforByUsernameAndEmail(user);
     }
 
     @Override
-    public int updatePasswordInforByUsernameService(User user) {
-        return getUserMapper().updatePasswordInforByUsername(user);
+    public int updatePasswordInforByUsernameAndEmailService(User user) {
+        return getUserMapper().updatePasswordInforByUsernameAndEmail(user);
     }
 }

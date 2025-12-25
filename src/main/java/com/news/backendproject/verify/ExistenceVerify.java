@@ -22,6 +22,7 @@ public class ExistenceVerify {
     public boolean emailExistenceVerify(ExistenceVerifyDto dto) {
         User user = new User();
         user.setEmail(dto.getEmail());
+        user.setUsername(dto.getUsername());
         int i = userDaoImp.verifyEmailExistenceService(user);
         return i != 0;
     }

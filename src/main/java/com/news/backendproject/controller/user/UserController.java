@@ -183,6 +183,7 @@ public class UserController {
         return userForgotService.forgot(dto,redisKey);
     }
 
+    @AccessRestriction(limit = 10, message = "获取个人信息过于频繁,1分钟后再试", limitKey = false)
     @GetMapping("/getSelfProfile")
     public ApiResponse<GeneralDataResponse> getSelfProfile() {
         GeneralDataResponse data = new GeneralDataResponse(false, null);

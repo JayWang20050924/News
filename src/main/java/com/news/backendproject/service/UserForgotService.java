@@ -1,8 +1,11 @@
 package com.news.backendproject.service;
 
+import com.news.backendproject.dao.Imp.UserDaoImp;
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDataResponse;
 import com.news.backendproject.dto.UserForgotDto;
+import com.news.backendproject.entity.User;
+import com.news.backendproject.verify.EmailCaptchaVerify;
 import com.news.backendproject.verify.ExistenceVerify;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserForgotService {
     private final ExistenceVerify existenceVerify;
+    private final EmailCaptchaVerify emailCaptchaVerify;
+    private final UserDaoImp userDaoImp;
+
     public ApiResponse<GeneralDataResponse> forgot(UserForgotDto dto, String redisKey){
         if (!dto.getPasswordReset().equals(dto.getConfirmPwdReset())) {
             return new ApiResponse<>(409,"两次密码不一致",new GeneralDataResponse(false,null));
@@ -19,8 +25,23 @@ public class UserForgotService {
             return new ApiResponse<>(409,"用户不存在",new GeneralDataResponse(false,null));
         }
         if (!existenceVerify.emailExistenceVerify(dto)){
-            return new ApiResponse<>(409,"错误的密保邮箱",new GeneralDataResponse(false,null));
+            return new ApiResponse<>(409,"无效的密保邮箱",new GeneralDataResponse(false,null));
         }
-        return null;
+        String emailCaptcha = dto.getEmailCaptcha();
+        ApiResponse<GeneralDataResponse> verify = emailCaptchaVerify.verify(emailCaptcha, redisKey);
+
+        if (verify.getCode()==200){
+            User user = new User();
+            user.setUsername(dto.getUsername());
+            user.setEmail(dto.getEmail());
+            user.setPassword(dto.getPasswordReset());
+            int i = userDaoImp.updatePasswordInforByUsernameAndEmailService(user);
+            if (i!=0){
+                verify.setMsg("密码重置成功");
+                return verify;
+            }
+            return new ApiResponse<>(500,"密码重置失败",new GeneralDataResponse(false,null));
+        }
+        return verify;
     }
 }
