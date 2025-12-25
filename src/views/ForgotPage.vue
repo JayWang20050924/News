@@ -264,8 +264,7 @@ const showBotCheck = async () => {
   if (isDisabled.value) return
 
   // 邮箱格式验证
-  const email = bindEmail.value.trim()
-  if (!email) {
+  if (!bindEmail.value.trim()) {
     ElMessage({
       message: '请输入绑定邮箱',
       type: 'error',
@@ -274,7 +273,7 @@ const showBotCheck = async () => {
     })
     return
   }
-  if (!validatePatternEmail.test(email)) {
+  if (!validatePatternEmail.test(bindEmail.value.trim())) {
     ElMessage({
       message: '邮箱格式错误',
       type: 'error',
@@ -352,12 +351,12 @@ const getEmailCaptcha = async () => {
 const handleSubmit = async () => {
   // 1. 空值验证
   const usernameValue=username.value.trim()
-  const email = bindEmail.value.trim()
-  const captcha = emailCaptcha.value.trim()
-  const password = newPassword.value.trim()
-  const confirmPwd = confirmNewPassword.value.trim()
+  const emailValue = bindEmail.value.trim()
+  const emailCaptchaValue = emailCaptcha.value.trim()
+  const passwordValue = newPassword.value.trim()
+  const confirmPwdValue = confirmNewPassword.value.trim()
 
-  if (!usernameValue || !email || !captcha || !password || !confirmPwd) {
+  if (!usernameValue || !emailValue || !emailCaptchaValue || !passwordValue || !confirmPwdValue) {
     ElMessage({
       message: '请填写所有必填项',
       type: 'error',
@@ -378,7 +377,7 @@ const handleSubmit = async () => {
     return
   }
 
-  if (!validatePatternEmail.test(email)) {
+  if (!validatePatternEmail.test(emailValue)) {
     ElMessage({
       message: '邮箱格式错误',
       type: 'error',
@@ -388,7 +387,7 @@ const handleSubmit = async () => {
     return
   }
 
-  if (!validateEmailCaptchaPattern.test(captcha)) {
+  if (!validateEmailCaptchaPattern.test(emailCaptchaValue)) {
     ElMessage({
       message: '验证码格式错误（8位大写字母/数字）',
       type: 'error',
@@ -398,7 +397,7 @@ const handleSubmit = async () => {
     return
   }
 
-  if (!validatePatternPass.test(password)) {
+  if (!validatePatternPass.test(passwordValue)) {
     ElMessage({
       message: '新密码格式错误（8-20位数字和字母）',
       type: 'error',
@@ -409,7 +408,7 @@ const handleSubmit = async () => {
   }
 
   // 密码一致性验证
-  if (password !== confirmPwd) {
+  if (passwordValue !== confirmPwdValue) {
     ElMessage({
       message: '两次输入的密码不一致',
       type: 'error',
@@ -423,9 +422,10 @@ const handleSubmit = async () => {
   try {
     const params = {
       username: usernameValue,
-      email: email,
-      emailCaptcha: captcha,
-      newPassword: password,
+      passwordReset: passwordValue,
+      confirmPwdReset: confirmPwdValue,
+      email: emailValue,
+      emailCaptcha: emailCaptchaValue,
       operationType: 'forgot',
     }
     const data = await request.post('/getForgotResponse', params)
