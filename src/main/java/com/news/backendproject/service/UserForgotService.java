@@ -37,7 +37,6 @@ public class UserForgotService {
         ApiResponse<GeneralDataResponse> verify = emailCaptchaVerify.verify(emailCaptcha, redisKey);
 
         if (verify.getCode()==200){
-
             User user = new User();
             user.setUsername(dto.getUsername());
             user.setEmail(dto.getEmail());
@@ -47,7 +46,7 @@ public class UserForgotService {
                 verify.setMsg("密码重置成功");
                 return verify;
             }
-            return new ApiResponse<>(500,"密码重置失败",new GeneralDataResponse(false,null));
+            return new ApiResponse<>(409,"检查是否与旧密码重复",new GeneralDataResponse(false,null));
         }
         return verify;
     }

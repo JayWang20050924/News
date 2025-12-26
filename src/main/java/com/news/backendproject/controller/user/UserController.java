@@ -2,6 +2,7 @@ package com.news.backendproject.controller.user;
 
 import com.google.code.kaptcha.Producer;
 import com.news.backendproject.annotation.AccessRestriction;
+import com.news.backendproject.annotation.JwtRequired;
 import com.news.backendproject.dto.*;
 import com.news.backendproject.entity.User;
 import com.news.backendproject.service.*;
@@ -168,7 +169,6 @@ public class UserController {
         return userRegisterService.userRegister(dto, redisKey);
     }
     // 找回密码接口
-    //todo:验证修改密码不能与旧密码重复
     @AccessRestriction(limit = 5, message = "找回密码过于频繁,1分钟后再试", limitKey = false)
     @PostMapping("/getForgotResponse")
     public ApiResponse<GeneralDataResponse> userForgotPassword(
@@ -181,11 +181,24 @@ public class UserController {
         String redisKey = dto.getOperationType() +dto.getUsername()+ request.getSession().getId();
         return userForgotService.forgot(dto,redisKey);
     }
-
+    //获取个人信息
     @AccessRestriction(limit = 10, message = "获取个人信息过于频繁,1分钟后再试", limitKey = false)
-    @GetMapping("/getSelfProfile")
+    @JwtRequired
+    @GetMapping("/getUserSelfProfile")
     public ApiResponse<GeneralDataResponse> getSelfProfile() {
-        GeneralDataResponse data = new GeneralDataResponse(false, null);
-        return new ApiResponse<>(200, "获取信息", data);
+        return new ApiResponse<>(400, "获取信息测试成功", new GeneralDataResponse(true, null));
+    }
+
+    //修改个人信息
+    @AccessRestriction(limit = 10, message = "获取个人信息过于频繁,1分钟后再试", limitKey = false)
+    @JwtRequired
+    @GetMapping("/updateSelfProfile")
+    public ApiResponse<GeneralDataResponse> updateSelfProfile(
+            @RequestBody User user
+    ) {
+        if (user.getUsername().trim().equals("")) {
+            return new ApiResponse<>(400, "用户基础信息缺失", new GeneralDataResponse(false, null));
+        }
+        return new ApiResponse<>(400, "获取信息测试成功", new GeneralDataResponse(true, null));
     }
 }

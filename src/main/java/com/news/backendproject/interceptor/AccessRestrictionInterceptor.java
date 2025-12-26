@@ -6,6 +6,7 @@ import com.news.backendproject.dto.GeneralDataResponse;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -19,13 +20,11 @@ import java.util.concurrent.TimeUnit;
  * 访问频率限制拦截器：处理 @AccessRestriction 注解的核心逻辑
  */
 @Component
+@RequiredArgsConstructor
 public class AccessRestrictionInterceptor implements HandlerInterceptor {
-
     // Redis 模板：用于存储访问计数
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
-    @Resource
-    private ObjectMapper objectMapper;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final ObjectMapper objectMapper;
     /**
      * 接口调用前执行：判断是否超限
      */
@@ -76,17 +75,7 @@ public class AccessRestrictionInterceptor implements HandlerInterceptor {
         // 判断是否超限
         if (count != null&&count > limit) {
             // 超限：返回提示信息
-            GeneralDataResponse data = new GeneralDataResponse(false,null);
-            ApiResponse<GeneralDataResponse> apiResponse = new ApiResponse<>(429, message, data);
-            //自定义错误频率响应头
-            response.setHeader("X-Error-Type", "rate-limit");
-            // 设置响应头（JSON格式+Retry-After）
-            response.setContentType("application/json;charset=UTF-8");
-            //返回结果
-            try (OutputStream outputStream = response.getOutputStream()) {
-                objectMapper.writeValue(outputStream, apiResponse);
-                outputStream.flush(); // 强制刷新，确保数据立即写入
-            }
+            buildErrorResponse(response,429,message);
             return false; // 拦截，不执行接口逻辑
         }
 
@@ -110,5 +99,22 @@ public class AccessRestrictionInterceptor implements HandlerInterceptor {
         }
         // 处理多IP场景（X-Forwarded-For可能返回多个IP，取第一个）
         return ip != null ? ip.split(",")[0].trim() : "unknown";
+    }
+    private void buildErrorResponse(HttpServletResponse response, int code, String message) throws Exception {
+        // 设置响应头（JSON格式+UTF-8编码）
+        response.setContentType("application/json;charset=UTF-8");
+        //  自定义错误类型响应头
+        response.setHeader("X-Error-Type", "rate-limit");
+        //  构建统一的返回体
+        ApiResponse<GeneralDataResponse> apiResponse = new ApiResponse<>(
+                code,
+                message,
+                new GeneralDataResponse(false, null)
+        );
+        //  写入响应体（指定UTF-8，避免中文乱码）
+        try (OutputStream outputStream = response.getOutputStream()) {
+            objectMapper.writeValue(outputStream, apiResponse);
+            outputStream.flush(); // 强制刷新，确保数据立即写入
+        }
     }
 }

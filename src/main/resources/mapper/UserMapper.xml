@@ -62,6 +62,6 @@
     <update id="updatePasswordInforByUsernameAndEmail" parameterType="com.news.backendproject.entity.User">
         UPDATE user
         SET password = #{password}
-        WHERE username = #{username} AND email= #{email}  AND status = 1
+        WHERE username = #{username} AND email= #{email}  AND status = 1 ANd password !=#{password};
     </update>
 </mapper>

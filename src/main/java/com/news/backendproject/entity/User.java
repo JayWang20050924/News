@@ -2,6 +2,7 @@ package com.news.backendproject.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 @ToString(of = {"id","username", "password","email","gender","address","birthday"})
 public class User {
     private int id;
+    @NotBlank
     private String username;
     //确保向前端传输user对象时不包含密码
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
