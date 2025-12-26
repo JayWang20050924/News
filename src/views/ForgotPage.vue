@@ -210,9 +210,9 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
-import request from '../utils/request.js'
-import RouterLinkBlank from '../components/RouterLinkBlank.vue'
-import BotCheckModule from '../components/BotCheckModule.vue'
+import request from '@/utils/request.js'
+import RouterLinkBlank from '@/components/RouterLinkBlank.vue'
+import BotCheckModule from '@/components/BotCheckModule.vue'
 
 // 提示持续时间
 const MESSAGE_DURATION = 2000

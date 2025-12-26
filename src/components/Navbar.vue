@@ -243,7 +243,7 @@
 <!-- ts声明变量,js进行逻辑操作 -->
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import getLoginStatus from '../api/getLoginStatus.js'
+import getLoginStatus from '@/api/getLoginStatus.js'
 //导入 RouterLink（用于路由导航）
 import { RouterLink } from 'vue-router'
 //引入element-plus消息提示

@@ -224,11 +224,11 @@ import { ElMessage } from 'element-plus'
 // 引入Vue Router的useRouter函数
 import { useRouter } from 'vue-router'
 // 引入封装的请求模块
-import request from '../utils/request.js'
+import request from '@/utils/request.js'
 //引入routerlinkblank组件
-import RouterLinkBlank from '../components/RouterLinkBlank.vue'
+import RouterLinkBlank from '@/components/RouterLinkBlank.vue'
 //引入人机验证模块
-import BotCheckModule from '../components/BotCheckModule.vue'
+import BotCheckModule from '@/components/BotCheckModule.vue'
 
 //提示持续时间
 const MESSAGE_DURATION = 2000
@@ -361,7 +361,7 @@ const getEmailCaptcha = async () => {
   }
 }
 
-// 处理注册表单提交
+// 处理注册提交
 const handleSubmit = () => {
   if (!username.value.trim() || !password.value.trim() || !confirmPassword.value.trim()) {
     ElMessage({

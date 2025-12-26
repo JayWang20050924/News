@@ -65,7 +65,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import request from '../utils/request.js'
+import request from '@/utils/request.js'
 let botCheckCodeCountdownTimer = null
 //人机验证码格式规则
 const validatebotCheckCodePattern = /^[A-Za-z0-9]{4}$/
