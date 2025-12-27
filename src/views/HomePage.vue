@@ -492,7 +492,7 @@
     </div>
   </main>
 </template>
-<script setup lang="ts">
+<script setup>
 const commentBtn = () => {
   alert('点击了评论图标，显示评论区（功能待实现）')
 }

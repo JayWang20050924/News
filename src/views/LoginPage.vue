@@ -177,7 +177,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 // 从Element Plus中导入ElMessage（消息提示组件）
 import { ElMessage } from 'element-plus'
@@ -344,7 +344,7 @@ const handleSubmit = async () => {
     refreshBotCheckCode()
   }
 }
-const handleKeydown = (e: KeyboardEvent) => {
+const handleKeydown = (e) => {
   if (e.key === 'Enter') {
     e.preventDefault()
     handleSubmit()

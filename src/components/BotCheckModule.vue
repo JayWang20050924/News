@@ -62,7 +62,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request.js'
@@ -76,17 +76,18 @@ const isBotCheckCodeDisabled = ref(false)
 //常量
 const MESSAGE_DURATION = 3000
 // 组件属性
-const props = defineProps<{
-  visible: boolean
-  operationType?: string
-}>()
-
+const props = defineProps({
+  visible: {
+    type: Boolean, // 明确prop类型为布尔值
+    required: true // visible是必传的
+  },
+  operationType: {
+    type: [String],
+    required: true
+  }
+})
 // 组件事件
-const emit = defineEmits<{
-  (e: 'close'): void
-  (e: 'success'): void
-}>()
-
+const emit = defineEmits(['close', 'success'])
 // 刷新验证码
 const refreshBotCheckCode = async () => {
   // 如果已处于禁用状态，直接返回

@@ -7,7 +7,7 @@
   ></canvas>
 </template>
 
-<script setup lang="ts">
+<script setup lang="js">
 import { onMounted, onUnmounted, ref } from 'vue';
 
 // 常量配置（可根据需求调整）
@@ -16,14 +16,14 @@ const STAR_COLOR_BASE = 'rgba(240, 240, 240, '; // 星星基础颜色（配合�
 const BG_OPACITY = 0.2; // 背景拖影透明度
 const BG_COLOR = `rgba(18, 18, 18, ${BG_OPACITY})`; // 背景拖影颜色
 
-// DOM元素引用
+// DOM元素引用：移除TS泛型，保留原生ref写法
 const starfieldCanvas = ref(null); // canvas元素
 let ctx = null; // 2D绘图上下文
 
 // 状态管理
 const stars = ref([]); // 星星数据数组（响应式）
 let animationId = null; // 动画帧ID（用于清理）
-let maskCheckInterval = null; // 加载遮罩检查定时器
+const maskCheckInterval = null; // 加载遮罩检查定时器
 
 
 /**

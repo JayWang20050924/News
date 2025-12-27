@@ -6,19 +6,29 @@
   </a>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { useRouter } from 'vue-router'
 import { defineProps } from 'vue'
 
 const router = useRouter()
 
-// 重命名 props 中的类名属性（避免与 Vue 保留属性冲突）
-const props = defineProps<{
-  to: string | { path?: string; name?: string; query?: Record<string, any> }
-  customClass?: string // 原“class”改为“customClass”
-  id?: string
-}>()
-
+const props = defineProps({
+  // 配置to的类型：支持字符串路径 或 路由对象（path/name/query）
+  to: {
+    type: [String, Object],
+    required: true // to是核心参数，标记为必传
+  },
+  // 自定义类名
+  customClass: {
+    type: String,
+    required: false
+  },
+  // 元素ID
+  id: {
+    type: String,
+    required: false
+  }
+})
 const handleClick = () => {
   const routeLocation = router.resolve(props.to)
   window.open(routeLocation.href, '_blank', 'noopener noreferrer')

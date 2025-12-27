@@ -240,31 +240,33 @@
     </div>
   </header>
 </template>
-<!-- ts声明变量,js进行逻辑操作 -->
-<script setup lang="ts">
+
+<script setup lang="js">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import getLoginStatus from '@/api/getLoginStatus.js'
 //导入 RouterLink（用于路由导航）
 import { RouterLink } from 'vue-router'
 //引入element-plus消息提示
 import { ElMessage } from 'element-plus'
+
 // 下拉菜单项显示状态
 const isLoginShowDropdownItem = ref('hidden')
 const dontLoginShowDropdownItem = ref('block')
-// PC端登录下拉框
+// PC端登录下拉框：移除TS类型注解 <HTMLElement | null>
 const ifShowLoginDropdownPc = ref('hidden')
-const loginDropdown = ref<HTMLElement | null>(null)
-const loginTrigger = ref<HTMLButtonElement | null>(null)
+const loginDropdown = ref(null)
+const loginTrigger = ref(null)
 const userIco = ref('fa-user')
-// 移动端菜单
-const mobileMenu = ref<HTMLElement | null>(null)
-const mobileMenuBtn = ref<HTMLButtonElement | null>(null)
+// 移动端菜单：移除TS类型注解
+const mobileMenu = ref(null)
+const mobileMenuBtn = ref(null)
 const ifShowMobile = ref('hidden')
 
-// 导航指示器
-const navIndicator = ref<HTMLElement | null>(null)
-const navItems = ref<HTMLAnchorElement[]>([])
-// 页面可见性变化时的处理函数
+// 导航指示器：移除TS类型注解
+const navIndicator = ref(null)
+const navItems = ref([])
+
+// 页面可见性变化时的处理函数：移除参数类型注解
 const handleVisibilityChange = () => {
   // 判断页面是否从不可见变为可见
   if (document.visibilityState === 'visible') {
@@ -297,8 +299,8 @@ onMounted(async () => {
   document.addEventListener('click', handleClickOutside)
   document.addEventListener('click', handleMobileClickOutside)
 
-  // 获取所有桌面端导航项
-  const items = document.querySelectorAll<HTMLAnchorElement>('.nav-item')
+  // 获取所有桌面端导航项：移除TS泛型 <HTMLAnchorElement>
+  const items = document.querySelectorAll('.nav-item')
   navItems.value = Array.from(items)
 
   // 初始化指示器位置（首页）
@@ -310,7 +312,7 @@ onMounted(async () => {
 })
 
 // 导航指示器位置设置
-const setIndicatorPosition = (targetItem: HTMLAnchorElement) => {
+const setIndicatorPosition = (targetItem) => {
   if (!navIndicator.value) return
   const rect = targetItem.getBoundingClientRect()
   const containerRect = targetItem.parentElement?.getBoundingClientRect()
@@ -319,11 +321,11 @@ const setIndicatorPosition = (targetItem: HTMLAnchorElement) => {
   navIndicator.value.style.left = `${left}px`
 }
 
-//通过事件对象获取当前点击的导航项DOM元素
-const handleNavItemClick = (e: MouseEvent) => {
+//通过事件对象获取当前点击的导航项DOM元素：移除参数类型注解 + 类型断言
+const handleNavItemClick = (e) => {
   e.preventDefault()
-  // currentTarget 指向绑定事件的<a>标签，确保是有效DOM元素
-  const targetItem = e.currentTarget as HTMLAnchorElement
+  // 移除 TS 类型断言 as HTMLAnchorElement
+  const targetItem = e.currentTarget
   setIndicatorPosition(targetItem)
 }
 
@@ -353,6 +355,7 @@ const showDropdownItems = () => {
     }, 100 * index)
   })
 }
+
 //退出登录
 const exitLogin = async () => {
   localStorage.removeItem('token')
@@ -372,6 +375,7 @@ const exitLogin = async () => {
   })
   return
 }
+
 const resetDropdownItems = () => {
   if (!loginDropdown.value) return
   const dropdownItems = loginDropdown.value.querySelectorAll('.dropdown-item')
@@ -387,19 +391,22 @@ const ifShowDropdownMobile = () => {
 }
 
 // PC端点击外部关闭下拉框
-const handleClickOutside = (e: MouseEvent) => {
+const handleClickOutside = (e) => {
   if (ifShowLoginDropdownPc.value === 'hidden') return
-  const isClickInsideTrigger = loginTrigger.value?.contains(e.target as Node)
-  const isClickInsideDropdown = loginDropdown.value?.contains(e.target as Node)
+  // 移除 TS 类型断言 as Node
+  const isClickInsideTrigger = loginTrigger.value?.contains(e.target)
+  const isClickInsideDropdown = loginDropdown.value?.contains(e.target)
   if (!isClickInsideTrigger && !isClickInsideDropdown) {
     ifShowLoginDropdownPc.value = 'hidden'
     resetDropdownItems()
   }
 }
+
 // Mobile端点击外部关闭下拉框
-const handleMobileClickOutside = (e: MouseEvent) => {
+const handleMobileClickOutside = (e) => {
   if (ifShowMobile.value === 'hidden' || !mobileMenu.value || !mobileMenuBtn.value) return
-  const target = e.target as Node
+  // 移除 TS 类型断言 as Node
+  const target = e.target
   const isClickInsideMenu = mobileMenu.value.contains(target)
   const isClickInsideBtn = mobileMenuBtn.value.contains(target)
   if (!isClickInsideMenu && !isClickInsideBtn) {
@@ -421,6 +428,7 @@ onUnmounted(() => {
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 </script>
+
 <style>
 #navbar {
   background-color: rgb(52, 52, 52);

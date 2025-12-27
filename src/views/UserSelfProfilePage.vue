@@ -7,7 +7,7 @@
     </center>
   </div>
 </template>
-<script setup lang="ts">
+<script setup>
 // 从Element Plus中导入ElMessage（消息提示组件）
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request.js'

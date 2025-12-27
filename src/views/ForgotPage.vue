@@ -206,7 +206,7 @@
   />
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -467,7 +467,7 @@ const handleSubmit = async () => {
 }
 
 // 回车键提交
-const handleKeydown = (e: KeyboardEvent) => {
+const handleKeydown = (e) => {
   if (e.key === 'Enter') {
     e.preventDefault()
     handleSubmit()
