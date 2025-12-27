@@ -2,7 +2,7 @@ package com.news.backendproject;
 
 import com.news.backendproject.entity.User;
 import com.news.backendproject.dao.Imp.UserDaoImp;
-import com.news.backendproject.dto.UserProfieDto;
+import com.news.backendproject.dto.UserProfileDto;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -19,11 +19,11 @@ public class MybatisTest {
     @Test
     public void updateBasic() {
          User user = new User();
-        UserProfieDto userProfieDto = new UserProfieDto();
+        UserProfileDto userProfileDto = new UserProfileDto();
         user.setUsername("wangpeng");
-        userProfieDto.setGender("female");
-        userProfieDto.setBirthday(LocalDate.now());
-        userProfieDto.setAddress("woshinibaba");
+        userProfileDto.setGender("female");
+        userProfileDto.setBirthday(LocalDate.now());
+        userProfileDto.setAddress("woshinibaba");
         System.out.println(new UserDaoImp().updateBasicInforByUsernameAndEmailService(user));
     }
     @Test

@@ -131,7 +131,7 @@ public class UserController {
     }
 
     // 发送邮箱验证码
-    @AccessRestriction(limit = 1, message = "验证码请求过于频繁,稍后再试", limitKey = false)
+    @AccessRestriction(limit = 5, message = "验证码请求过于频繁,稍后再试", limitKey = false)
     @PostMapping("/sendEmailCaptcha")
     public ApiResponse<GeneralDataResponse> sendEmailCaptcha(
             @RequestBody @Valid SendEmailCaptchaDTO dto,
@@ -190,15 +190,15 @@ public class UserController {
     }
 
     //修改个人信息
-    @AccessRestriction(limit = 10, message = "获取个人信息过于频繁,1分钟后再试", limitKey = false)
+    @AccessRestriction(limit = 2, message = "修改个人信息过于频繁,1分钟后再试", limitKey = false)
     @JwtRequired
     @GetMapping("/updateSelfProfile")
     public ApiResponse<GeneralDataResponse> updateSelfProfile(
             @RequestBody User user
     ) {
-        if (user.getUsername().trim().equals("")) {
+        if (user.getUsername().trim().isEmpty()) {
             return new ApiResponse<>(400, "用户基础信息缺失", new GeneralDataResponse(false, null));
         }
-        return new ApiResponse<>(400, "获取信息测试成功", new GeneralDataResponse(true, null));
+        return new ApiResponse<>(400, "修改信息测试成功", new GeneralDataResponse(true, null));
     }
 }
