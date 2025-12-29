@@ -3,10 +3,13 @@ package com.news.backendproject.controller.user;
 import com.google.code.kaptcha.Producer;
 import com.news.backendproject.annotation.AccessRestriction;
 import com.news.backendproject.annotation.JwtRequired;
+import com.news.backendproject.dao.Imp.UserDaoImp;
 import com.news.backendproject.dto.*;
 import com.news.backendproject.entity.User;
 import com.news.backendproject.service.*;
+import com.news.backendproject.utils.JwtUtil;
 import com.news.backendproject.verify.BotCaptchaVerify;
+import com.news.backendproject.verify.ExistenceVerifyAccessJwt;
 import com.news.backendproject.verify.OperationTypeVerify;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,11 +43,16 @@ public class UserController {
     private final StringRedisTemplate stringRedisTemplate;
     private final BotCaptchaVerify botCaptchaVerify;
     private final SendEmailCaptchaService sendEmailCaptchaService;
+    private final ExistenceVerifyAccessJwt existenceVerifyAccessJwt;
+
 
     // 正则常量（抽离便于维护）
     private static final String REGEX_USER_PASS = "^[A-Za-z0-9]{8,20}$"; // 用户名/密码规则
     private static final String REGEX_EMAIL = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"; // 邮箱规则
     private static final String REGEX_BOT_CAPTCHA = "^[0-9a-z]{4}$"; // 人机验证码规则
+    private final JwtUtil jwtUtil;
+    private final UserDaoImp userDaoImp;
+    private User user;
 
     // 发送人机验证码
     @AccessRestriction(message = "验证码请求过于频繁,1分钟后再试")
@@ -182,23 +191,42 @@ public class UserController {
         return userForgotService.forgot(dto,redisKey);
     }
     //获取个人信息
+    //todo:
+    // jwt获取认证的用户名,查询对应的其他信息
     @AccessRestriction(limit = 10, message = "获取个人信息过于频繁,1分钟后再试", limitKey = false)
     @JwtRequired
     @GetMapping("/getUserSelfProfile")
-    public ApiResponse<GeneralDataResponse> getSelfProfile() {
-        return new ApiResponse<>(400, "获取信息测试成功", new GeneralDataResponse(true, null));
+    public ApiResponse<UserProfileDto> getSelfProfile(HttpServletRequest request) {
+        User userInfor =existenceVerifyAccessJwt.verify(request);
+        //查找出的用户绑定email为空
+        if (userInfor.getEmail().isEmpty()){
+            return new ApiResponse<>(409,"获取失败",null);
+        }
+        System.out.println(userInfor);
+        UserProfileDto dto = new UserProfileDto();
+        dto.setUsername(userInfor.getUsername());
+        dto.setEmail(userInfor.getEmail());
+        dto.setGender(userInfor.getGender());
+        dto.setAddress(userInfor.getAddress());
+        dto.setBirthday(userInfor.getBirthday());
+        System.out.println(dto.toString());
+        return new ApiResponse<>(200,"获取成功",dto);
+        //return new ApiResponse<>(400, "获取信息测试成功", new GeneralDataResponse(true, null));
     }
 
     //修改个人信息
+    //todo:使用jwt获得的用户名检查合法性后,修改对应信息
     @AccessRestriction(limit = 2, message = "修改个人信息过于频繁,1分钟后再试", limitKey = false)
     @JwtRequired
-    @GetMapping("/updateSelfProfile")
+    @PostMapping("/updateSelfProfile")
     public ApiResponse<GeneralDataResponse> updateSelfProfile(
             @RequestBody User user
     ) {
+        System.out.println(user.toString());
         if (user.getUsername().trim().isEmpty()) {
             return new ApiResponse<>(400, "用户基础信息缺失", new GeneralDataResponse(false, null));
         }
+        System.out.println(user.toString());
         return new ApiResponse<>(400, "修改信息测试成功", new GeneralDataResponse(true, null));
     }
 }

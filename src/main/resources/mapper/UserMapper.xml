@@ -42,12 +42,13 @@
     <!-- 结果映射：处理数据库字段与实体属性的映射（如birthday字段类型） -->
     <resultMap id="UserResultMap" type="com.news.backendproject.entity.User">
         <result column="username" property="username"/>
+        <result column="email" property="email"/>
         <result column="gender" property="gender"/>
         <result column="address" property="address"/>
         <result column="birthday" property="birthday"/>
     </resultMap>
     <select id="getUserInfor" parameterType="String" resultMap="UserResultMap">
-        SELECT username, gender, birthday, address FROM user WHERE username = #{username}  AND status = 1
+        SELECT username,email, gender, address, birthday FROM user WHERE username = #{username}  AND status = 1
     </select>
 
     <!--  更新用户信息 -->

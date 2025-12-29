@@ -12,7 +12,7 @@ public class UserProfileDto {
     private String email;
     private String gender;
     private String address;
-    // @JsonFormat日期格式化逻辑不变
+    // @JsonFormat日期格式化
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDate birthday;
 }

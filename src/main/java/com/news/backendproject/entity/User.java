@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-@ToString(of = {"id","username", "password","email","gender","address","birthday"})
+@ToString(of = {"id","username","email","gender","address","birthday"})
 public class User {
     private int id;
     @NotBlank
