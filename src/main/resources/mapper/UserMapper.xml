@@ -57,7 +57,7 @@
         SET gender = #{gender},
         birthday = #{birthday},
         address = #{address}
-        WHERE username = #{username} AND email= #{email} AND status = 1
+        WHERE username = #{username} AND status = 1
     </update>
     <!-- 更新用户密码 -->
     <update id="updatePasswordInforByUsernameAndEmail" parameterType="com.news.backendproject.entity.User">

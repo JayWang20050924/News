@@ -11,6 +11,7 @@ import com.news.backendproject.utils.JwtUtil;
 import com.news.backendproject.verify.BotCaptchaVerify;
 import com.news.backendproject.verify.ExistenceVerifyAccessJwt;
 import com.news.backendproject.verify.OperationTypeVerify;
+import com.news.backendproject.verify.ProfileInconsistencyVerify;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -44,6 +44,8 @@ public class UserController {
     private final BotCaptchaVerify botCaptchaVerify;
     private final SendEmailCaptchaService sendEmailCaptchaService;
     private final ExistenceVerifyAccessJwt existenceVerifyAccessJwt;
+    private final UserUpdateProfileService userUpdateProfileService;
+    private final ProfileInconsistencyVerify profileInconsistencyVerify;
 
 
     // 正则常量（抽离便于维护）
@@ -191,42 +193,41 @@ public class UserController {
         return userForgotService.forgot(dto,redisKey);
     }
     //获取个人信息
-    //todo:
-    // jwt获取认证的用户名,查询对应的其他信息
     @AccessRestriction(limit = 10, message = "获取个人信息过于频繁,1分钟后再试", limitKey = false)
     @JwtRequired
     @GetMapping("/getUserSelfProfile")
     public ApiResponse<UserProfileDto> getSelfProfile(HttpServletRequest request) {
-        User userInfor =existenceVerifyAccessJwt.verify(request);
-        //查找出的用户绑定email为空
-        if (userInfor.getEmail().isEmpty()){
-            return new ApiResponse<>(409,"获取失败",null);
+        User selectUserProfileByJwtUsername =existenceVerifyAccessJwt.verifyAndReturnProfile(request);
+        System.err.println("selectUserProfileByJwtUsername:"+selectUserProfileByJwtUsername);
+        if (selectUserProfileByJwtUsername==null){
+            return new ApiResponse<>(409,"修改失败,提交了错误信息",null);
         }
-        System.out.println(userInfor);
         UserProfileDto dto = new UserProfileDto();
-        dto.setUsername(userInfor.getUsername());
-        dto.setEmail(userInfor.getEmail());
-        dto.setGender(userInfor.getGender());
-        dto.setAddress(userInfor.getAddress());
-        dto.setBirthday(userInfor.getBirthday());
-        System.out.println(dto.toString());
+        dto.setUsername(selectUserProfileByJwtUsername.getUsername());
+        dto.setEmail(selectUserProfileByJwtUsername.getEmail());
+        dto.setGender(selectUserProfileByJwtUsername.getGender());
+        dto.setAddress(selectUserProfileByJwtUsername.getAddress());
+        dto.setBirthday(selectUserProfileByJwtUsername.getBirthday());
         return new ApiResponse<>(200,"获取成功",dto);
-        //return new ApiResponse<>(400, "获取信息测试成功", new GeneralDataResponse(true, null));
     }
 
     //修改个人信息
-    //todo:使用jwt获得的用户名检查合法性后,修改对应信息
     @AccessRestriction(limit = 2, message = "修改个人信息过于频繁,1分钟后再试", limitKey = false)
     @JwtRequired
     @PostMapping("/updateSelfProfile")
     public ApiResponse<GeneralDataResponse> updateSelfProfile(
-            @RequestBody User user
+            @RequestBody UserProfileDto dto,
+            HttpServletRequest request
     ) {
-        System.out.println(user.toString());
-        if (user.getUsername().trim().isEmpty()) {
-            return new ApiResponse<>(400, "用户基础信息缺失", new GeneralDataResponse(false, null));
+        User selectUserProfileByJwtUsername =existenceVerifyAccessJwt.verifyAndReturnProfile(request);
+        if (selectUserProfileByJwtUsername==null){
+            return new ApiResponse<>(409,"修改失败,提交了错误信息",null);
         }
-        System.out.println(user.toString());
-        return new ApiResponse<>(400, "修改信息测试成功", new GeneralDataResponse(true, null));
+        boolean isInconsistent = profileInconsistencyVerify.inconsistencyVerify(dto, selectUserProfileByJwtUsername);
+        //可修改信息是否至少一项被修改过
+        if (isInconsistent){
+            return userUpdateProfileService.updateProfile(dto,request);
+        }
+        return new ApiResponse<>(400, "您未修改任何信息", new GeneralDataResponse(false, null));
     }
 }
