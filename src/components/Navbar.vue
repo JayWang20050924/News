@@ -331,8 +331,8 @@ const handleNavItemClick = (e) => {
 
 // PC端下拉框显示/隐藏
 const showDropdownPc = async () => {
-  const isOpen = ifShowLoginDropdownPc.value !== 'hidden'
-  if (isOpen) {
+  const show = ifShowLoginDropdownPc.value !== 'hidden'
+  if (show) {
     ifShowLoginDropdownPc.value = 'hidden'
     resetDropdownItems()
   } else {

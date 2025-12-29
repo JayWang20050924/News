@@ -20,7 +20,7 @@
       <!-- 表单主体 -->
       <div class="px-6 py-8 space-y-6 overflow-y-auto" id="profileForm">
         <!-- 已有账号链接 -->
-        <div class="text-center" >
+        <div class="text-center">
           <RouterLinkBlank
             to="/LoginPage"
             @click="exitLogin"
@@ -29,7 +29,7 @@
             <i class="fa fa-arrow-left mr-2"></i>切换账号?前往登录
           </RouterLinkBlank>
         </div>
-        <!-- 用户名输入框（不可修改） -->
+        <!-- 用户名显示框（不可修改） -->
         <div class="input-container">
           <label for="username" class="block text-gray-300 text-sm font-medium mb-2">
             用户名
@@ -49,7 +49,7 @@
           </div>
         </div>
 
-        <!-- 邮箱输入框（不可修改） -->
+        <!-- 邮箱显示框（不可修改） -->
         <div class="input-container">
           <label for="email" class="block text-gray-300 text-sm font-medium mb-2"> 邮箱 </label>
           <div class="relative">
@@ -147,17 +147,25 @@
           ]"
         >
           <span class="text">
-            <i class="fa fa-save"></i>&nbsp;{{ isSaving ? '保存中...' : hasChanges ? '保存修改' : '无修改项' }}
+            <i class="fa fa-save"></i>&nbsp;{{
+              isSaving ? '保存中...' : hasChanges ? '保存修改' : '无修改项'
+            }}
           </span>
         </button>
 
         <!-- 显示修改项提示 -->
-        <div v-if="hasChanges" class="mt-2 p-3 bg-gray-800 rounded-lg text-sm text-gray-300">
+        <div class="mt-2 p-3 bg-gray-800 rounded-lg text-sm text-gray-300">
           <p>您的修改:</p>
           <ul class="ml-4 mt-1 list-disc">
-            <li v-if="profile.gender !== originalProfile.gender">性别: {{ originalProfile.gender }} → {{ profile.gender }}</li>
-            <li v-if="profile.address !== originalProfile.address">地址: {{ originalProfile.address }} → {{ profile.address }}</li>
-            <li v-if="profile.birthday !== originalProfile.birthday">生日: {{ originalProfile.birthday }} → {{ profile.birthday }}</li>
+            <li v-if="profile.gender !== originalProfile.gender">
+              性别: {{ originalProfile.gender }} → {{ profile.gender }}
+            </li>
+            <li v-if="profile.address !== originalProfile.address">
+              地址: {{ originalProfile.address }} → {{ profile.address }}
+            </li>
+            <li v-if="profile.birthday !== originalProfile.birthday">
+              生日: {{ originalProfile.birthday }} → {{ profile.birthday }}
+            </li>
           </ul>
         </div>
       </div>
@@ -165,9 +173,11 @@
       <!-- 卡片底部 -->
       <div class="bg-gray-800 px-6 py-4 text-center flex-shrink-0">
         <span class="text-gray-300 text-sm">
-        <RouterLinkBlank to="/LoginPage" @click="exitLogin" class="text-gray-100 hover:underline"> 切换账号 </RouterLinkBlank>
-        &emsp;|&emsp;
-        <RouterLinkBlank to="/" class="text-gray-100 hover:underline"> 返回首页 </RouterLinkBlank>
+          <RouterLinkBlank to="/LoginPage" @click="exitLogin" class="text-gray-100 hover:underline">
+            切换账号
+          </RouterLinkBlank>
+          &emsp;|&emsp;
+          <RouterLinkBlank to="/" class="text-gray-100 hover:underline"> 返回首页 </RouterLinkBlank>
         </span>
       </div>
     </div>
@@ -179,7 +189,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request.js'
 import RouterLinkBlank from '@/components/RouterLinkBlank.vue'
-
+import router from '@/router/index.js'
 // 提示持续时间
 const MESSAGE_DURATION = 2000
 
@@ -194,8 +204,6 @@ const profile = ref({
 
 // 存储原始数据，用于比较
 const originalProfile = ref({
-  username: '',
-  email: '',
   gender: '',
   address: '',
   birthday: '',
@@ -222,28 +230,31 @@ const exitLogin = async () => {
 const getUserProfile = async () => {
   try {
     const data = await request.get('/getUserSelfProfile')
-    console.log('用户信息：', data)
-    if(!data.username.isEmpty && !data.email.isEmpty){
+    if (!data.username.isEmpty && !data.email.isEmpty) {
+      profile.value.username = data.username || ''
+      profile.value.email = data.email || ''
+      profile.value.gender = data.gender || ''
+      profile.value.address = data.address || ''
+      profile.value.birthday = data.birthday || ''
+
+      // 保存原始数据用于比较
+      originalProfile.value.username = data.username || ''
+      originalProfile.value.email = data.email || ''
+      originalProfile.value.gender = data.gender || ''
+      originalProfile.value.address = data.address || ''
+      originalProfile.value.birthday = data.birthday || ''
+    } else {
       ElMessage({
-        message: '个人信息获取成功',
-        type: 'success',
+        message: '请重新登录',
+        type: 'error',
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,
       })
+      //用户名或邮箱为空，跳转登录页
+      setTimeout(() => {
+        router.push('/LoginPage')
+      }, MESSAGE_DURATION)
     }
-    // 填充响应式变量
-    profile.value.username = data.username || ''
-    profile.value.email = data.email || ''
-    profile.value.gender = data.gender || ''
-    profile.value.address = data.address || ''
-    profile.value.birthday = data.birthday || ''
-
-    // 同时保存原始数据用于比较
-    originalProfile.value.username = data.username || ''
-    originalProfile.value.email = data.email || ''
-    originalProfile.value.gender = data.gender || ''
-    originalProfile.value.address = data.address || ''
-    originalProfile.value.birthday = data.birthday || ''
   } catch (error) {
     ElMessage({
       message: error,
@@ -251,14 +262,16 @@ const getUserProfile = async () => {
       customClass: 'custom-message',
       duration: MESSAGE_DURATION,
     })
-    // 未登录或token失效，跳转登录页
-    // router.push('/LoginPage')
+    //未登录或token失效，跳转登录页
+    setTimeout(() => {
+      router.push('/LoginPage')
+    }, MESSAGE_DURATION)
   }
 }
 
 // 保存用户信息
 const handleSubmit = async () => {
-  // 如果没有修改项，直接返回
+  //如果没有修改项，直接返回
   if (!hasChanges.value) {
     ElMessage({
       message: '当前未修改任何信息',
@@ -268,15 +281,32 @@ const handleSubmit = async () => {
     })
     return
   }
-
   isSaving.value = true
+  // 用户名和邮箱不可修改，若被修改则提示并返回
+  if (
+    profile.value.username !== originalProfile.value.username ||
+    profile.value.email !== originalProfile.value.email
+  ) {
+    ElMessage({
+      message: '用户名和邮箱不可修改',
+      type: 'warning',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    isSaving.value = false
+    return
+  }
+
   try {
-    // 仅提交可修改的字段
+    // 提交可被修改字段(jwt保存用户)
     const updateData = {
+      username: 'wwaaa',
+      email: profile.value.email,
       gender: profile.value.gender || '',
       address: profile.value.address || '',
       birthday: profile.value.birthday || '',
     }
+    console.log('提交数据:', updateData)
     const data = await request.post('/updateSelfProfile', updateData)
     if (data.status) {
       ElMessage({
@@ -289,6 +319,8 @@ const handleSubmit = async () => {
       originalProfile.value.gender = profile.value.gender
       originalProfile.value.address = profile.value.address
       originalProfile.value.birthday = profile.value.birthday
+      // 重新获取用户信息以更新页面显示
+      await getUserProfile()
     } else {
       ElMessage({
         message: '修改保存失败',
@@ -392,8 +424,4 @@ input:disabled {
     overflow-y: auto;
   }
 }
-
 </style>
-
-
-
