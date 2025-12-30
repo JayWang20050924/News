@@ -71,6 +71,18 @@
         <div>
           <label class="block text-gray-300 text-sm font-medium mb-2"> 性别 </label>
           <div class="flex space-x-8 pl-2 py-3 bg-gray-800 rounded-t-lg">
+            <!--保密secret-->
+            <label class="flex items-center space-x-2 text-gray-300 cursor-pointer">
+              <input
+                type="radio"
+                name="gender"
+                v-model="profile.gender"
+                class="h-4 w-4 text-gray-300 bg-gray-800 border-gray-700 rounded focus:ring-gray-300"
+                value="secret"
+              />
+              <span>保密</span>
+            </label>
+
             <!--男male-->
             <label class="flex items-center space-x-2 text-gray-300 cursor-pointer">
               <input
@@ -234,6 +246,9 @@ const getUserProfile = async () => {
       profile.value.username = data.username || ''
       profile.value.email = data.email || ''
       profile.value.gender = data.gender || ''
+      if (data.gender=='') {
+        profile.value.gender = 'secret'
+      }
       profile.value.address = data.address || ''
       profile.value.birthday = data.birthday || ''
 

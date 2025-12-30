@@ -33,10 +33,10 @@
           >
             <i class="fa fa-sign-in mr-2"></i> 登录账户
           </router-link>
-          <a
+          <router-link
             @click="redirectPage"
             id="centerBtn"
-            href="/UserSelfProfilePage"
+            to="/UserSelfProfilePage"
             target="_blank"
             :class="[
               isLoginShowDropdownItem,
@@ -44,32 +44,32 @@
             ]"
           >
             <i class="fa fa-user-circle-o mr-2"></i>用户中心
-          </a>
-          <a
+          </router-link>
+          <router-link
             @click="redirectPage"
             id="registerBtn"
-            href="/RegisterPage"
+            to="/RegisterPage"
             target="_self"
             :class="[
               'dropdown-item block px-6 py-3 text-gray-100 hover:bg-gray-800 transition-colors duration-200 hover:text-gray-100',
             ]"
           >
             <i class="fa fa-user-plus mr-2"></i>注册账户
-          </a>
-          <a
+          </router-link>
+          <router-link
             @click="redirectPage"
             id="forgotBtn"
-            href="/ForgotPage"
+            to="/ForgotPage"
             target="_self"
             :class="[
               'dropdown-item block px-6 py-3 text-gray-100 hover:bg-gray-800 transition-colors duration-200 hover:text-gray-100',
             ]"
           >
             <i class="fa fa-key mr-2"></i>忘记密码
-          </a>
-          <a
+          </router-link>
+          <router-link
             @click="(exitLogin(), redirectPage())"
-            href="#"
+            to="#"
             id="logoutBtn"
             :class="[
               isLoginShowDropdownItem,
@@ -77,7 +77,7 @@
             ]"
           >
             <i class="fa fa-sign-out mr-2"></i>退出登录
-          </a>
+          </router-link>
         </div>
       </div>
 
@@ -248,7 +248,6 @@ import getLoginStatus from '@/api/getLoginStatus.js'
 import { RouterLink } from 'vue-router'
 //引入element-plus消息提示
 import { ElMessage } from 'element-plus'
-
 // 下拉菜单项显示状态
 const isLoginShowDropdownItem = ref('hidden')
 const dontLoginShowDropdownItem = ref('block')
