@@ -42,7 +42,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    // 从令牌中获取用户名（不变）
+    // 从令牌中获取用户名
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }

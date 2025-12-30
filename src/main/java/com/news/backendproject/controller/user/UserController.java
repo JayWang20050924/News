@@ -193,7 +193,7 @@ public class UserController {
         return userForgotService.forgot(dto,redisKey);
     }
     //获取个人信息
-    @AccessRestriction(limit = 10, message = "获取个人信息过于频繁,1分钟后再试", limitKey = false)
+    @AccessRestriction(limit = 30, message = "获取个人信息过于频繁,1分钟后再试", limitKey = false)
     @JwtRequired
     @GetMapping("/getUserSelfProfile")
     public ApiResponse<UserProfileDto> getSelfProfile(HttpServletRequest request) {
