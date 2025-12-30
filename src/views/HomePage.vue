@@ -2,32 +2,34 @@
   <!-- 主内容区 - 保持原有代码不变 -->
   <main class="container mx-auto px-4 pt-28 pb-16">
     <!-- 头条新闻区 -->
-    <section class="mb-12">
-      <div
-        class="relative rounded-2xl overflow-hidden shadow-2xl shadow-gray-900/50 h-[50vh] min-h-[400px]"
-      >
-        <img src="/img/gta6.jpg" alt="头条新闻图片" class="w-full h-full object-cover" />
-        <div class="absolute inset-0 news-card-overlay flex flex-col justify-end p-6 md:p-10">
-          <span class="inline-block bg-red-600 text-white text-xs px-3 py-1 rounded-full mb-4 w-max"
-            >头条</span
-          >
-          <h2 class="text-[clamp(1.5rem,5vw,2.5rem)] font-bold text-white mb-3 leading-tight">
-            R星游戏工作室旗下GTA6,最快2026年上线
-          </h2>
-          <p class="text-gray-200 text-sm md:text-base mb-4 max-w-3xl">
-            在最新的游戏开发者大会上,R星Rock Star游戏工作室正式宣布GTA6预计发售日期
-          </p>
-          <div class="flex items-center text-gray-300 text-sm">
-            <span><i class="fa fa-clock-o mr-1"></i> 2小时前</span>
-            <span class="mx-3">|</span>
-            <span><i class="fa fa-user mr-1"></i> 环球时报记者</span>
-            <span class="mx-3">|</span>
-            <span @click="commentBtn"><i class="fa fa-comment mr-1"></i> 328评论</span>
+    <router-link to="/DetailedNewsPage/10086">
+      <section class="mb-12">
+        <div
+          class="relative rounded-2xl overflow-hidden shadow-2xl shadow-gray-900/50 h-[50vh] min-h-[400px]"
+        >
+          <img src="/img/gta6.jpg" alt="头条新闻图片" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 news-card-overlay flex flex-col justify-end p-6 md:p-10">
+            <span
+              class="inline-block bg-red-600 text-white text-xs px-3 py-1 rounded-full mb-4 w-max"
+              >头条</span
+            >
+            <h2 class="text-[clamp(1.5rem,5vw,2.5rem)] font-bold text-white mb-3 leading-tight">
+              R星游戏工作室旗下GTA6,最快2026年上线
+            </h2>
+            <p class="text-gray-200 text-sm md:text-base mb-4 max-w-3xl">
+              在最新的游戏开发者大会上,R星Rock Star游戏工作室正式宣布GTA6预计发售日期
+            </p>
+            <div class="flex items-center text-gray-300 text-sm">
+              <span><i class="fa fa-clock-o mr-1"></i> 2小时前</span>
+              <span class="mx-3">|</span>
+              <span><i class="fa fa-user mr-1"></i> 环球时报记者</span>
+              <span class="mx-3">|</span>
+              <span><i class="fa fa-thumbs-up mr-1"></i> 328点赞</span>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-
+      </section>
+    </router-link>
     <!-- 主要新闻流和侧边栏 -->
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- 主要新闻流 -->
@@ -261,7 +263,7 @@
       </div>
 
       <!-- 侧边栏 -->
-      <div class="lg:w-1/3 space-y-8" style="margin-top: 3.5rem;">
+      <div class="lg:w-1/3 space-y-8" style="margin-top: 3.5rem">
         <!-- 热门排行 -->
         <div class="bg-gray-900 rounded-xl p-5 shadow-lg">
           <h3 class="text-lg font-bold mb-4 text-gray-100 flex items-center">
@@ -493,7 +495,6 @@
   </main>
 </template>
 <script setup>
-const commentBtn = () => {
-  alert('点击了评论图标，显示评论区（功能待实现）')
-}
+import { ref } from 'vue'
+import { RouterLink } from 'vue-router';
 </script>
