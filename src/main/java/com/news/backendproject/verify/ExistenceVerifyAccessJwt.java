@@ -15,7 +15,7 @@ public class ExistenceVerifyAccessJwt {
     //判断返回值是否为null判断是否用户合法
     public User verifyAndReturnProfile(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer")) {
             return null;
         }
         String token = authHeader.substring(7).trim();

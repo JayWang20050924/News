@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public  class UserLoginService {
+public  class UserLoginAndExitLoginService {
     private final JwtUtil jwtUtil;
     private final UserDaoImp userDaoImp;
     private final StringRedisTemplate stringRedisTemplate;
@@ -63,5 +63,9 @@ public  class UserLoginService {
         }
         GeneralDataResponse data = new GeneralDataResponse(false,null);
         return new ApiResponse<>(404,"未知的错误",data);
+    }
+    //用户退出登录
+    public ApiResponse<GeneralDataResponse> userExitLogin(String token){
+        return new ApiResponse<>(200,"登出成功",new GeneralDataResponse(true,null));
     }
 }

@@ -14,13 +14,13 @@
 
             <!-- 数据源：配置连接池和JDBC参数（核心配置） -->
             <dataSource type="POOLED"> <!-- type="POOLED"表示使用MyBatis内置连接池 -->
-                <!-- 驱动类：对应JDBC配置的driver=com.mysql.cj.jdbc.Driver -->
+                <!-- 驱动类 -->
                 <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
-                <!-- 数据库URL：对应JDBC配置的url=jdbc:mysql://localhost:3306/wp，补充时区参数（MySQL 8.x必需） -->
+                <!-- 数据库URL-->
                 <property name="url" value="jdbc:mysql://localhost:3306/wp?useSSL=false&amp;serverTimezone=Asia/Shanghai"/>
-                <!-- 数据库用户名：对应JDBC配置的user=root -->
+                <!-- 数据库用户名-->
                 <property name="username" value="root"/>
-                <!-- 数据库密码：对应JDBC配置的password=123456 -->
+                <!-- 数据库密码-->
                 <property name="password" value="123456"/>
             </dataSource>
         </environment>

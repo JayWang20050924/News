@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 @Validated // 启用参数验证
 public class UserController {
     private final Producer kaptchaProducer;
-    private final UserLoginService userLoginService;
+    private final UserLoginAndExitLoginService userLoginAndExitLoginService;
     private final UserGetLoginStatusService userGetLoginStatusService;
     private final UserRegisterService userRegisterService;
     private final UserForgotService userForgotService;
@@ -138,9 +138,19 @@ public class UserController {
             return new ApiResponse<>(400, "非法验证请求", new GeneralDataResponse(false, null));
         }
         String redisKey = operationType + request.getSession().getId();
-        return userLoginService.userLogin(username, password, captcha, redisKey);
+        return userLoginAndExitLoginService.userLogin(username, password, captcha, redisKey);
     }
-
+    //todo:添加退出登录接口,向redis中添加对应的jwt黑名单
+    @AccessRestriction(limit = 1, message = "退出登录过于频繁", limitKey = false)
+    @GetMapping("/userExitLogin")
+    public ApiResponse<GeneralDataResponse> userExitLogin(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer")) {
+            return new ApiResponse<>(409,"暂未登录",new GeneralDataResponse(false,null));
+        }
+        String token = authHeader.substring(7).trim();
+        return userLoginAndExitLoginService.userExitLogin(token);
+    }
     // 发送邮箱验证码
     @AccessRestriction(limit = 5, message = "验证码请求过于频繁,稍后再试", limitKey = false)
     @PostMapping("/sendEmailCaptcha")
@@ -212,7 +222,8 @@ public class UserController {
     }
 
     //修改个人信息
-    @AccessRestriction(limit = 2, message = "修改个人信息过于频繁,1分钟后再试", limitKey = false)
+    //todo:临近上线添加每天只能修改两次个人信息
+    @AccessRestriction(limit = 2,period = 60, message = "修改个人信息过于频繁,1分钟后再试", limitKey = false)
     @JwtRequired
     @PostMapping("/updateSelfProfile")
     public ApiResponse<GeneralDataResponse> updateSelfProfile(

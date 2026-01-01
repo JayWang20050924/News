@@ -6,58 +6,57 @@ import com.news.backendproject.mapper.UserMapper;
 import com.news.backendproject.dao.UserDao;
 import com.news.backendproject.service.UserRegisterService;
 import com.news.backendproject.utils.MyBatisUtil;
+import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserDaoImp implements UserDao {
-    // 通过SqlSession获取Mapper(关联UserMapper)
-    private UserMapper getUserMapper() {
-        SqlSession sqlSession = MyBatisUtil.getSqlSession();
-        return sqlSession.getMapper(UserMapper.class);
-    }
+    //spring注入
+    private final UserMapper userMapper;
 
     @Override
     public int addUserService(UserRegisterDto dto) {
-        return getUserMapper().addUser(dto);
+        return userMapper.addUser(dto);
     }
 
     @Override
     public int verifyUserExistenceService(User user) {
-        Integer result = getUserMapper().verifyUserExistence(user.getUsername());
+        Integer result = userMapper.verifyUserExistence(user.getUsername());
         return result != null ? result : 0;
     }
 
     @Override
     public int verifyEmailExistenceForgotService(User user) {
-        Integer result = getUserMapper().verifyEmailExistenceForgot(user.getEmail(),user.getUsername());
+        Integer result = userMapper.verifyEmailExistenceForgot(user.getEmail(),user.getUsername());
         return result != null ? result : 0;
     }
 
     @Override
     public int verifyEmailExistenceRegisterService(User user) {
-        Integer result = getUserMapper().verifyEmailExistenceRegister(user.getEmail());
+        Integer result = userMapper.verifyEmailExistenceRegister(user.getEmail());
         return result != null ? result : 0;
     }
 
     @Override
     public int verifyUserPasswordService(User user) {
-        Integer result = getUserMapper().verifyUserPassword(user.getUsername(), user.getPassword());
+        Integer result = userMapper.verifyUserPassword(user.getUsername(), user.getPassword());
         return result != null ? result : 0;
     }
 
     @Override
     public User getUserInforService(User user) {
-        return getUserMapper().getUserInfor(user.getUsername());
+        return userMapper.getUserInfor(user.getUsername());
     }
 
     @Override
     public int updateBasicInforByUsernameAndEmailService(User user) {
-        return getUserMapper().updateBasicInforByUsernameAndEmail(user);
+        return userMapper.updateBasicInforByUsernameAndEmail(user);
     }
 
     @Override
     public int updatePasswordInforByUsernameAndEmailService(User user) {
-        return getUserMapper().updatePasswordInforByUsernameAndEmail(user);
+        return userMapper.updatePasswordInforByUsernameAndEmail(user);
     }
 }
