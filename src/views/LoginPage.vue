@@ -207,6 +207,11 @@ const botCheckCodeUrl = ref('')
 const isBotCheckCodeDisabled = ref(false)
 //useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
 const router = useRouter()
+// 退出登录函数进入页面加载
+const exitLogin = async () => {
+  localStorage.removeItem('token')
+  return
+}
 // 切换密码可见性
 const togglePassword = () => {
   passwordType.value = passwordType.value === 'password' ? 'text' : 'password'
@@ -352,6 +357,7 @@ const handleKeydown = (e) => {
 }
 // 组件挂载时初始化
 onMounted(() => {
+  exitLogin()
   document.addEventListener('keydown', handleKeydown)
   refreshBotCheckCode()
 })

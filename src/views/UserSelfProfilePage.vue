@@ -23,10 +23,9 @@
         <div class="text-center">
           <RouterLinkBlank
             to="/LoginPage"
-            @click="exitLogin"
             class="text-gray-300 hover:text-gray-100 transition-colors flex items-center justify-center text-base"
           >
-            <i class="fa fa-arrow-left mr-2"></i>切换账号?前往登录
+            <i class="fa fa-arrow-left mr-2"></i>切换账号?退出登录
           </RouterLinkBlank>
         </div>
         <!-- 用户名显示框（不可修改） -->
@@ -78,7 +77,7 @@
                 name="gender"
                 v-model="profile.gender"
                 class="h-4 w-4 text-gray-300 bg-gray-800 border-gray-700 rounded focus:ring-gray-300"
-                value="secret"
+                value="保密"
               />
               <span>保密</span>
             </label>
@@ -90,7 +89,7 @@
                 name="gender"
                 v-model="profile.gender"
                 class="h-4 w-4 text-gray-300 bg-gray-800 border-gray-700 rounded focus:ring-gray-300"
-                value="male"
+                value="男"
               />
               <span>男</span>
             </label>
@@ -102,7 +101,7 @@
                 name="gender"
                 v-model="profile.gender"
                 class="h-4 w-4 text-gray-300 bg-gray-800 border-gray-700 rounded focus:ring-gray-300"
-                value="female"
+                value="女"
               />
               <span>女</span>
             </label>
@@ -143,6 +142,22 @@
           </div>
         </div>
 
+        <!-- 显示修改项提示 -->
+        <div class="mt-2 p-3 bg-gray-800 rounded-lg text-sm text-gray-300">
+          <p>您的修改:</p>
+          <ul class="ml-4 mt-1 list-disc">
+            <li v-if="profile.gender !== originalProfile.gender">
+              性别: {{ originalProfile.gender }} → {{ profile.gender }}
+            </li>
+            <li v-if="profile.address !== originalProfile.address">
+              地址: {{ originalProfile.address }} → {{ profile.address }}
+            </li>
+            <li v-if="profile.birthday !== originalProfile.birthday">
+              生日: {{ originalProfile.birthday }} → {{ profile.birthday }}
+            </li>
+          </ul>
+        </div>
+
         <!-- 保存按钮 -->
         <button
           @click="handleSubmit"
@@ -164,28 +179,12 @@
             }}
           </span>
         </button>
-
-        <!-- 显示修改项提示 -->
-        <div class="mt-2 p-3 bg-gray-800 rounded-lg text-sm text-gray-300">
-          <p>您的修改:</p>
-          <ul class="ml-4 mt-1 list-disc">
-            <li v-if="profile.gender !== originalProfile.gender">
-              性别: {{ originalProfile.gender }} → {{ profile.gender }}
-            </li>
-            <li v-if="profile.address !== originalProfile.address">
-              地址: {{ originalProfile.address }} → {{ profile.address }}
-            </li>
-            <li v-if="profile.birthday !== originalProfile.birthday">
-              生日: {{ originalProfile.birthday }} → {{ profile.birthday }}
-            </li>
-          </ul>
-        </div>
       </div>
 
       <!-- 卡片底部 -->
       <div class="bg-gray-800 px-6 py-4 text-center flex-shrink-0">
         <span class="text-gray-300 text-sm">
-          <RouterLinkBlank to="/LoginPage" @click="exitLogin" class="text-gray-100 hover:underline">
+          <RouterLinkBlank to="/LoginPage"  class="text-gray-100 hover:underline">
             切换账号
           </RouterLinkBlank>
           &emsp;|&emsp;
@@ -231,13 +230,6 @@ const hasChanges = computed(() => {
     profile.value.birthday !== originalProfile.value.birthday
   )
 })
-
-// 退出登录，清除token
-const exitLogin = async () => {
-  localStorage.removeItem('token')
-  return
-}
-
 // 获取用户个人信息
 const getUserProfile = async () => {
   try {
@@ -246,9 +238,6 @@ const getUserProfile = async () => {
       profile.value.username = data.username || ''
       profile.value.email = data.email || ''
       profile.value.gender = data.gender || ''
-      if (data.gender=='') {
-        profile.value.gender = 'secret'
-      }
       profile.value.address = data.address || ''
       profile.value.birthday = data.birthday || ''
 
@@ -315,8 +304,6 @@ const handleSubmit = async () => {
   try {
     // 提交可被修改字段(jwt保存用户)
     const updateData = {
-      username: 'wwaaa',
-      email: profile.value.email,
       gender: profile.value.gender || '',
       address: profile.value.address || '',
       birthday: profile.value.birthday || '',

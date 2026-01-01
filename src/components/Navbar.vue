@@ -366,12 +366,6 @@ const exitLogin = async () => {
   //下拉菜单项显示状态
   isLoginShowDropdownItem.value = data.status === true ? 'block' : 'hidden'
   dontLoginShowDropdownItem.value = data.status === true ? 'hidden' : 'block'
-  ElMessage({
-    message: '您已退出登录',
-    type: 'warning',
-    customClass: 'custom-message',
-    duration: 1500,
-  })
   return
 }
 
