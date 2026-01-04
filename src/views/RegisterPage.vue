@@ -450,13 +450,13 @@ const handleSubmit = () => {
       //request返回结果中data字段数据
       if (data.status) {
         ElMessage({
-          message: '注册成功,即将回到主页',
+          message: '注册成功,即将跳转登录',
           type: 'success',
           customClass: 'custom-message',
           duration: MESSAGE_DURATION,
         })
         // 注册成功后回到主页
-        router.push('/')
+        router.push('/LoginPage')
       } else {
         ElMessage({
           message: '注册失败:' + data.msg,

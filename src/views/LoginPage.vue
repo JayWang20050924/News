@@ -178,7 +178,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted,nextTick } from 'vue'
 // 从Element Plus中导入ElMessage（消息提示组件）
 import { ElMessage } from 'element-plus'
 // 引入Vue Router的useRouter函数
@@ -188,6 +188,10 @@ import request from '@/utils/request.js'
 // 引入js-cookie库
 import Cookies from 'js-cookie'
 import RouterLinkBlank from '@/components/RouterLinkBlank.vue'
+
+import { useUserStore } from '@/stores/user.js'
+
+const userStore = useUserStore()
 //提示持续时间
 const MESSAGE_DURATION = 2000
 //用户名,密码格式规则
@@ -207,7 +211,7 @@ const botCheckCodeUrl = ref('')
 const isBotCheckCodeDisabled = ref(false)
 //useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
 const router = useRouter()
-// 退出登录函数进入页面加载
+// 退出登录函数进入页面加载todo:获取pinia中全局登录状态即可
 const exitLogin = async () => {
   localStorage.removeItem('token')
   return
@@ -320,7 +324,7 @@ const handleSubmit = async () => {
     params.append('operationType', 'login')
 
     const data = await request.post('/getLoginResponse', params)
-
+    // 登录成功
     if (data.status) {
       ElMessage({
         message: '登录成功，即将跳转主页',
@@ -329,8 +333,10 @@ const handleSubmit = async () => {
         duration: MESSAGE_DURATION,
       })
       localStorage.setItem('token', data.token)
+      userStore.setLoginStatus(true) // 更新全局登录状态
+      await nextTick()
       router.push('/')
-    }else{
+    } else {
       ElMessage({
         message: data.msg,
         type: 'error',
