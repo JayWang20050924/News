@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import request from '@/utils/request.js'
 
+
 export const useUserStore = defineStore('user', {
   //直接返回括号内的对象
   state: () => ({

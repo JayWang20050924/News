@@ -332,7 +332,9 @@ const handleSubmit = async () => {
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,
       })
+      // 保存发送的token到本地存储
       localStorage.setItem('token', data.token)
+      console.log(localStorage.getItem('token'))
       userStore.setLoginStatus(true) // 更新全局登录状态
       await nextTick()
       router.push('/')

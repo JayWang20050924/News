@@ -3,7 +3,7 @@
   <header id="navbar" class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-5">
     <div class="container mx-auto px-4 md:px-6 flex items-center justify-between">
       <!-- 左上角登录图标下拉组件 -->
-      <div class="relative z-50" id="loginDropdownContainer">
+      <div class="relative z-50" id="functionDropdownContainer">
         <button
           id="loginTrigger"
           ref="loginTrigger"
@@ -14,17 +14,19 @@
           <i
             :class="[
               userStore.isLogin ? 'fa fa-user-o' : 'fa fa-user',
-              'fa-lg text-gray-100 transition-all duration-300'
+              'fa-lg text-gray-100 transition-all duration-300',
             ]"
           ></i>
         </button>
         <!-- 改用 opacity/visibility 控制显隐（保留文档流，动画更流畅） -->
         <div
-          id="loginDropdown"
-          ref="loginDropdown"
+          id="functionDropdown"
+          ref="functionDropdown"
           :class="[
             'absolute top-full left-0 mt-3 w-40 bg-gray-900 rounded-lg shadow-xl shadow-gray-900/60 border border-gray-700 transition-all duration-300 ease-in-out transform origin-top-right',
-            ifShowFunctionDropdown ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+            ifShowFunctionDropdown
+              ? 'block'
+              : 'hidden',
           ]"
         >
           <!-- 登录按钮：未登录显示 -->
@@ -32,7 +34,7 @@
             @click="redirectPage"
             :class="[
               !userStore.isLogin ? 'block' : 'hidden',
-              'dropdown-item block px-6 py-3 text-gray-100 hover:bg-gray-800 transition-colors duration-200 hover:text-gray-100'
+              'dropdown-item block px-6 py-3 text-gray-100 hover:bg-gray-800 transition-colors duration-200 hover:text-gray-100',
             ]"
             id="loginBtn"
             to="/LoginPage"
@@ -48,7 +50,7 @@
             target="_blank"
             :class="[
               userStore.isLogin ? 'block' : 'hidden',
-              'dropdown-item px-6 py-3 text-gray-100 hover:bg-gray-800 transition-colors duration-200 hover:text-gray-100'
+              'dropdown-item px-6 py-3 text-gray-100 hover:bg-gray-800 transition-colors duration-200 hover:text-gray-100',
             ]"
           >
             <i class="fa fa-user-circle-o mr-2"></i>用户中心
@@ -80,7 +82,7 @@
             id="logoutBtn"
             :class="[
               userStore.isLogin ? 'block' : 'hidden',
-              'dropdown-item block px-6 py-3 text-gray-100 hover:bg-gray-800 transition-colors duration-200 hover:text-gray-100'
+              'dropdown-item block px-6 py-3 text-gray-100 hover:bg-gray-800 transition-colors duration-200 hover:text-gray-100',
             ]"
           >
             <i class="fa fa-sign-out mr-2"></i>退出登录
@@ -184,7 +186,7 @@
       id="mobileMenu"
       :class="[
         ifShowMobile ? 'block' : 'hidden',
-        'bg-gray-900 border-t border-gray-800 mt-4 md:hidden'
+        'bg-gray-900 border-t border-gray-800 mt-4 md:hidden',
       ]"
     >
       <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
@@ -252,7 +254,7 @@
 </template>
 
 <script setup lang="js">
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 
 import { useUserStore } from '@/stores/user.js'
 
@@ -262,7 +264,7 @@ const userStore = useUserStore()
 // ========== 状态定义（统一用布尔值，更易维护） ==========
 // PC端登录下拉框显示状态（true=显示，false=隐藏）
 const ifShowFunctionDropdown = ref(false)
-const loginDropdown = ref(null)
+const functionDropdown = ref(null)
 const loginTrigger = ref(null)
 
 // 移动端菜单显示状态
@@ -273,27 +275,6 @@ const mobileMenuBtn = ref(null)
 // 导航指示器
 const navIndicator = ref(null)
 const navItems = ref([])
-
-// ========== 监听登录状态变化 ==========
-watch(
-  () => userStore.isLogin,
-  async (newIsLogin) => {
-    // 重置所有下拉项动画（避免状态切换残留样式）
-    resetDropdownItems()
-
-    // 如果下拉框正在显示，等待DOM更新后重新执行动画
-    if (ifShowFunctionDropdown.value) {
-      await nextTick() // 等待Vue更新DOM
-      showDropdownItems()
-    }
-
-    // 退出登录时自动关闭下拉框（优化体验）
-    if (!newIsLogin) {
-      ifShowFunctionDropdown.value = false
-    }
-  },
-  { immediate: true, deep: false } // 立即执行+非深度监听
-)
 
 // ========== 生命周期 ==========
 onMounted(() => {
@@ -334,7 +315,7 @@ const handleNavItemClick = (e) => {
   setIndicatorPosition(e.currentTarget)
 }
 
-// ========== 登录下拉框逻辑 ==========
+// ========== 下拉框逻辑 ==========
 // 切换下拉框显隐
 const functionDropdownTrigger = async () => {
   ifShowFunctionDropdown.value = !ifShowFunctionDropdown.value
@@ -348,9 +329,9 @@ const functionDropdownTrigger = async () => {
 
 // 下拉项动画：显示
 const showDropdownItems = () => {
-  if (!loginDropdown.value) return
+  if (!functionDropdown.value) return
   // 只选择非hidden的项执行动画
-  const dropdownItems = loginDropdown.value.querySelectorAll('.dropdown-item:not(.hidden)')
+  const dropdownItems = functionDropdown.value.querySelectorAll('.dropdown-item:not(.hidden)')
   dropdownItems.forEach((item, index) => {
     setTimeout(() => {
       item.style.opacity = '1'
@@ -361,8 +342,8 @@ const showDropdownItems = () => {
 
 // 下拉项动画：重置
 const resetDropdownItems = () => {
-  if (!loginDropdown.value) return
-  const dropdownItems = loginDropdown.value.querySelectorAll('.dropdown-item')
+  if (!functionDropdown.value) return
+  const dropdownItems = functionDropdown.value.querySelectorAll('.dropdown-item')
   dropdownItems.forEach((item) => {
     item.style.opacity = '0'
     item.style.transform = 'translateY(2px)'
@@ -373,7 +354,7 @@ const resetDropdownItems = () => {
 const handleClickOutside = (e) => {
   if (!ifShowFunctionDropdown.value) return
   const isInTrigger = loginTrigger.value?.contains(e.target)
-  const isInDropdown = loginDropdown.value?.contains(e.target)
+  const isInDropdown = functionDropdown.value?.contains(e.target)
   if (!isInTrigger && !isInDropdown) {
     ifShowFunctionDropdown.value = false
     resetDropdownItems()
@@ -396,7 +377,7 @@ const ifShowMobileMenu = () => {
   ifShowMobile.value = !ifShowMobile.value
 }
 
-// 点击外部关闭移动端菜单（直接改状态，避免模拟点击）
+// 点击外部关闭移动端菜单
 const handleMobileClickOutside = (e) => {
   if (!ifShowMobile.value || !mobileMenu.value || !mobileMenuBtn.value) return
   const isInMenu = mobileMenu.value.contains(e.target)
@@ -423,7 +404,9 @@ const redirectPage = () => {
 .dropdown-item {
   opacity: 0;
   transform: translateY(2px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
 #mobileMenu {
@@ -445,22 +428,14 @@ const redirectPage = () => {
 #navIndicator {
   height: 3px;
   background-color: #f0096d;
-  transition: left 0.3s ease, width 0.3s ease;
+  transition:
+    left 0.3s ease,
+    width 0.3s ease;
   border-radius: 2px;
   position: absolute;
   bottom: -8px;
   margin: 0;
 }
-
-/* 下拉框显隐过渡优化 */
-#loginDropdown {
-  pointer-events: none; /* 隐藏时禁止点击 */
-}
-
-#loginDropdown.visible {
-  pointer-events: auto; /* 显示时允许点击 */
-}
-
 .custom-message .el-icon-warning {
   color: #ffd166 !important;
 }

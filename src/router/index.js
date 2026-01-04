@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 // 引入 views 下主页组件
 import HomePage from '../views/HomePage.vue'
 import path from 'path'
-
+import {useUserStore} from '@/stores/user.js'
 // 路由规则：路径 -> 对应组件
 const routes = [
   {
@@ -48,6 +48,10 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(), // 使用 HTML5 历史模式（无 # 号）
   routes
+})
+//todo: 添加路由守卫
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore()
 })
 
 export default router
