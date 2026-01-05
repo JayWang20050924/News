@@ -21,12 +21,12 @@
       <div class="px-6 py-8 space-y-6 overflow-y-auto" id="registerForm">
         <!-- 已有账号链接 -->
         <div class="text-center">
-          <RouterLinkBlank
+          <router-link
             to="/LoginPage"
             class="text-gray-300 hover:text-gray-100 transition-colors flex items-center justify-center text-base"
           >
             <i class="fa fa-arrow-left mr-2"></i>已有账号?前往登录
-          </RouterLinkBlank>
+          </router-link>
         </div>
         <!-- 用户名输入框 -->
         <div class="input-container">
@@ -196,12 +196,12 @@
       <!-- 卡片底部 -->
       <div class="bg-gray-800 px-6 py-4 text-center flex-shrink-0">
         <span class="text-gray-300 text-sm">
-          <RouterLinkBlank to="/LoginPage" class="text-gray-100 hover:underline"
-            >立即登录</RouterLinkBlank
+          <router-link to="/LoginPage" class="text-gray-100 hover:underline"
+            >立即登录</router-link
           >
           &emsp;|&emsp;
-          <RouterLinkBlank to="/ForgotPage" class="text-gray-100 hover:underline"
-            >忘记密码</RouterLinkBlank
+          <router-link to="/ForgotPage" class="text-gray-100 hover:underline"
+            >忘记密码</router-link
           >
         </span>
       </div>
@@ -225,8 +225,6 @@ import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 // 引入封装的请求模块
 import request from '@/utils/request.js'
-//引入routerlinkblank组件
-import RouterLinkBlank from '@/components/RouterLinkBlank.vue'
 //引入人机验证模块
 import BotCheckModule from '@/components/BotCheckModule.vue'
 

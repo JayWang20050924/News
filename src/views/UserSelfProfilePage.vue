@@ -21,12 +21,14 @@
       <div class="px-6 py-8 space-y-6 overflow-y-auto" id="profileForm">
         <!-- 已有账号链接 -->
         <div class="text-center">
-          <RouterLinkBlank
+          <router-link
+            @click="exitLogin"
             to="/LoginPage"
+            target="_self"
             class="text-gray-300 hover:text-gray-100 transition-colors flex items-center justify-center text-base"
           >
             <i class="fa fa-arrow-left mr-2"></i>切换账号?退出登录
-          </RouterLinkBlank>
+          </router-link>
         </div>
         <!-- 用户名显示框（不可修改） -->
         <div class="input-container">
@@ -184,11 +186,18 @@
       <!-- 卡片底部 -->
       <div class="bg-gray-800 px-6 py-4 text-center flex-shrink-0">
         <span class="text-gray-300 text-sm">
-          <RouterLinkBlank to="/LoginPage"  class="text-gray-100 hover:underline">
+          <router-link
+            @click="exitLogin"
+            to="/LoginPage"
+            target="_self"
+            class="text-gray-100 hover:underline"
+          >
             切换账号
-          </RouterLinkBlank>
+          </router-link>
           &emsp;|&emsp;
-          <RouterLinkBlank to="/" class="text-gray-100 hover:underline"> 返回首页 </RouterLinkBlank>
+          <router-link to="/" target="_self" class="text-gray-100 hover:underline">
+            返回首页
+          </router-link>
         </span>
       </div>
     </div>
@@ -199,7 +208,6 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request.js'
-import RouterLinkBlank from '@/components/RouterLinkBlank.vue'
 import router from '@/router/index.js'
 // 提示持续时间
 const MESSAGE_DURATION = 2000
@@ -221,6 +229,11 @@ const originalProfile = ref({
 })
 
 const isSaving = ref(false)
+
+const exitLogin = async () => {
+  localStorage.removeItem('jwtAuth')
+  return
+}
 
 // 计算属性：判断是否有修改项
 const hasChanges = computed(() => {

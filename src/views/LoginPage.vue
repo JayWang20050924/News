@@ -21,12 +21,12 @@
       <div class="px-6 py-8 space-y-6 overflow-y-auto" id="loginForm">
         <!-- 注册账号链接 -->
         <div class="text-center">
-          <RouterLinkBlank
+          <router-link
             to="/RegisterPage"
             class="text-gray-300 hover:text-gray-100 transition-colors flex items-center justify-center text-base"
           >
             <i class="fa fa-arrow-left mr-2"></i>没有账号?前往注册
-          </RouterLinkBlank>
+          </router-link>
         </div>
         <!-- 用户名输入框 -->
         <div class="input-container">
@@ -160,16 +160,16 @@
       <!-- 卡片底部 -->
       <div class="bg-gray-800 px-6 py-4 text-center flex-shrink-0">
         <span class="text-gray-300 text-sm">
-          <RouterLinkBlank to="/RegisterPage" class="text-gray-100 hover:underline"
-            >立即注册</RouterLinkBlank
+          <router-link to="/RegisterPage" class="text-gray-100 hover:underline"
+            >立即注册</router-link
           >
           &emsp;|&emsp;
-          <RouterLinkBlank to="/ForgotPage" class="text-gray-100 hover:underline"
-            >忘记密码</RouterLinkBlank
+          <router-link to="/ForgotPage" class="text-gray-100 hover:underline"
+            >忘记密码</router-link
           >
           &emsp;|&emsp;
-          <RouterLinkBlank to="/AdminLoginPage" class="text-gray-100 hover:underline"
-            >后台登录</RouterLinkBlank
+          <router-link to="/AdminLoginPage" class="text-gray-100 hover:underline"
+            >后台登录</router-link
           >
         </span>
       </div>
@@ -178,7 +178,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted,nextTick } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 // 从Element Plus中导入ElMessage（消息提示组件）
 import { ElMessage } from 'element-plus'
 // 引入Vue Router的useRouter函数
@@ -187,7 +187,6 @@ import { useRouter } from 'vue-router'
 import request from '@/utils/request.js'
 // 引入js-cookie库
 import Cookies from 'js-cookie'
-import RouterLinkBlank from '@/components/RouterLinkBlank.vue'
 
 import { useUserStore } from '@/stores/user.js'
 
@@ -211,11 +210,6 @@ const botCheckCodeUrl = ref('')
 const isBotCheckCodeDisabled = ref(false)
 //useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
 const router = useRouter()
-// 退出登录函数进入页面加载todo:获取pinia中全局登录状态即可
-const exitLogin = async () => {
-  localStorage.removeItem('token')
-  return
-}
 // 切换密码可见性
 const togglePassword = () => {
   passwordType.value = passwordType.value === 'password' ? 'text' : 'password'
@@ -332,11 +326,9 @@ const handleSubmit = async () => {
         customClass: 'custom-message',
         duration: MESSAGE_DURATION,
       })
-      // 保存发送的token到本地存储
-      localStorage.setItem('token', data.token)
-      console.log(localStorage.getItem('token'))
+      // 保存发送的token
+      localStorage.setItem('jwtAuth', data.token)
       userStore.setLoginStatus(true) // 更新全局登录状态
-      await nextTick()
       router.push('/')
     } else {
       ElMessage({
@@ -365,7 +357,7 @@ const handleKeydown = (e) => {
 }
 // 组件挂载时初始化
 onMounted(() => {
-  exitLogin()
+
   document.addEventListener('keydown', handleKeydown)
   refreshBotCheckCode()
 })

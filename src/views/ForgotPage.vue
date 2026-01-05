@@ -21,12 +21,12 @@
       <div class="px-6 py-8 space-y-6 overflow-y-auto" id="forgotForm">
         <!-- 返回登录链接 -->
         <div class="text-center">
-          <RouterLinkBlank
+          <router-link
             to="/LoginPage"
             class="text-gray-300 hover:text-gray-100 transition-colors flex items-center justify-center text-base"
           >
             <i class="fa fa-arrow-left mr-2"></i>再次尝试?返回登录
-          </RouterLinkBlank>
+          </router-link>
         </div>
 
         <!-- 用户名输入 -->
@@ -185,12 +185,12 @@
       <!-- 卡片底部 -->
       <div class="bg-gray-800 px-6 py-4 text-center flex-shrink-0">
         <span class="text-gray-300 text-sm">
-          <RouterLinkBlank to="/LoginPage" class="text-gray-100 hover:underline"
-            >立即登录</RouterLinkBlank
+          <router-link to="/LoginPage" class="text-gray-100 hover:underline"
+            >立即登录</router-link
           >
           &emsp;|&emsp;
-          <RouterLinkBlank to="/RegisterPage" class="text-gray-100 hover:underline"
-            >注册账号</RouterLinkBlank
+          <router-link to="/RegisterPage" class="text-gray-100 hover:underline"
+            >注册账号</router-link
           >
         </span>
       </div>
@@ -211,7 +211,6 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import request from '@/utils/request.js'
-import RouterLinkBlank from '@/components/RouterLinkBlank.vue'
 import BotCheckModule from '@/components/BotCheckModule.vue'
 
 // 提示持续时间

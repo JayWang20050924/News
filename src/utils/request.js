@@ -20,7 +20,7 @@ service.interceptors.request.use(
       config.params = { timestamp: timestamp }
     }
     //添加token到请求头
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('jwtAuth')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }

@@ -1,15 +1,11 @@
-import { defineStore } from 'pinia'
-import request from '@/utils/request.js'
-
-export const useUserStore = defineStore('user', {
-  //直接返回括号内的对象
+export const useAdminStore = defineStore('admin', {
   state: () => ({
     isLogin: false,
   }),
   actions: {
     async fetchLoginStatus() {
       try {
-        const data = await request.get('/getLoginStatus')
+        const data = await request.get('/getAdminLoginStatus')
         if (!data.status) {
           throw new Error('未登录')
         }
@@ -21,10 +17,9 @@ export const useUserStore = defineStore('user', {
       }
     },
     async exitLogin() {
-      localStorage.removeItem('jwtAuth')
+      localStorage.removeItem('adminToken')
       try {
-        const data = await request.get('/userExitLogin')
-        console.log(data)
+        const data = await request.get('/adminExitLogin')
         if (!data.status) {
           throw new Error('退出登录失败')
         }
@@ -42,12 +37,9 @@ export const useUserStore = defineStore('user', {
   },
   persist: {
     enabled: true,
-    key: 'user-login-status',
+    key: 'admin-login-status',
     //存储至本地缓存
     storage: localStorage,
     //只持久化isLogin字段
-    paths: ['isLogin'],
   },
 })
-
-

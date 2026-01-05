@@ -18,15 +18,12 @@
             ]"
           ></i>
         </button>
-        <!-- 改用 opacity/visibility 控制显隐（保留文档流，动画更流畅） -->
         <div
           id="functionDropdown"
           ref="functionDropdown"
           :class="[
             'absolute top-full left-0 mt-3 w-40 bg-gray-900 rounded-lg shadow-xl shadow-gray-900/60 border border-gray-700 transition-all duration-300 ease-in-out transform origin-top-right',
-            ifShowFunctionDropdown
-              ? 'block'
-              : 'hidden',
+            ifShowFunctionDropdown ? 'block' : 'hidden',
           ]"
         >
           <!-- 登录按钮：未登录显示 -->
@@ -47,7 +44,7 @@
             @click="redirectPage"
             id="centerBtn"
             to="/UserSelfProfilePage"
-            target="_blank"
+            target="_self"
             :class="[
               userStore.isLogin ? 'block' : 'hidden',
               'dropdown-item px-6 py-3 text-gray-100 hover:bg-gray-800 transition-colors duration-200 hover:text-gray-100',
@@ -75,7 +72,7 @@
           >
             <i class="fa fa-key mr-2"></i>忘记密码
           </router-link>
-          <!-- 退出登录：已登录显示（单独处理点击事件） -->
+          <!-- 退出登录 -->
           <a
             @click="handleLogout"
             href="javascript:void(0)"
