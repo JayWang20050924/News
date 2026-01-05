@@ -89,9 +89,6 @@
 
       <!-- 网站Logo -->
       <div class="flex items-center md:text-3xl font-bold text-gray-100" style="font-size: 2rem">
-        <a href="#" style="font-size: 2.5rem">
-          <i class="fa fa-newspaper-o mr-2"></i>
-        </a>
         <span>&nbsp;环&nbsp;球&nbsp;新&nbsp;闻&nbsp;</span>
       </div>
 
@@ -144,6 +141,10 @@
           <!-- 导航下划线指示器-->
           <div ref="navIndicator" id="navIndicator"></div>
 
+          <!-- github图标 -->
+          <a href="https://github.com/wangpeng119112/News" target="_blank">
+            <i class="fa fa-github  " style="font-size: 2.5rem;margin-left: 2rem;"></i>
+          </a>
           <!-- 桌面端搜索框 -->
           <div
             class="search-container-pc hidden md:flex items-center bg-gray-800 border-2 border-gray-400 rounded-lg overflow-hidden"
@@ -187,6 +188,13 @@
       ]"
     >
       <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+        <!-- github图标 -->
+          <a href="https://github.com/wangpeng119112/News" target="_blank"
+          class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
+          >
+            <i class="fa fa-github"  style="font-size: 2.5rem;"></i>
+          </a>
+
         <a
           @click="redirectPage"
           href="#"
