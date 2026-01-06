@@ -351,6 +351,10 @@ const handleSubmit = async () => {
       customClass: 'custom-message',
       duration: MESSAGE_DURATION,
     })
+    //未登录或token失效，跳转登录页
+    setTimeout(() => {
+      router.push('/LoginPage')
+    }, MESSAGE_DURATION)
   } finally {
     isSaving.value = false
   }

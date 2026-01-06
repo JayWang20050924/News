@@ -10,7 +10,7 @@
           @click="functionDropdownTrigger"
           class="ml-2 w-12 bg-gray-900 h-12 rounded-full flex items-center justify-center text-gray-100 border-2 border-gray-500"
         >
-          <!-- 响应式图标：直接绑定 userStore.isLogin，Pinia 响应式自动更新 -->
+          <!-- 响应式图标 -->
           <i
             :class="[
               userStore.isLogin ? 'fa fa-user-o' : 'fa fa-user',
@@ -143,7 +143,7 @@
 
           <!-- github图标 -->
           <a href="https://github.com/wangpeng119112/News" target="_blank">
-            <i class="fa fa-github  " style="font-size: 2.5rem;margin-left: 2rem;"></i>
+            <i class="fa fa-github" style="font-size: 2.5rem; margin-left: 2rem"></i>
           </a>
           <!-- 桌面端搜索框 -->
           <div
@@ -189,11 +189,13 @@
     >
       <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
         <!-- github图标 -->
-          <a href="https://github.com/wangpeng119112/News" target="_blank"
+        <a
+          href="https://github.com/wangpeng119112/News"
+          target="_blank"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
-          >
-            <i class="fa fa-github"  style="font-size: 2.5rem;"></i>
-          </a>
+        >
+          <i class="fa fa-github" style="font-size: 2.5rem"></i>
+        </a>
 
         <a
           @click="redirectPage"
@@ -266,7 +268,7 @@ import { useUserStore } from '@/stores/user.js'
 // 实例化依赖
 const userStore = useUserStore()
 
-// ========== 状态定义（统一用布尔值，更易维护） ==========
+// ========== 状态定义==========
 // PC端登录下拉框显示状态（true=显示，false=隐藏）
 const ifShowFunctionDropdown = ref(false)
 const functionDropdown = ref(null)
@@ -283,6 +285,7 @@ const navItems = ref([])
 
 // ========== 生命周期 ==========
 onMounted(() => {
+  
   // 绑定全局点击事件
   document.addEventListener('click', handleClickOutside)
   document.addEventListener('click', handleMobileClickOutside)
@@ -401,8 +404,28 @@ const redirectPage = () => {
 </script>
 
 <style scoped>
+@keyframes slideDownBounce {
+  0% {
+    transform: translateY(-100%); /* 完全隐藏在顶部 */
+    opacity: 0; /* 初始透明 */
+  }
+  85% {
+    transform: translateY(6px); /*轻微超出目标位置*/
+    opacity: 1; /* 完全显示 */
+  }
+  100% {
+    transform: translateY(0); /* 归位 */
+    opacity: 1;
+  }
+}
+
 #navbar {
   background-color: rgb(52, 52, 52);
+  /* 初始状态：隐藏 + 透明 */
+  transform: translateY(-100%);
+  opacity: 0;
+  /* 绑定动画0.7秒，缓动函数增强丝滑感 */
+  animation: slideDownBounce 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 /* 下拉项初始样式（动画基础） */
