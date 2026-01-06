@@ -29,14 +29,14 @@ public class UserGetLoginStatusService {
                 user.setUsername(currentUsername);
                 if(userDaoImp.verifyUserExistenceService(user)!=0){
                     GeneralDataResponse data = new GeneralDataResponse(true, null);
-                    return new ApiResponse<GeneralDataResponse>(200, "已登录", data);
+                    return new ApiResponse<>(200, "已登录", data);
                 }
                 GeneralDataResponse data = new GeneralDataResponse(false, null);
-                return new ApiResponse<GeneralDataResponse>(401, "用户失效", data);
+                return new ApiResponse<>(401, "用户失效", data);
             } catch (JwtException e) {
                 // 解析失败（签名无效/过期等），视为未登录
                 GeneralDataResponse data = new GeneralDataResponse(false, null);
-                return new ApiResponse<GeneralDataResponse>(401, "未登录", data);
+                return new ApiResponse<>(401, "未登录", data);
             }
         }
         return new ApiResponse<>(401,"未登录",new GeneralDataResponse(false, null));

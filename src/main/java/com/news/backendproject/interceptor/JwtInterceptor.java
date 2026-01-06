@@ -9,6 +9,9 @@ import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -19,13 +22,17 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtInterceptor implements HandlerInterceptor {
-
+    @Value("${jwt.blacklist-prefix}")
+    private String blacklistPrefix;
     private final JwtUtil jwtUtil;
     private final ObjectMapper objectMapper;
-
+    private final StringRedisTemplate stringRedisTemplate;
+    //todo: 添加黑名单校验
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
         //  判断当前处理器是否是控制器方法（HandlerMethod），静态资源等非方法类型直接放行
         if (!(handler instanceof HandlerMethod handlerMethod)) {
             return true;
@@ -46,6 +53,14 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         // 提取令牌（去掉Bearer前缀）
         String token = authHeader.substring(7);
+        //  是否被拉黑,防止jwt被盗取
+        String redisKey=blacklistPrefix+token;
+        Boolean blacklistResult = stringRedisTemplate.hasKey(redisKey);
+        if (blacklistResult){
+            log.warn("疑似存在盗用jwt行为");
+            buildErrorResponse(response, 401, "当前用户已退出,请重新登录");
+            return false;
+        }
         try {
             // 校验令牌并提取用户名
             String username = jwtUtil.extractUsername(token);

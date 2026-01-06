@@ -28,7 +28,7 @@ public class UserForgotService {
         if (!existenceVerify.usernameExistenceVerify(dto)){
             return new ApiResponse<>(409,"用户不存在",new GeneralDataResponse(false,null));
         }
-        //返回值为是否用于找回密码的对象不存在
+        //是否用于找回密码的对象不存在
         if (existenceVerify.emailExistenceVerifyForgot(dto)){
             return new ApiResponse<>(409,"无效的密保邮箱",new GeneralDataResponse(false,null));
         }

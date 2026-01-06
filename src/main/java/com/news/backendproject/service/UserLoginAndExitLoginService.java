@@ -6,16 +6,18 @@ import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDataResponse;
 import com.news.backendproject.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public  class UserLoginAndExitLoginService {
     private final JwtUtil jwtUtil;
     private final UserDaoImp userDaoImp;
     private final StringRedisTemplate stringRedisTemplate;
-
+    private final BlacklistJwtService blacklistJwtService;
     public ApiResponse<GeneralDataResponse> userLogin(
             String username,
             String password,
@@ -58,14 +60,19 @@ public  class UserLoginAndExitLoginService {
                 &&userDaoImp.verifyUserPasswordService(user)!=0){
             String token = jwtUtil.generateToken(user.getUsername()); // 传入用户名生成令牌
             GeneralDataResponse data = new GeneralDataResponse(true,token);
-            System.err.println("接口发送的token:"+token);
+            System.err.println("接口发送token:"+token);
+            log.info("接口发送了token:{}", token);
             return new ApiResponse<>(200,"登录成功",data);
         }
         GeneralDataResponse data = new GeneralDataResponse(false,null);
         return new ApiResponse<>(404,"未知的错误",data);
     }
     //用户退出登录
-    public ApiResponse<GeneralDataResponse> userExitLogin(String token){
-        return new ApiResponse<>(200,"登出成功",new GeneralDataResponse(true,null));
+    public ApiResponse<GeneralDataResponse> userExitLogin(String token,String reason){
+        if (token.trim().isEmpty()){
+            log.error("JWT 令牌为空，无法加入黑名单");
+            return new ApiResponse<>(401,"用户认证为空",new GeneralDataResponse(false,null));
+        }
+        return blacklistJwtService.addBlacklist(token,reason);
     }
 }

@@ -47,7 +47,6 @@ public class UserController {
     private final UserUpdateProfileService userUpdateProfileService;
     private final ProfileInconsistencyVerify profileInconsistencyVerify;
 
-
     // 正则常量（抽离便于维护）
     private static final String REGEX_USER_PASS = "^[A-Za-z0-9]{8,20}$"; // 用户名/密码规则
     private static final String REGEX_EMAIL = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"; // 邮箱规则
@@ -98,7 +97,7 @@ public class UserController {
         out.close();
     }
 
-    // 人机验证码的验证接口
+    // 人机验证码验证接口
     @GetMapping("/botCheck")
     public ApiResponse<GeneralDataResponse> botCheck(
             // 人机验证码格式验证
@@ -115,13 +114,14 @@ public class UserController {
         String redisKey = operationType + request.getSession().getId();
         return botCaptchaVerify.verify(captcha, redisKey);
     }
-
+    //获取登录状态接口(jwt用户验证)
+    @JwtRequired
     @AccessRestriction(limit = 30, message = "获取登录状态过于频繁")
     @GetMapping("/getLoginStatus")
     public ApiResponse<GeneralDataResponse> getLoginStatus(HttpServletRequest request) {
         return userGetLoginStatusService.getLoginStatus(request);
     }
-
+    //登录接口
     @AccessRestriction(limit = 5, message = "登录过于频繁,1分钟后再试", limitKey = false)
     @PostMapping("/getLoginResponse")
     public ApiResponse<GeneralDataResponse> getLoginResponse(
@@ -140,16 +140,19 @@ public class UserController {
         String redisKey = operationType + request.getSession().getId();
         return userLoginAndExitLoginService.userLogin(username, password, captcha, redisKey);
     }
-    //todo:添加退出登录接口,向redis中添加对应的jwt黑名单
-    @AccessRestriction(limit = 1, message = "退出登录过于频繁", limitKey = false)
+    //退出登录接口
+    @AccessRestriction(limit = 30, message = "退出登录过于频繁", limitKey = false)
     @GetMapping("/userExitLogin")
     public ApiResponse<GeneralDataResponse> userExitLogin(HttpServletRequest request) {
+
         String authHeader = request.getHeader("Authorization");
+        System.out.println(authHeader);
         if (authHeader == null || !authHeader.startsWith("Bearer")) {
             return new ApiResponse<>(409,"暂未登录",new GeneralDataResponse(false,null));
         }
         String token = authHeader.substring(7).trim();
-        return userLoginAndExitLoginService.userExitLogin(token);
+        final String reason = "用户退出登录";
+        return userLoginAndExitLoginService.userExitLogin(token, reason);
     }
     // 发送邮箱验证码
     @AccessRestriction(limit = 5, message = "验证码请求过于频繁,稍后再试", limitKey = false)
@@ -160,7 +163,6 @@ public class UserController {
         String redisKey = dto.getOperationType()+dto.getUsername() + request.getSession().getId();
         //通过枚举类获得当前操作类型
         OperationTypeVerify operationType = OperationTypeVerify.getByCode(dto.getOperationType());
-        System.out.println(dto.toString());
         switch (operationType) {
             case REGISTER -> {
                 return sendEmailCaptchaService.sendRegister(dto, redisKey);
