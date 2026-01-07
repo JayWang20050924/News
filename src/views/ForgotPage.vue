@@ -6,13 +6,13 @@
     >
       <!-- 卡片头部 -->
       <div class="bg-gray-800 px-6 py-8 flex-shrink-0">
-        <!-- 取消,回到主页按钮 -->
-        <router-link
-          to="/"
+        <!-- 返回按钮 -->
+        <button
+          @click="goBack"
           class="absolute top-0 right-1 text-gray-300 hover:text-gray-100 text-3xl transition-colors"
         >
           <i class="fa fa-times"></i>
-        </router-link>
+        </button>
         <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-gray-100 text-center">找回密码</h2>
         <p class="text-gray-300 text-center mt-2 text-sm">通过绑定邮箱重置您的密码</p>
       </div>
@@ -248,7 +248,10 @@ const validateEmailCaptchaPattern = /^[A-Z0-9]{8}$/ // 验证码规则：8位大
 
 // 路由实例
 const router = useRouter()
-
+const goBack = () => {
+  // 调用路由的back方法，模拟浏览器的返回按钮
+  router.back()
+}
 // 切换密码可见性
 const togglePassword = () => {
   passwordType.value = passwordType.value === 'password' ? 'text' : 'password'

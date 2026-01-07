@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 // 引入 views 下主页组件
-import HomePage from '../views/HomePage.vue'
-// 移除多余的无效导入（浏览器环境无需 node 的 path 模块，meta 导入无意义）
+import HomePage from '@/views/HomePage.vue'
 import { useUserStore } from '@/stores/user.js'
 
 // 路由规则：路径 -> 对应组件

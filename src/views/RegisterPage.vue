@@ -7,12 +7,12 @@
       <!-- 卡片头部 -->
       <div class="bg-gray-800 px-6 py-8 flex-shrink-0">
         <!-- 取消,回到主页按钮 -->
-        <router-link
-          to="/"
+        <button
+          @click="goBack"
           class="absolute top-0 right-1 text-gray-300 hover:text-gray-100 text-3xl transition-colors"
         >
           <i class="fa fa-times"></i>
-        </router-link>
+        </button>
         <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-gray-100 text-center">账户注册</h2>
         <p class="text-gray-300 text-center mt-2 text-sm">新建您的账号和密码</p>
       </div>
@@ -256,6 +256,10 @@ const validatePatternEmail = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
 const validateEmailCaptchaPattern = /^[A-Z0-9]{8}$/
 //useRouter 是 Vue Router 的 Composition API 函数，必须在组件的 setup 顶层作用域调用
 const router = useRouter()
+
+const goBack = () => {
+  router.back()
+}
 // 切换密码可见性
 const togglePassword = () => {
   passwordType.value = passwordType.value === 'password' ? 'text' : 'password'

@@ -1,6 +1,10 @@
 <template>
-  <!-- 导航栏 -->
-  <header id="navbar" class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-5">
+  <!-- 导航栏：绑定动态背景色，基于opacity变量 -->
+  <header
+    id="navbar"
+    class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-5"
+    :style="{ backgroundColor: `rgba(52, 52, 52, ${navbarBgOpacity})` }"
+  >
     <div class="container mx-auto px-4 md:px-6 flex items-center justify-between">
       <!-- 左上角登录图标下拉组件 -->
       <div class="relative z-50" id="functionDropdownContainer">
@@ -262,13 +266,18 @@
 
 <script setup lang="js">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-
 import { useUserStore } from '@/stores/user.js'
 
 // 实例化依赖
 const userStore = useUserStore()
 
 // ========== 状态定义==========
+// 导航栏背景透明度
+const navbarBgOpacity = ref(0)
+// 滚动阈值：超过该距离后透明度固定为1
+const scrollThreshold = 50
+let debounceTimer = null
+
 // PC端登录下拉框显示状态（true=显示，false=隐藏）
 const ifShowFunctionDropdown = ref(false)
 const functionDropdown = ref(null)
@@ -283,9 +292,36 @@ const mobileMenuBtn = ref(null)
 const navIndicator = ref(null)
 const navItems = ref([])
 
+
+// 防抖函数（避免滚动高频触发，确保动画流畅）
+const debounce = (fn, delay = 16) => { // 16ms ≈ 60帧/秒，兼顾流畅度和响应速度
+  return (...args) => {
+    clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => fn.apply(this, args), delay)
+  }
+}
+
+// ========== 滚动处理逻辑 ==========
+const handleScroll = () => {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop
+
+  if (scrollTop <= 0) {
+    navbarBgOpacity.value = 0
+  } else if (scrollTop >= scrollThreshold) {
+    navbarBgOpacity.value = 1
+  } else {
+    //二次缓入缓出
+    navbarBgOpacity.value = scrollTop / scrollThreshold < 0.5
+  }
+}
+
 // ========== 生命周期 ==========
 onMounted(() => {
-  
+  // 绑定滚动事件（passive: true 提升移动端性能）
+  window.addEventListener('scroll', debounce(handleScroll), { passive: true })
+  // 初始化执行一次，避免页面刷新后滚动位置非顶部时样式异常
+  handleScroll()
+
   // 绑定全局点击事件
   document.addEventListener('click', handleClickOutside)
   document.addEventListener('click', handleMobileClickOutside)
@@ -302,7 +338,10 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  //避免内存泄漏
+  // 移除滚动事件监听（避免内存泄漏）
+  window.removeEventListener('scroll', debounce(handleScroll))
+  clearTimeout(debounceTimer) // 清除防抖计时器，避免内存泄漏
+  // 移除其他事件监听
   document.removeEventListener('click', handleClickOutside)
   document.removeEventListener('click', handleMobileClickOutside)
 })
@@ -420,12 +459,16 @@ const redirectPage = () => {
 }
 
 #navbar {
-  background-color: rgb(52, 52, 52);
+  /* 移除固定的background-color，改为动态绑定 */
   /* 初始状态：隐藏 + 透明 */
   transform: translateY(-100%);
-  opacity: 0;
   /* 绑定动画0.7秒，缓动函数增强丝滑感 */
   animation: slideDownBounce 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  /* 确保背景色过渡丝滑（和transition-all复用也可以，这里显式声明更清晰） */
+  transition:
+    background-color 500ms ease-out,
+    box-shadow 500ms ease-out, /* 阴影同步过渡 */
+    transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* 下拉项初始样式（动画基础） */

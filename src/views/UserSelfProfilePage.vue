@@ -6,13 +6,13 @@
     >
       <!-- 卡片头部 -->
       <div class="bg-gray-800 px-6 py-8 flex-shrink-0">
-        <!-- 返回主页按钮 -->
-        <router-link
-          to="/"
+        <!-- 返回按钮 -->
+        <button
+          @click="goBack"
           class="absolute top-0 right-1 text-gray-300 hover:text-gray-100 text-3xl transition-colors"
         >
           <i class="fa fa-times"></i>
-        </router-link>
+        </button>
         <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-gray-100 text-center">个人中心</h2>
         <p class="text-gray-300 text-center mt-2 text-sm">查看/编辑您的个人信息</p>
       </div>
@@ -207,6 +207,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
 import request from '@/utils/request.js'
 import router from '@/router/index.js'
 // 提示持续时间
@@ -229,6 +230,11 @@ const originalProfile = ref({
 })
 
 const isSaving = ref(false)
+const routerBack= useRouter()
+
+const goBack=()=>{
+  routerBack.back();
+}
 
 const exitLogin = async () => {
   localStorage.removeItem('jwtAuth')

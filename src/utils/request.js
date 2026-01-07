@@ -13,7 +13,7 @@ service.interceptors.request.use(
   (config) => {
     // 生成时间戳
     const timestamp = Date.now()
-    // 如果已有params，直接添加时间戳；否则初始化并添加时间戳params
+    // 如果已有params,直接添加时间戳=>否则初始化并添加时间戳params
     if (config.params) {
       config.params.timestamp = timestamp
     } else {
