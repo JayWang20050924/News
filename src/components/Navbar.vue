@@ -97,7 +97,7 @@
       </div>
 
       <!-- 桌面端导航菜单 -->
-      <nav class="hidden md:flex items-center" style="padding-right: 2rem">
+      <nav class="hidden custom:flex items-center" style="padding-right: 2rem">
         <div class="desktop-nav-container flex items-center space-x-8 mr-2 relative">
           <a
             @click="handleNavItemClick($event)"
@@ -149,17 +149,21 @@
           <a href="https://github.com/wangpeng119112/News" target="_blank">
             <i class="fa fa-github" style="font-size: 2.5rem; margin-left: 2rem"></i>
           </a>
+
           <!-- 桌面端搜索框 -->
           <div
-            class="search-container-pc hidden md:flex items-center bg-gray-800 border-2 border-gray-400 rounded-lg overflow-hidden"
-            style="margin-left: 5rem"
+            class="search-container-pc hidden custom:flex items-center bg-gray-800 border-2 border-gray-400 rounded-lg overflow-hidden"
+            :class="{
+              'ml-4 lg:ml-8 xl:ml-20': true,
+              'w-auto flex-1': true,
+            }"
           >
             <input
               ref="searchInput"
               id="searchInput"
               type="text"
               placeholder="搜索新闻..."
-              class="bg-gray-800 text-gray-100 px-4 py-2 outline-none w-40 md:w-56"
+              class="bg-gray-800 text-gray-100 px-4 py-2 outline-none w-32 md:w-40 lg:w-48 xl:w-56"
               aria-label="搜索输入框"
             />
             <button
@@ -176,7 +180,7 @@
         ref="mobileMenuBtn"
         id="mobileMenuBtn"
         @click="ifShowMobileMenu"
-        class="md:hidden text-gray-100 text-2xl"
+        class="custom:hidden text-gray-100 text-2xl"
       >
         <i class="fa fa-bars"></i>
       </button>
@@ -188,7 +192,7 @@
       id="mobileMenu"
       :class="[
         ifShowMobile ? 'block' : 'hidden',
-        'bg-gray-900 border-t border-gray-800 mt-4 md:hidden',
+        'bg-gray-900 border-t border-gray-800 mt-4 custom:hidden',
       ]"
     >
       <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
@@ -292,9 +296,9 @@ const mobileMenuBtn = ref(null)
 const navIndicator = ref(null)
 const navItems = ref([])
 
-
 // 防抖函数（避免滚动高频触发，确保动画流畅）
-const debounce = (fn, delay = 16) => { // 16ms ≈ 60帧/秒，兼顾流畅度和响应速度
+const debounce = (fn, delay = 16) => {
+  // 16ms ≈ 60帧/秒，兼顾流畅度和响应速度
   return (...args) => {
     clearTimeout(debounceTimer)
     debounceTimer = setTimeout(() => fn.apply(this, args), delay)
@@ -467,8 +471,8 @@ const redirectPage = () => {
   /* 确保背景色过渡丝滑（和transition-all复用也可以，这里显式声明更清晰） */
   transition:
     background-color 500ms ease-out,
-    box-shadow 500ms ease-out, /* 阴影同步过渡 */
-    transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow 500ms ease-out,
+    /* 阴影同步过渡 */ transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* 下拉项初始样式（动画基础） */

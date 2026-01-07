@@ -1,11 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    './index.html',
-    './src/**/*.{vue,js,ts,jsx,tsx}',
-  ],
+  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      screens: {
+        custom: '1088px', // 自定义断点，用于1088px
+      },
       colors: {
         dark: '#121212',
         'gray-900': 'rgb(30 30 30)',
@@ -43,7 +43,8 @@ export default {
           'transition-property': 'all',
           'transition-duration': '300ms',
           '&:hover': {
-            'box-shadow': '0 20px 25px -5px rgba(17, 24, 39, 0.3), 0 10px 10px -5px rgba(17, 24, 39, 0.1)',
+            'box-shadow':
+              '0 20px 25px -5px rgba(17, 24, 39, 0.3), 0 10px 10px -5px rgba(17, 24, 39, 0.1)',
             transform: 'translateY(-0.25rem)',
           },
         },
