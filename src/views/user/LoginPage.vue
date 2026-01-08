@@ -139,10 +139,10 @@
             class="h-4 w-4 text-gray-300 bg-gray-800 border-gray-700 rounded focus:ring-gray-300"
           />
           <span class="text-gray-300 text-sm">
-            我同意<a href="Agreement.html" target="_blank" class="text-gray-100 hover:underline"
-              >《用户服务协议》</a
-            >和<a href="Agreement.html" target="_blank" class="text-gray-100 hover:underline"
-              >《隐私政策》</a
+            我同意<router-link to="#" class="text-gray-100 hover:underline"
+              >《用户服务协议》</router-link
+            >和<router-link to="#"  class="text-gray-100 hover:underline"
+              >《隐私政策》</router-link
             >
           </span>
         </label>
@@ -178,6 +178,7 @@
 </template>
 
 <script setup>
+//命名导出需要{}包裹,导入时不可自定义名称
 import { ref, onMounted, onUnmounted } from 'vue'
 // 从Element Plus中导入ElMessage（消息提示组件）
 import { ElMessage } from 'element-plus'

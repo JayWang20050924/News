@@ -134,12 +134,12 @@
             data-nav="sports"
             >体&nbsp;育</a
           >
-          <a
+          <router-link
             @click="handleNavItemClick($event)"
-            href="#"
+            to="/EntertainmentNewsPage"
             class="nav-item text-gray-100 hover:text-white transition-colors"
             data-nav="entertainment"
-            >娱&nbsp;乐</a
+            >娱&nbsp;乐</router-link
           >
 
           <!-- 导航下划线指示器-->
@@ -269,6 +269,8 @@
 </template>
 
 <script setup lang="js">
+  //todo:
+  //导航栏新闻类别点击后状态保留
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useUserStore } from '@/stores/user.js'
 
