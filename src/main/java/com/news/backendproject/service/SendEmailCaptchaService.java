@@ -1,7 +1,7 @@
 package com.news.backendproject.service;
 
 import com.news.backendproject.dto.ApiResponse;
-import com.news.backendproject.dto.GeneralDataResponse;
+import com.news.backendproject.dto.GeneralDto;
 import com.news.backendproject.dto.SendEmailCaptchaDTO;
 import com.news.backendproject.utils.RadomCaptchaUtil;
 import com.news.backendproject.verify.ExistenceVerify;
@@ -23,14 +23,14 @@ public class SendEmailCaptchaService {
     private final StringRedisTemplate stringRedisTemplate;
     private final ExistenceVerify existenceVerify;
     //用于注册时发送邮箱验证码
-    public ApiResponse<GeneralDataResponse> sendRegister(SendEmailCaptchaDTO dto, String redisKey) {
+    public ApiResponse<GeneralDto> sendRegister(SendEmailCaptchaDTO dto, String redisKey) {
         //用户名是否重复
         if (existenceVerify.usernameExistenceVerify(dto)){
-            return new ApiResponse<>(409,"当前账户被注册了,换一个吧~",new GeneralDataResponse(false,null));
+            return new ApiResponse<>(409,"当前账户被注册了,换一个吧~",new GeneralDto(false,null));
         }
         //邮箱是否被绑定过
         if (existenceVerify.emailExistenceVerifyRegister(dto)){
-            return new ApiResponse<>(409,"当前邮箱被绑定了,换一个吧~",new GeneralDataResponse(false,null));
+            return new ApiResponse<>(409,"当前邮箱被绑定了,换一个吧~",new GeneralDto(false,null));
         }
         String emailCaptchaGenerated=RadomCaptchaUtil.generate8DigitCaptcha();
 
@@ -44,20 +44,20 @@ public class SendEmailCaptchaService {
                     TimeUnit.SECONDS
             );
             System.err.println("存储验证码--->"+"KEY->"+redisKey+"VALUE->"+emailCaptchaGenerated+":"+redisKey);
-            return new ApiResponse<>(200,"发送成功",new GeneralDataResponse(true,null));
+            return new ApiResponse<>(200,"发送成功",new GeneralDto(true,null));
         }
-        return new ApiResponse<>(500,"邮箱验证码发送失败",new GeneralDataResponse(false,null));
+        return new ApiResponse<>(500,"邮箱验证码发送失败",new GeneralDto(false,null));
     }
 
     //用于忘记密码时发送邮箱验证码
-    public ApiResponse<GeneralDataResponse> sendForgotPwd(SendEmailCaptchaDTO dto, String redisKey){
+    public ApiResponse<GeneralDto> sendForgotPwd(SendEmailCaptchaDTO dto, String redisKey){
         //用户是否存在
         if (!existenceVerify.usernameExistenceVerify(dto)){
-            return new ApiResponse<>(409,"用户不存在",new GeneralDataResponse(false,null));
+            return new ApiResponse<>(409,"用户不存在",new GeneralDto(false,null));
         }
         //是否用于找回密码的对象不存在
         if (existenceVerify.emailExistenceVerifyForgot(dto)){
-            return new ApiResponse<>(409,"无效的密保邮箱",new GeneralDataResponse(false,null));
+            return new ApiResponse<>(409,"无效的密保邮箱",new GeneralDto(false,null));
         }
 
         String emailCaptchaGenerated=RadomCaptchaUtil.generate8DigitCaptcha();
@@ -71,8 +71,8 @@ public class SendEmailCaptchaService {
                     TimeUnit.SECONDS
             );
             System.err.println("存储验证码redisValue->"+"KEY>"+redisKey+"VALUE>"+emailCaptchaGenerated);
-            return new ApiResponse<>(200,"发送成功",new GeneralDataResponse(true,null));
+            return new ApiResponse<>(200,"发送成功",new GeneralDto(true,null));
         }
-        return new ApiResponse<>(500,"邮箱验证码发送失败",new GeneralDataResponse(false,null));
+        return new ApiResponse<>(500,"邮箱验证码发送失败",new GeneralDto(false,null));
     }
 }

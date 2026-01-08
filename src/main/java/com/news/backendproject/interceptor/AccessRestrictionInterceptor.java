@@ -2,8 +2,7 @@ package com.news.backendproject.interceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.news.backendproject.annotation.AccessRestriction;
 import com.news.backendproject.dto.ApiResponse;
-import com.news.backendproject.dto.GeneralDataResponse;
-import jakarta.annotation.Resource;
+import com.news.backendproject.dto.GeneralDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -106,10 +105,10 @@ public class AccessRestrictionInterceptor implements HandlerInterceptor {
         //  自定义错误类型响应头
         response.setHeader("X-Error-Type", "rate-limit");
         //  构建统一的返回体
-        ApiResponse<GeneralDataResponse> apiResponse = new ApiResponse<>(
+        ApiResponse<GeneralDto> apiResponse = new ApiResponse<>(
                 code,
                 message,
-                new GeneralDataResponse(false, null)
+                new GeneralDto(false, null)
         );
         //  写入响应体（指定UTF-8，避免中文乱码）
         try (OutputStream outputStream = response.getOutputStream()) {

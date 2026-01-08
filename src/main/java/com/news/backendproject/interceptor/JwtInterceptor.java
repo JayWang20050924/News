@@ -3,7 +3,7 @@ package com.news.backendproject.interceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.news.backendproject.annotation.JwtRequired;
 import com.news.backendproject.dto.ApiResponse;
-import com.news.backendproject.dto.GeneralDataResponse;
+import com.news.backendproject.dto.GeneralDto;
 import com.news.backendproject.utils.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +17,6 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 @Component
@@ -87,10 +86,10 @@ public class JwtInterceptor implements HandlerInterceptor {
         //  自定义错误类型响应头
         response.setHeader("X-Error-Type", "jwt-invalid");
         //  构建统一的返回体
-        ApiResponse<GeneralDataResponse> apiResponse = new ApiResponse<>(
+        ApiResponse<GeneralDto> apiResponse = new ApiResponse<>(
                 code,
                 message,
-                new GeneralDataResponse(false, null)
+                new GeneralDto(false, null)
         );
         //  写入响应体（指定UTF-8，避免中文乱码）
         try (OutputStream outputStream = response.getOutputStream()) {

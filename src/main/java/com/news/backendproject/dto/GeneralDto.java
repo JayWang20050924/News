@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class GeneralDataResponse {
+public class GeneralDto {
     private boolean status;
     private String token;
 }

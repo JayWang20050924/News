@@ -7,6 +7,7 @@ import com.news.backendproject.dao.Imp.UserDaoImp;
 import com.news.backendproject.dto.*;
 import com.news.backendproject.entity.User;
 import com.news.backendproject.service.*;
+import com.news.backendproject.service.user.*;
 import com.news.backendproject.utils.JwtUtil;
 import com.news.backendproject.verify.BotCaptchaVerify;
 import com.news.backendproject.verify.ExistenceVerifyAccessJwt;
@@ -99,7 +100,7 @@ public class UserController {
 
     // 人机验证码验证接口
     @GetMapping("/botCheck")
-    public ApiResponse<GeneralDataResponse> botCheck(
+    public ApiResponse<GeneralDto> botCheck(
             // 人机验证码格式验证
             @RequestParam @Pattern(regexp = REGEX_BOT_CAPTCHA, message = "人机验证码格式错误") String captcha,
             @RequestParam @NotBlank String operationType,
@@ -109,7 +110,7 @@ public class UserController {
                 !(operationType.equals(OperationTypeVerify.FORGOT_PASSWORD.getCode())) &&
                 !(operationType.equals(OperationTypeVerify.REGISTER.getCode()))
         ) {
-            return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
+            return new ApiResponse<>(400, "非法请求", new GeneralDto(false, null));
         }
         String redisKey = operationType + request.getSession().getId();
         return botCaptchaVerify.verify(captcha, redisKey);
@@ -118,13 +119,13 @@ public class UserController {
     @JwtRequired
     @AccessRestriction(limit = 30, message = "获取登录状态过于频繁")
     @GetMapping("/getLoginStatus")
-    public ApiResponse<GeneralDataResponse> getLoginStatus(HttpServletRequest request) {
+    public ApiResponse<GeneralDto> getLoginStatus(HttpServletRequest request) {
         return userGetLoginStatusService.getLoginStatus(request);
     }
     //登录接口
     @AccessRestriction(limit = 5, message = "登录过于频繁,1分钟后再试", limitKey = false)
     @PostMapping("/getLoginResponse")
-    public ApiResponse<GeneralDataResponse> getLoginResponse(
+    public ApiResponse<GeneralDto> getLoginResponse(
             // 用户名格式验证
             @RequestParam @Pattern(regexp = REGEX_USER_PASS, message = "用户名错误") String username,
             // 密码格式验证
@@ -135,7 +136,7 @@ public class UserController {
             HttpServletRequest request) {
         // 限制验证请求为登录业务
         if (!operationType.equals(OperationTypeVerify.LOGIN.getCode())) {
-            return new ApiResponse<>(400, "非法验证请求", new GeneralDataResponse(false, null));
+            return new ApiResponse<>(400, "非法验证请求", new GeneralDto(false, null));
         }
         String redisKey = operationType + request.getSession().getId();
         return userLoginAndExitLoginService.userLogin(username, password, captcha, redisKey);
@@ -143,12 +144,12 @@ public class UserController {
     //退出登录接口
     @AccessRestriction(limit = 30, message = "退出登录过于频繁", limitKey = false)
     @GetMapping("/userExitLogin")
-    public ApiResponse<GeneralDataResponse> userExitLogin(HttpServletRequest request) {
+    public ApiResponse<GeneralDto> userExitLogin(HttpServletRequest request) {
 
         String authHeader = request.getHeader("Authorization");
         System.out.println(authHeader);
         if (authHeader == null || !authHeader.startsWith("Bearer")) {
-            return new ApiResponse<>(409,"暂未登录",new GeneralDataResponse(false,null));
+            return new ApiResponse<>(409,"暂未登录",new GeneralDto(false,null));
         }
         String token = authHeader.substring(7).trim();
         final String reason = "用户退出登录";
@@ -157,7 +158,7 @@ public class UserController {
     // 发送邮箱验证码
     @AccessRestriction(limit = 5, message = "验证码请求过于频繁,稍后再试", limitKey = false)
     @PostMapping("/sendEmailCaptcha")
-    public ApiResponse<GeneralDataResponse> sendEmailCaptcha(
+    public ApiResponse<GeneralDto> sendEmailCaptcha(
             @RequestBody @Valid SendEmailCaptchaDTO dto,
             HttpServletRequest request) {
         String redisKey = dto.getOperationType()+dto.getUsername() + request.getSession().getId();
@@ -171,7 +172,7 @@ public class UserController {
                 return sendEmailCaptchaService.sendForgotPwd(dto, redisKey);
             }
             default -> {
-                return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
+                return new ApiResponse<>(400, "非法请求", new GeneralDto(false, null));
             }
         }
 
@@ -180,12 +181,12 @@ public class UserController {
     //注册接口包含验证邮箱验证码
     @AccessRestriction(limit = 5, message = "注册过于频繁,1分钟后再试", limitKey = false)
     @PostMapping("/getRegisterResponse")
-    public ApiResponse<GeneralDataResponse> getRegisterResponse(
+    public ApiResponse<GeneralDto> getRegisterResponse(
             // @Valid 触发User实体类的字段验证
             @RequestBody @Valid UserRegisterDto dto,
             HttpServletRequest request) {
         if (!dto.getOperationType().equals(OperationTypeVerify.REGISTER.getCode())) {
-            return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
+            return new ApiResponse<>(400, "非法请求", new GeneralDto(false, null));
         }
         String redisKey = dto.getOperationType()+dto.getUsername() + request.getSession().getId();
         System.out.println(dto);
@@ -194,12 +195,12 @@ public class UserController {
     // 找回密码接口
     @AccessRestriction(limit = 5, message = "找回密码过于频繁,1分钟后再试", limitKey = false)
     @PostMapping("/getForgotResponse")
-    public ApiResponse<GeneralDataResponse> userForgotPassword(
+    public ApiResponse<GeneralDto> userForgotPassword(
             @RequestBody @Valid UserForgotDto dto,
             HttpServletRequest request
     ){
         if (!dto.getOperationType().equals(OperationTypeVerify.FORGOT_PASSWORD.getCode())) {
-            return new ApiResponse<>(400, "非法请求", new GeneralDataResponse(false, null));
+            return new ApiResponse<>(400, "非法请求", new GeneralDto(false, null));
         }
         String redisKey = dto.getOperationType() +dto.getUsername()+ request.getSession().getId();
         return userForgotService.forgot(dto,redisKey);
@@ -228,7 +229,7 @@ public class UserController {
     @AccessRestriction(limit = 2,period = 60, message = "修改个人信息过于频繁,1分钟后再试", limitKey = false)
     @JwtRequired
     @PostMapping("/updateSelfProfile")
-    public ApiResponse<GeneralDataResponse> updateSelfProfile(
+    public ApiResponse<GeneralDto> updateSelfProfile(
             @RequestBody UserProfileDto dto,
             HttpServletRequest request
     ) {
@@ -241,6 +242,6 @@ public class UserController {
         if (isInconsistent){
             return userUpdateProfileService.updateProfile(dto,request);
         }
-        return new ApiResponse<>(400, "您未修改任何信息", new GeneralDataResponse(false, null));
+        return new ApiResponse<>(400, "您未修改任何信息", new GeneralDto(false, null));
     }
 }

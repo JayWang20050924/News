@@ -4,10 +4,7 @@ import com.news.backendproject.dto.UserRegisterDto;
 import com.news.backendproject.entity.User;
 import com.news.backendproject.mapper.UserMapper;
 import com.news.backendproject.dao.UserDao;
-import com.news.backendproject.service.UserRegisterService;
-import com.news.backendproject.utils.MyBatisUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
 
 @Service
