@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user.js'
 import path from 'path'
+import { pa } from 'element-plus/es/locales.mjs'
 
 // 路由规则：路径 -> 对应组件
 const routes = [
@@ -48,11 +49,29 @@ const routes = [
     meta: { requireAuth: false },
   },
   {
-    path:'/EntertainmentNewsPage',
-    name:'EntertainmentNewsPage',
+    path: '/InternationalNewsPage',
+    name: 'InternationalNewsPage',
+    component: () => import('@/views/news/InternationalNewsPage.vue'), // 懒加载国际新闻页面组件
+  },
+  {
+    path: '/TechNewsPage',
+    name: 'TechNewsPage',
+    component: () => import('@/views/news/TechNewsPage.vue'), // 懒加载科技新闻页面组件
+  },
+  {
+    path: '/FinancialNewsPage',
+    name: 'FinancialNewsPage',
+    component: () => import('@/views/news/FinancialNewsPage.vue'), // 懒加载财经新闻页面组件
+  },{
+    path: '/SportsNewsPage',
+    name: 'SportsNewsPage',
+    component: () => import('@/views/news/SportsNewsPage.vue'), // 懒加载体育新闻页面组件
+  },
+  {
+    path: '/EntertainmentNewsPage',
+    name: 'EntertainmentNewsPage',
     component: () => import('@/views/news/EntertainmentNewsPage.vue'), // 懒加载娱乐新闻页面组件
-    meta: { requireAuth: false },
-  }
+  },
 ]
 
 const router = createRouter({

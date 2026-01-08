@@ -99,40 +99,40 @@
       <!-- 桌面端导航菜单 -->
       <nav class="hidden custom:flex items-center" style="padding-right: 2rem">
         <div class="desktop-nav-container flex items-center space-x-8 mr-2 relative">
-          <a
+          <router-link
             @click="handleNavItemClick($event)"
-            href="#"
+            to="/"
             class="nav-item text-gray-100 hover:text-white transition-colors"
             data-nav="home"
-            >首&nbsp;页</a
+            >首&nbsp;页</router-link
           >
-          <a
+          <router-link
             @click="handleNavItemClick($event)"
-            href="#"
+            to="/InternationalNewsPage"
             class="nav-item text-gray-100 hover:text-white transition-colors"
             data-nav="international"
-            >国&nbsp;际</a
+            >国&nbsp;际</router-link
           >
-          <a
+          <router-link
             @click="handleNavItemClick($event)"
-            href="#"
+            to="/TechNewsPage"
             class="nav-item text-gray-100 hover:text-white transition-colors"
             data-nav="tech"
-            >科&nbsp;技</a
+            >科&nbsp;技</router-link
           >
-          <a
+          <router-link
             @click="handleNavItemClick($event)"
-            href="#"
+            to="/FinancialNewsPage"
             class="nav-item text-gray-100 hover:text-white transition-colors"
             data-nav="finance"
-            >财&nbsp;经</a
+            >财&nbsp;经</router-link
           >
-          <a
+          <router-link
             @click="handleNavItemClick($event)"
-            href="#"
+            to="/SportsNewsPage"
             class="nav-item text-gray-100 hover:text-white transition-colors"
             data-nav="sports"
-            >体&nbsp;育</a
+            >体&nbsp;育</router-link
           >
           <router-link
             @click="handleNavItemClick($event)"
@@ -204,49 +204,49 @@
         >
           <i class="fa fa-github" style="font-size: 2.5rem"></i>
         </a>
-
-        <a
+        <router-link
           @click="redirectPage"
-          href="#"
+          to="/"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
           id="mobileHome"
-          >首&nbsp;页</a
+          >首&nbsp;页</router-link
         >
-        <a
+        <router-link
           @click="redirectPage"
-          href="#"
+          to="/InternationalNewsPage"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
           id="mobileInternational"
-          >国&nbsp;际</a
+          >国&nbsp;际</router-link
         >
-        <a
+        <router-link
           @click="redirectPage"
-          href="#"
+          to="/TechNewsPage"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
           id="mobileTech"
-          >科&nbsp;技</a
+          >科&nbsp;技</router-link
         >
-        <a
+        <router-link
           @click="redirectPage"
-          href="#"
+          to="/FinancialNewsPage"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
           id="mobileFinance"
-          >财&nbsp;经</a
+          >财&nbsp;经</router-link
         >
-        <a
+        <router-link
           @click="redirectPage"
-          href="#"
+          to="/SportsNewsPage"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
           id="mobileSports"
-          >体&nbsp;育</a
+          >体&nbsp;育</router-link
         >
-        <a
+        <router-link
           @click="redirectPage"
-          href="#"
+          to="/EntertainmentNewsPage"
           class="mobile-nav-item text-gray-100 hover:text-white transition-colors py-2 border-b border-gray-800"
           id="mobileEntertainment"
-          >娱&nbsp;乐</a
+          >娱&nbsp;乐</router-link
         >
+
         <!-- 移动端搜索框 -->
         <div
           class="search-container-mobile flex items-center bg-gray-800 border-2 border-gray-400 rounded-lg overflow-hidden"
@@ -269,13 +269,17 @@
 </template>
 
 <script setup lang="js">
-  //todo:
-  //导航栏新闻类别点击后状态保留
+//todo:
+//导航栏新闻类别点击后状态保留
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useUserStore } from '@/stores/user.js'
+import { usePositionStore } from '@/stores/position.js'
+import { useRouter } from 'vue-router'
 
 // 实例化依赖
 const userStore = useUserStore()
+const positionStore = usePositionStore()
+const router = useRouter()
 
 // ========== 状态定义==========
 // 导航栏背景透明度
@@ -321,46 +325,20 @@ const handleScroll = () => {
   }
 }
 
-// ========== 生命周期 ==========
-onMounted(() => {
-  // 绑定滚动事件（passive: true 提升移动端性能）
-  window.addEventListener('scroll', debounce(handleScroll), { passive: true })
-  // 初始化执行一次，避免页面刷新后滚动位置非顶部时样式异常
-  handleScroll()
-
-  // 绑定全局点击事件
-  document.addEventListener('click', handleClickOutside)
-  document.addEventListener('click', handleMobileClickOutside)
-
-  // 初始化导航指示器（首页）
-  const items = document.querySelectorAll('.nav-item')
-  navItems.value = Array.from(items)
-  if (navIndicator.value && navItems.value.length > 0) {
-    setIndicatorPosition(navItems.value[0])
-  }
-
-  // 初始化下拉项样式
-  resetDropdownItems()
-})
-
-onUnmounted(() => {
-  // 移除滚动事件监听（避免内存泄漏）
-  window.removeEventListener('scroll', debounce(handleScroll))
-  clearTimeout(debounceTimer) // 清除防抖计时器，避免内存泄漏
-  // 移除其他事件监听
-  document.removeEventListener('click', handleClickOutside)
-  document.removeEventListener('click', handleMobileClickOutside)
-})
-
 // ========== 导航指示器逻辑 ==========
 const setIndicatorPosition = (targetItem) => {
   if (!navIndicator.value) return
   const rect = targetItem.getBoundingClientRect()
   const containerRect = targetItem.parentElement?.getBoundingClientRect()
   if (!containerRect) return
-  // 同步指示器位置和宽度
-  navIndicator.value.style.left = `${rect.left - containerRect.left}px`
-  navIndicator.value.style.width = `${rect.width}px`
+  // 计算位置和宽度
+  const left = rect.left - containerRect.left
+  const width = rect.width
+  // 同步指示器位置和宽度到DOM
+  navIndicator.value.style.left = `${left}px`
+  navIndicator.value.style.width = `${width}px`
+  // 将位置保存到Pinia（实现持久化）
+  positionStore.setNavIndicatorPos({ left, width })
 }
 
 const handleNavItemClick = (e) => {
@@ -446,6 +424,76 @@ const redirectPage = () => {
   ifShowMobile.value = false
   resetDropdownItems()
 }
+
+// ========== 生命周期 ==========
+onMounted(() => {
+  // 绑定滚动事件（passive: true 提升移动端性能）
+  window.addEventListener('scroll', debounce(handleScroll), { passive: true })
+  // 初始化执行一次，避免页面刷新后滚动位置非顶部时样式异常
+  handleScroll()
+
+  // 绑定全局点击事件
+  document.addEventListener('click', handleClickOutside)
+  document.addEventListener('click', handleMobileClickOutside)
+
+  // 初始化导航指示器
+  const items = document.querySelectorAll('.nav-item')
+  navItems.value = Array.from(items)
+  if (navIndicator.value && navItems.value.length > 0) {
+    // 优先读取Pinia中保存的位置
+    const savedPos = positionStore.navIndicatorPos
+    if (savedPos.left !== 0 || savedPos.width !== 0) {
+      // 恢复保存的位置到DOM
+      navIndicator.value.style.left = `${savedPos.left}px`
+      navIndicator.value.style.width = `${savedPos.width}px`
+    } else {
+      // 无保存值时默认选中首页
+      setIndicatorPosition(navItems.value[0])
+    }
+  }
+
+  // 初始化下拉项样式
+  resetDropdownItems()
+
+  //  监听路由变化，同步指示器位置
+  router.afterEach((to) => {
+    // 根据路由匹配对应的导航项
+    let targetNavItem = null
+    switch (to.path) {
+      case '/':
+        targetNavItem = navItems.value.find(item => item.dataset.nav === 'home')
+        break
+      case '/InternationalNewsPage':
+        targetNavItem = navItems.value.find(item => item.dataset.nav === 'international')
+        break
+      case '/TechNewsPage':
+        targetNavItem = navItems.value.find(item => item.dataset.nav === 'tech')
+        break
+      case '/FinancialNewsPage':
+        targetNavItem = navItems.value.find(item => item.dataset.nav === 'finance')
+        break
+      case '/SportsNewsPage':
+        targetNavItem = navItems.value.find(item => item.dataset.nav === 'sports')
+        break
+      case '/EntertainmentNewsPage':
+        targetNavItem = navItems.value.find(item => item.dataset.nav === 'entertainment')
+        break
+    }
+    // 找到匹配项则更新位置
+    if (targetNavItem) {
+      setIndicatorPosition(targetNavItem)
+    }
+  })
+})
+
+onUnmounted(() => {
+  // 移除滚动事件监听（避免内存泄漏）
+  window.removeEventListener('scroll', debounce(handleScroll))
+  clearTimeout(debounceTimer) // 清除防抖计时器，避免内存泄漏
+  // 移除其他事件监听
+  document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('click', handleMobileClickOutside)
+})
 </script>
 
 <style scoped>
