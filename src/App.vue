@@ -8,7 +8,7 @@
   <!-- 星空背景组件 -->
   <Starfield></Starfield>
 </template>
-<script setup lang="ts">
+<script setup>
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router' // 导入路由钩子
 import Navbar from '@/components/Navbar.vue'
@@ -24,7 +24,7 @@ watch(
   () => route.name, // 监听路由name的变化
   (currentRouteName) => {
     // 如果当前name在隐藏列表中,隐藏导航栏,否则显示(v-if)
-    showNavbar.value = !shouldHidePath.includes(currentRouteName as string)
+    showNavbar.value = !shouldHidePath.includes(currentRouteName)
   },
   { immediate: true } // 初始加载时就执行一次判断
 )

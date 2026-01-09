@@ -17,12 +17,10 @@
               {{ topNews.title }}
             </h2>
             <p class="text-gray-200 text-sm md:text-base mb-4 max-w-3xl">
-              {{ topNews.desc }}
+              {{ topNews.summary }}
             </p>
             <div class="flex items-center text-gray-300 text-sm">
               <span><i class="fa fa-clock-o mr-1"></i> {{ topNews.time }}</span>
-              <span class="mx-3">|</span>
-              <span><i class="fa fa-user mr-1"></i> {{ topNews.author }}</span>
               <span class="mx-3">|</span>
               <span><i class="fa fa-thumbs-up mr-1"></i> {{ topNews.likes }}点赞</span>
             </div>
@@ -73,7 +71,7 @@
                   <router-link :to="`/DetailedNewsPage/${item.id}`">{{ item.title }}</router-link>
                 </h3>
                 <p class="text-gray-400 text-sm mb-4 line-clamp-2">
-                  {{ item.desc }}
+                  {{ item.summary }}
                 </p>
                 <div class="flex justify-between items-center text-gray-500 text-xs">
                   <span>{{ item.time }}</span>
@@ -124,7 +122,7 @@
                     <router-link :to="`/DetailedNewsPage/${item.id}`">{{ item.title }}</router-link>
                   </h3>
                   <p class="text-gray-400 text-sm mb-4 line-clamp-3">
-                    {{ item.desc }}
+                    {{ item.summary }}
                   </p>
                 </div>
                 <div class="flex justify-between items-center text-gray-500 text-xs">
@@ -303,12 +301,11 @@ const setDefaultData = () => {
   topNews.value = {
     id: '10086',
     title: 'R星游戏工作室旗下GTA6,最快2026年上线',
-    desc: '在最新的游戏开发者大会上,R星Rock Star游戏工作室正式宣布GTA6预计发售日期',
+    summary: '在最新的游戏开发者大会上,R星Rock Star游戏工作室正式宣布GTA6预计发售日期',
     category: '头条',
     categoryColor: 'red',
     image: '/img/gta6.jpg',
     time: '2小时前',
-    author: '环球时报记者',
     likes: '328'
   }
 
@@ -316,7 +313,7 @@ const setDefaultData = () => {
     {
       id: '1',
       title: '人工智能技术取得重大突破，多家公司发布最新研究成果',
-      desc: '在最近的科技峰会上，多家知名科技公司展示了其在人工智能领域的最新研究成果，标志着AI技术进入新的发展阶段。',
+      summary: '在最近的科技峰会上，多家知名科技公司展示了其在人工智能领域的最新研究成果，标志着AI技术进入新的发展阶段。',
       category: '科技',
       categoryColor: 'blue',
       image: '/img/tech-ai.jpg',
@@ -327,7 +324,7 @@ const setDefaultData = () => {
     {
       id: '2',
       title: '全球股市大幅上涨，投资者信心显著回升',
-      desc: '受经济数据向好和政策利好消息影响，全球主要股市今日大幅上涨，投资者信心显著回升。',
+      summary: '受经济数据向好和政策利好消息影响，全球主要股市今日大幅上涨，投资者信心显著回升。',
       category: '财经',
       categoryColor: 'green',
       image: '/img/finance-stock.jpg',
@@ -338,7 +335,7 @@ const setDefaultData = () => {
     {
       id: '3',
       title: '新能源汽车销量持续攀升，市场份额创新高',
-      desc: '最新数据显示，新能源汽车销量持续攀升，市场份额创下历史新高，传统燃油车面临转型压力。',
+      summary: '最新数据显示，新能源汽车销量持续攀升，市场份额创下历史新高，传统燃油车面临转型压力。',
       category: '汽车',
       categoryColor: 'purple',
       image: '/img/car-electric.jpg',
@@ -349,7 +346,7 @@ const setDefaultData = () => {
     {
       id: '4',
       title: '体育界盛事：国际足球联赛决赛圆满落幕',
-      desc: '经过激烈角逐，国际足球联赛决赛圆满落幕，新科冠军诞生，为球迷们奉献了一场精彩绝伦的比赛。',
+      summary: '经过激烈角逐，国际足球联赛决赛圆满落幕，新科冠军诞生，为球迷们奉献了一场精彩绝伦的比赛。',
       category: '体育',
       categoryColor: 'red',
       image: '/img/sports-football.jpg',
@@ -363,7 +360,7 @@ const setDefaultData = () => {
     {
       id: '5',
       title: '教育部发布新政策，推动教育公平发展',
-      desc: '教育部今日发布新政策，旨在进一步推动教育公平发展，缩小城乡教育差距，提高教育质量。',
+      summary: '教育部今日发布新政策，旨在进一步推动教育公平发展，缩小城乡教育差距，提高教育质量。',
       category: '教育',
       categoryColor: 'yellow',
       image: '/img/education-policy.jpg',
@@ -374,7 +371,7 @@ const setDefaultData = () => {
     {
       id: '6',
       title: '环保组织呼吁加强海洋保护，减少塑料污染',
-      desc: '全球环保组织联合发出呼吁，要求各国政府采取更严格措施减少海洋塑料污染，保护海洋生态。',
+      summary: '全球环保组织联合发出呼吁，要求各国政府采取更严格措施减少海洋塑料污染，保护海洋生态。',
       category: '环保',
       categoryColor: 'emerald',
       image: '/img/environment-ocean.jpg',
@@ -385,7 +382,7 @@ const setDefaultData = () => {
     {
       id: '7',
       title: '医学研究新发现：特定饮食习惯可有效预防疾病',
-      desc: '最新医学研究表明，特定的饮食习惯和生活方式可以有效预防多种常见疾病，为公众健康提供新指导。',
+      summary: '最新医学研究表明，特定的饮食习惯和生活方式可以有效预防多种常见疾病，为公众健康提供新指导。',
       category: '健康',
       categoryColor: 'pink',
       image: '/img/health-diet.jpg',
@@ -396,7 +393,7 @@ const setDefaultData = () => {
     {
       id: '8',
       title: '5G网络覆盖范围进一步扩大，连接速度大幅提升',
-      desc: '随着5G基础设施建设的加速推进，5G网络覆盖范围进一步扩大，用户连接速度得到显著提升。',
+      summary: '随着5G基础设施建设的加速推进，5G网络覆盖范围进一步扩大，用户连接速度得到显著提升。',
       category: '科技',
       categoryColor: 'blue',
       image: '/img/tech-5g.jpg',
@@ -407,7 +404,7 @@ const setDefaultData = () => {
     {
       id: '9',
       title: '文化产业发展迎来新机遇，数字文化成趋势',
-      desc: '文化产业在数字化转型中迎来新机遇，数字文化产品和服务成为行业发展的重要趋势。',
+      summary: '文化产业在数字化转型中迎来新机遇，数字文化产品和服务成为行业发展的重要趋势。',
       category: '文化',
       categoryColor: 'indigo',
       image: '/img/culture-digital.jpg',
@@ -418,7 +415,7 @@ const setDefaultData = () => {
     {
       id: '10',
       title: '旅游业复苏势头强劲，出境游预订量大幅增长',
-      desc: '随着疫情后限制的逐步解除，旅游业复苏势头强劲，出境游预订量出现大幅增长。',
+      summary: '随着疫情后限制的逐步解除，旅游业复苏势头强劲，出境游预订量出现大幅增长。',
       category: '旅游',
       categoryColor: 'teal',
       image: '/img/travel-tourism.jpg',

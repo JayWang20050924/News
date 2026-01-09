@@ -12,6 +12,7 @@ export const newsApi = {
     return request({
       url: '/news/homepage',
       method: 'get',
+      params: {},
     })
   },
 
@@ -21,8 +22,11 @@ export const newsApi = {
    */
   getNewsDetail: (id) => {
     return request({
-      url: `/news/detail/${id}`,
+      url: `/news/detail`,
       method: 'get',
+      params: {
+        id: id,
+      },
     })
   },
 
@@ -33,6 +37,7 @@ export const newsApi = {
     return request({
       url: '/news/hot',
       method: 'get',
+      params: {},
     })
   },
 
@@ -43,6 +48,7 @@ export const newsApi = {
     return request({
       url: '/news/latest',
       method: 'get',
+      params: {},
     })
   },
 
@@ -53,38 +59,32 @@ export const newsApi = {
     return request({
       url: '/news/ranking',
       method: 'get',
+      params: {},
     })
   },
 
   /**
    * 获取相关新闻
-   * @param {String|Number} id - 当前新闻ID
    */
-  getRelatedNews: (id) => {
+  getRelatedNews: () => {
     return request({
-      url: `/news/related/${id}`,
+      url: `/news/related`,
       method: 'get',
+      params: {},
     })
   },
 
   /**
-   * 获取新闻分类
-   */
-  getNewsCategories: () => {
-    return request({
-      url: '/news/categories',
-      method: 'get',
-    })
-  },
-
-  /**
-   * 获取分类下的新闻
+   * 获取对应分类下的新闻
    * @param {String} category - 分类名称
    */
   getNewsByCategory: (category) => {
     return request({
-      url: `/news/category/${category}`,
+      url: `/news/category`,
       method: 'get',
+      params: {
+        category: category,
+      },
     })
   },
 
@@ -94,8 +94,11 @@ export const newsApi = {
    */
   likeNews: (id) => {
     return request({
-      url: `/news/like/${id}`,
+      url: `/news/like`,
       method: 'post',
+      params: {
+        id: id,
+      },
     })
   },
 
@@ -107,7 +110,7 @@ export const newsApi = {
     return request({
       url: '/news/comment',
       method: 'post',
-      data,
+      params: data,
     })
   },
 
@@ -117,8 +120,11 @@ export const newsApi = {
    */
   getComments: (id) => {
     return request({
-      url: `/news/comments/${id}`,
+      url: `/news/comments`,
       method: 'get',
+      params: {
+        id: id,
+      },
     })
   },
 
@@ -128,9 +134,11 @@ export const newsApi = {
    */
   likeComment: (id) => {
     return request({
-      url: `/news/comment/like/${id}`,
+      url: `/news/comment/like`,
       method: 'post',
+      params: {
+        id: id,
+      },
     })
   },
 }
-export * from './newsApi'
