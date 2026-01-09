@@ -226,7 +226,7 @@ public class UserController {
 
     //修改个人信息
     //todo:临近上线添加每天只能修改两次个人信息
-    @AccessRestriction(limit = 2,period = 60, message = "修改个人信息过于频繁,1分钟后再试", limitKey = false)
+    @AccessRestriction(limit = 20,period = 60, message = "修改个人信息过于频繁,1分钟后再试", limitKey = false)
     @JwtRequired
     @PostMapping("/updateSelfProfile")
     public ApiResponse<GeneralDto> updateSelfProfile(

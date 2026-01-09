@@ -1,5 +1,6 @@
 package com.news.backendproject.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDto;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,6 +9,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,6 +18,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.format.DateTimeParseException;
 import java.util.stream.Collectors;
 
 /**
@@ -24,6 +27,19 @@ import java.util.stream.Collectors;
 @Slf4j // 用于日志记录
 @RestControllerAdvice // 作用于所有@RestController
 public class GlobalExceptionHandler {
+    // 处理JSON解析异常
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ApiResponse<GeneralDto> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.error("JSON解析异常：", e);
+        String errorMsg = "非法请求参数";
+        Throwable rootCause = e.getRootCause();
+        // 判断是否是日期解析错误
+        if (rootCause instanceof DateTimeParseException) {
+            errorMsg = "日期格式错误";
+        }
+        return new ApiResponse<>(400, errorMsg, new GeneralDto(false, null));
+    }
+
 
     /**
      * 处理参数缺失异常
