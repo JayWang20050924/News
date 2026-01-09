@@ -208,11 +208,13 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
+import {useUserStore} from '@/stores/user.js'
 import request from '@/utils/request.js'
 import router from '@/router/index.js'
 // 提示持续时间
 const MESSAGE_DURATION = 2000
 
+const userStore = useUserStore()
 // 响应式变量
 const profile = ref({
   username: '',
@@ -237,7 +239,7 @@ const goBack=()=>{
 }
 
 const exitLogin = async () => {
-  localStorage.removeItem('jwtAuth')
+  await userStore.exitLogin();
   return
 }
 
@@ -285,7 +287,7 @@ const getUserProfile = async () => {
       customClass: 'custom-message',
       duration: MESSAGE_DURATION,
     })
-    //未登录或token失效，跳转登录页
+    //未登录或token失效,或者传入异常参数，跳转登录页
     setTimeout(() => {
       router.push('/LoginPage')
     }, MESSAGE_DURATION)
@@ -358,6 +360,7 @@ const handleSubmit = async () => {
       duration: MESSAGE_DURATION,
     })
     //未登录或token失效，跳转登录页
+    //提交错误格式数据则会被路由守卫拦截回到主页
     setTimeout(() => {
       router.push('/LoginPage')
     }, MESSAGE_DURATION)

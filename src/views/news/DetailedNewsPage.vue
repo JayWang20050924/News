@@ -122,17 +122,15 @@
           评论区 ({{ comments.length }})
         </h2>
 
-        <!-- 评论输入框 - 增加ref和动态class实现固定 -->
+        <!-- 评论输入框 - 移除固定相关逻辑 -->
         <div
           id="commentPublish"
-          ref="commentPublishRef"
-          :class="['mb-8 flex flex-col gap-4', isCommentFixed ? 'fixed-comment' : '']"
+          class="mb-8 flex flex-col gap-4"
         >
           <textarea
             v-model="commentContent"
             placeholder="请输入你的评论..."
             class="w-full bg-gray-800 text-gray-200 rounded-lg p-4 border border-gray-700 focus:border-blue-600 focus:outline-none resize-none h-24 md:h-32 transition-colors"
-            @keydown.enter="($event) => $event.preventDefault()"
           ></textarea>
           <!-- 按钮右对齐 -->
           <div class="flex justify-end">
@@ -147,7 +145,7 @@
         </div>
 
         <!-- 评论列表 -->
-        <div class="space-y-6" :style="{ marginTop: isCommentFixed ? '140px' : '0' }">
+        <div class="space-y-6">
           <!-- 空评论提示 -->
           <div v-if="comments.length === 0" class="text-center text-gray-500 py-8">
             <i class="fa fa-comment-o text-4xl mb-2"></i>
@@ -162,7 +160,7 @@
           >
             <!-- 评论头部 - 用户名+时间 -->
             <div class="flex items-center gap-3 mb-3">
-              <i class="fa fa-user"></i>
+              <i class="fa fa-user-circle"></i>
               <div>
                 <h3 class="text-white font-medium">用户_{{ comment.username }}</h3>
                 <p class="text-xs text-gray-500">{{ comment.time }}</p>
@@ -184,7 +182,11 @@
                 <i class="fa fa-thumbs-up"></i>
                 <span>{{ comment.likeCount }}</span>
               </button>
-              <button class="text-gray-500 hover:text-gray-300 transition-colors">
+              <!-- 新增回复按钮点击事件 -->
+              <button
+                @click="handleReplyClick(idx)"
+                class="text-gray-500 hover:text-gray-300 transition-colors"
+              >
                 <i class="fa fa-reply"></i>
                 <span class="ml-1">回复</span>
               </button>
@@ -212,7 +214,7 @@
                 class="bg-gray-700 rounded-lg p-3"
               >
                 <div class="flex items-center gap-2 mb-2">
-                  <i class="fa fa-user-o text-xs"></i>
+                  <i class="fa fa-user-circle text-xs"></i>
                   <h4 class="text-white text-sm font-medium">用户_{{ reply.username }}</h4>
                   <span class="text-xs text-gray-500">{{ reply.time }}</span>
                 </div>
@@ -242,11 +244,54 @@
         </div>
       </div>
     </section>
+
+    <!-- 新增：回复评论弹窗 -->
+    <div
+      v-if="showReplyBox"
+      class="reply-box-overlay fixed inset-0 flex items-end justify-center z-50 pb-4"
+    >
+      <!-- 半透明背景（点击可关闭） -->
+      <div
+        class="absolute inset-0 bg-black/50"
+        @click="closeReplyBox"
+      ></div>
+      <!-- 回复框主体（带丝滑动画） -->
+      <div
+        class="reply-box bg-gray-900 rounded-xl shadow-2xl p-4 md:p-6 w-full max-w-4xl relative z-10 transition-all duration-300 ease-out"
+        :class="showReplyBox ? 'translate-y-0' : 'translate-y-full'"
+      >
+        <!-- 关闭按钮（FontAwesome 4.x 实心叉号） -->
+        <button
+          @click="closeReplyBox"
+          class="absolute text-gray-400 hover:text-white transition-colors text-3xl" style="top: 0.25rem; right: 0.45rem;"
+        >
+          <i class="fa fa-times"></i>
+        </button>
+        <!-- 回复提示 -->
+        <p class="text-gray-300 mb-4">回复 用户_{{ comments[replyToCommentIndex]?.username }}：</p>
+        <!-- 回复输入框（与发布评论样式一致） -->
+        <textarea
+          v-model="replyContent"
+          placeholder="请输入你的回复..."
+          class="w-full bg-gray-800 text-gray-200 rounded-lg p-4 border border-gray-700 focus:border-blue-600 focus:outline-none resize-none h-24 md:h-32 transition-colors"
+        ></textarea>
+        <!-- 发布回复按钮 -->
+        <div class="flex justify-end mt-4">
+          <button
+            @click="publishReply"
+            class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg transition-colors disabled:bg-gray-700 disabled:cursor-not-allowed"
+            :disabled="!replyContent.trim()"
+          >
+            发布回复
+          </button>
+        </div>
+      </div>
+    </div>
   </main>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted} from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { newsApi } from '@/api/newsApi'
 
@@ -261,15 +306,10 @@ const page = ref(1) // 当前页码
 const hasMore = ref(true) // 是否有更多评论可加载
 const loadingMore = ref(false) // 加载更多按钮的加载状态
 
-// 评论区固定相关
-const commentPublishRef = ref(null)
-const isCommentFixed = ref(false)
-const commentOffsetTop = ref(0) // 评论区元素的初始顶部偏移量
-
 // 新闻详情数据（统一数据结构）
 const news = ref({
   id: '', // 新闻唯一标识符
-  cover: '', // 新闻封面图片URL
+  cover: '/img/gta6.jpg', // 新闻封面图片URL
   category: '', // 分类名称
   categoryColor: '', // 分类颜色（用于标签背景色）
   title: '', // 新闻标题
@@ -287,6 +327,11 @@ const relatedNews = ref([])
 // 评论相关响应式数据
 const commentContent = ref('')
 const comments = ref([])
+
+// 新增：回复评论相关响应式数据
+const showReplyBox = ref(false) // 是否显示回复框
+const replyToCommentIndex = ref(-1) // 回复的评论索引
+const replyContent = ref('') // 回复内容
 
 // 生成默认评论数据（扩展到8条，包含回复）
 const generateDefaultComments = () => {
@@ -587,7 +632,7 @@ const loadMoreComments = () => {
   // 显示加载状态
   loadingMore.value = true
 
-  // 模拟1秒加载时间
+  // 模拟加载时间
   setTimeout(() => {
     const newComments = generateMoreComments()
     comments.value = [...comments.value, ...newComments]
@@ -600,34 +645,7 @@ const loadMoreComments = () => {
 
     // 关闭加载状态
     loadingMore.value = false
-  }, 1000)
-}
-
-// 监听滚动事件处理评论区固定
-const handleScroll = () => {
-  if (!commentPublishRef.value) return
-
-  const scrollTop = window.scrollY || document.documentElement.scrollTop
-  // 获取元素的底部位置（顶部偏移 + 元素高度）
-  const elementBottom = commentOffsetTop.value + commentPublishRef.value.offsetHeight
-
-  // 当滚动距离超过元素底部位置时，固定评论区
-  if (scrollTop > elementBottom) {
-    isCommentFixed.value = true
-  } else {
-    isCommentFixed.value = false
-  }
-}
-
-// 初始化评论区位置
-const initCommentPosition = () => {
-  nextTick(() => {
-    if (commentPublishRef.value) {
-      // 获取元素相对于视口的顶部偏移（包含滚动距离）
-      const rect = commentPublishRef.value.getBoundingClientRect()
-      commentOffsetTop.value = rect.top + (window.scrollY || document.documentElement.scrollTop)
-    }
-  })
+  }, 500)
 }
 
 // 根据路由参数加载新闻详情
@@ -646,15 +664,10 @@ const loadNewsDetail = async () => {
     // 获取评论（如果接口返回空则使用默认数据）
     const commentList = await newsApi.getComments(newsId)
     comments.value = commentList.length > 0 ? commentList : generateDefaultComments()
-
-    // 初始化评论区位置
-    initCommentPosition()
   } catch (error) {
     console.error('加载新闻详情失败:', error)
     // 加载失败时使用默认评论数据
     comments.value = generateDefaultComments()
-    // 初始化评论区位置
-    initCommentPosition()
     // 如果加载失败，跳转回主页（可注释掉）
     // router.push('/')
   }
@@ -782,18 +795,65 @@ const toggleReplyExpand = (index) => {
   comments.value[index].isReplyExpanded = !comments.value[index].isReplyExpanded
 }
 
+// 新增：点击回复按钮
+const handleReplyClick = (index) => {
+  replyToCommentIndex.value = index
+  replyContent.value = '' // 清空回复内容
+  showReplyBox.value = true // 显示回复框
+}
+
+// 新增：关闭回复框
+const closeReplyBox = () => {
+  showReplyBox.value = false
+  // 延迟清空索引，避免动画过程中数据变化
+  setTimeout(() => {
+    replyToCommentIndex.value = -1
+  }, 300) // 匹配动画时长
+}
+
+// 新增：发布回复
+const publishReply = async () => {
+  const content = replyContent.value.trim()
+  if (!content || replyToCommentIndex.value === -1) return
+
+  try {
+    // 构造回复数据
+    const newReply = {
+      id: `r${Date.now()}`,
+      username: '我', // 实际项目中替换为真实用户名
+      time: '刚刚',
+      content: content,
+      likeCount: 0,
+      liked: false
+    }
+
+    // 添加到对应评论的回复列表中
+    comments.value[replyToCommentIndex.value].replies.push(newReply)
+    // 自动展开回复列表
+    comments.value[replyToCommentIndex.value].isReplyExpanded = true
+
+    // 关闭回复框
+    closeReplyBox()
+    // 清空回复内容
+    replyContent.value = ''
+
+    // 实际项目中调用API发布回复
+    // await newsApi.postReply({
+    //   newsId: news.value.id,
+    //   commentId: comments.value[replyToCommentIndex.value].id,
+    //   content: content
+    // })
+  } catch (error) {
+    console.error('发布回复失败:', error)
+  }
+}
+
 onMounted(() => {
   loadNewsDetail()
-  // 添加滚动监听
-  window.addEventListener('scroll', handleScroll)
-  // 窗口大小变化时重新计算位置
-  window.addEventListener('resize', initCommentPosition)
 })
 
 onUnmounted(() => {
-  // 移除滚动监听
-  window.removeEventListener('scroll', handleScroll)
-  window.removeEventListener('resize', initCommentPosition)
+  // 无监听需要移除
 })
 </script>
 
@@ -817,7 +877,7 @@ onUnmounted(() => {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #1f2937;
+  background: #2d2d2d;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb {
@@ -833,41 +893,46 @@ onUnmounted(() => {
   border-left-width: 2px;
 }
 .bg-gray-700 {
-  background-color: #374151;
-}
-
-/* 评论区固定样式 - 兼容移动端 */
-.fixed-comment {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 999;
-  background-color: #111827; /* 匹配评论区背景 */
-  padding: 16px;
-  margin: 0 !important;
-  border-top: 2px solid #4b5563;
-  border-radius: 12px 12px 0 0;
-  width: 100%;
-  max-width: 1200px; /* 匹配容器宽度 */
-  margin: 0 auto !important;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
-}
-
-/* 适配移动端 */
-@media (max-width: 768px) {
-  .fixed-comment {
-    padding: 12px;
-    border-radius: 8px 8px 0 0;
-  }
-  .fixed-comment textarea {
-    height: 100px !important;
-  }
+  background-color: #444444;
 }
 
 /* 加载更多按钮禁用样式 */
 button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* 新增：回复评论弹窗样式 */
+.reply-box-overlay {
+  pointer-events: none; /* 背景可点击，主体不可穿透 */
+}
+.reply-box-overlay .reply-box {
+  pointer-events: auto;
+  transform: translateY(100%); /* 默认在视窗下方隐藏 */
+}
+.reply-box-overlay .reply-box.translate-y-0 {
+  transform: translateY(0); /* 向上弹出到可视区域 */
+}
+.reply-box-overlay > div:first-child {
+  pointer-events: auto; /* 背景可点击关闭 */
+}
+
+/* 回复框样式优化 */
+.reply-box {
+
+  border-top: 2px solid #4b5563;
+  width: 90%;
+  max-width: 800px;
+}
+
+/* 适配移动端回复框 */
+@media (max-width: 768px) {
+  .reply-box {
+    width: 95%;
+    padding: 12px;
+  }
+  .reply-box textarea {
+    height: 100px !important;
+  }
 }
 </style>
