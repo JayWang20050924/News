@@ -34,7 +34,7 @@
 
           <div class="flex flex-wrap items-center gap-3 text-gray-300 text-sm">
             <span><i class="fa fa-clock-o mr-1"></i> {{ news.time }}</span>
-            <span><i class="fa fa-building-o mr-1"></i> {{ news.source }}</span>
+            <span><i class="fa fa-building-o mr-1"></i> {{ news.author }}</span>
             <span><i class="fa fa-eye mr-1"></i> {{ news.views }} 浏览</span>
           </div>
         </div>
@@ -123,10 +123,7 @@
         </h2>
 
         <!-- 评论输入框 - 移除固定相关逻辑 -->
-        <div
-          id="commentPublish"
-          class="mb-8 flex flex-col gap-4"
-        >
+        <div id="commentPublish" class="mb-8 flex flex-col gap-4">
           <textarea
             v-model="commentContent"
             placeholder="请输入你的评论..."
@@ -223,7 +220,9 @@
                   @click="handleReplyLike(idx, rIdx)"
                   class="mt-2 flex items-center gap-1 text-gray-500 hover:text-gray-300 text-xs transition-colors"
                 >
-                  <i :class="reply.liked ? 'fa fa-thumbs-up text-blue-500' : 'fa fa-thumbs-o-up'"></i>
+                  <i
+                    :class="reply.liked ? 'fa fa-thumbs-up text-blue-500' : 'fa fa-thumbs-o-up'"
+                  ></i>
                   <span>{{ reply.likeCount }}</span>
                 </button>
               </div>
@@ -251,10 +250,7 @@
       class="reply-box-overlay fixed inset-0 flex items-end justify-center z-50 pb-4"
     >
       <!-- 半透明背景（点击可关闭） -->
-      <div
-        class="absolute inset-0 bg-black/50"
-        @click="closeReplyBox"
-      ></div>
+      <div class="absolute inset-0 bg-black/50" @click="closeReplyBox"></div>
       <!-- 回复框主体（带丝滑动画） -->
       <div
         class="reply-box bg-gray-900 rounded-xl shadow-2xl p-4 md:p-6 w-full max-w-4xl relative z-10 transition-all duration-300 ease-out"
@@ -263,7 +259,8 @@
         <!-- 关闭按钮（FontAwesome 4.x 实心叉号） -->
         <button
           @click="closeReplyBox"
-          class="absolute text-gray-400 hover:text-white transition-colors text-3xl" style="top: 0.25rem; right: 0.45rem;"
+          class="absolute text-gray-400 hover:text-white transition-colors text-3xl"
+          style="top: 0.25rem; right: 0.45rem"
         >
           <i class="fa fa-times"></i>
         </button>
@@ -291,7 +288,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted} from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { newsApi } from '@/api/newsApi'
 
@@ -309,15 +306,15 @@ const loadingMore = ref(false) // 加载更多按钮的加载状态
 // 新闻详情数据（统一数据结构）
 const news = ref({
   id: '', // 新闻唯一标识符
-  cover: '/img/gta6.jpg', // 新闻封面图片URL
-  category: '', // 分类名称
-  categoryColor: '', // 分类颜色（用于标签背景色）
   title: '', // 新闻标题
   summary: '', // 新闻摘要
-  time: '', // 发布时间
-  source: '', // 新闻来源
-  views: 0, // 浏览量
   content: [], // 新闻正文内容数组
+  category: '', // 分类名称
+  categoryColor: '', // 分类颜色（用于标签背景色）
+  cover: '/img/5.jpg', // 新闻封面图片URL
+  time: '', // 发布时间
+  author: '', // 新闻来源
+  viewCount: 0, // 浏览量
   likeCount: 0, // 点赞数
 })
 
@@ -328,7 +325,7 @@ const relatedNews = ref([])
 const commentContent = ref('')
 const comments = ref([])
 
-// 新增：回复评论相关响应式数据
+// 回复评论相关响应式数据
 const showReplyBox = ref(false) // 是否显示回复框
 const replyToCommentIndex = ref(-1) // 回复的评论索引
 const replyContent = ref('') // 回复内容
@@ -352,9 +349,9 @@ const generateDefaultComments = () => {
           time: '2024-05-20 11:00',
           content: '确实，作者的视角很独特',
           likeCount: 3,
-          liked: false
-        }
-      ]
+          liked: false,
+        },
+      ],
     },
     {
       id: 'c2',
@@ -371,7 +368,7 @@ const generateDefaultComments = () => {
           time: '2024-05-20 14:20',
           content: '愿闻其详，说说你的看法？',
           likeCount: 2,
-          liked: false
+          liked: false,
         },
         {
           id: 'r2-2',
@@ -379,9 +376,9 @@ const generateDefaultComments = () => {
           time: '2024-05-20 14:30',
           content: '我也觉得，不能只看表面',
           likeCount: 1,
-          liked: false
-        }
-      ]
+          liked: false,
+        },
+      ],
     },
     {
       id: 'c3',
@@ -398,7 +395,7 @@ const generateDefaultComments = () => {
           time: '2024-05-20 16:45',
           content: '+1，确实涨知识了',
           likeCount: 5,
-          liked: false
+          liked: false,
         },
         {
           id: 'r3-2',
@@ -406,7 +403,7 @@ const generateDefaultComments = () => {
           time: '2024-05-20 16:50',
           content: '哪里可以找到更多相关资料？',
           likeCount: 2,
-          liked: false
+          liked: false,
         },
         {
           id: 'r3-3',
@@ -414,9 +411,9 @@ const generateDefaultComments = () => {
           time: '2024-05-20 17:00',
           content: '同求，想深入了解下',
           likeCount: 1,
-          liked: false
-        }
-      ]
+          liked: false,
+        },
+      ],
     },
     {
       id: 'c4',
@@ -433,7 +430,7 @@ const generateDefaultComments = () => {
           time: '2024-05-21 09:15',
           content: '确实，第一时间报道很重要',
           likeCount: 4,
-          liked: false
+          liked: false,
         },
         {
           id: 'r4-2',
@@ -441,7 +438,7 @@ const generateDefaultComments = () => {
           time: '2024-05-21 09:20',
           content: '希望能多些这样的优质内容',
           likeCount: 3,
-          liked: false
+          liked: false,
         },
         {
           id: 'r4-3',
@@ -449,7 +446,7 @@ const generateDefaultComments = () => {
           time: '2024-05-21 09:25',
           content: '同意，支持原创！',
           likeCount: 2,
-          liked: false
+          liked: false,
         },
         {
           id: 'r4-4',
@@ -457,9 +454,9 @@ const generateDefaultComments = () => {
           time: '2024-05-21 09:30',
           content: '已转发给朋友，一起讨论',
           likeCount: 1,
-          liked: false
-        }
-      ]
+          liked: false,
+        },
+      ],
     },
     // 新增第5-8条默认评论
     {
@@ -477,7 +474,7 @@ const generateDefaultComments = () => {
           time: '2024-05-21 11:25',
           content: '我也是，原来还有这么多细节',
           likeCount: 6,
-          liked: false
+          liked: false,
         },
         {
           id: 'r5-2',
@@ -485,9 +482,9 @@ const generateDefaultComments = () => {
           time: '2024-05-21 11:30',
           content: '推荐大家看看相关的纪录片，更全面',
           likeCount: 4,
-          liked: false
-        }
-      ]
+          liked: false,
+        },
+      ],
     },
     {
       id: 'c6',
@@ -504,7 +501,7 @@ const generateDefaultComments = () => {
           time: '2024-05-21 13:45',
           content: '确实，后续可能会有更多相关政策出台',
           likeCount: 3,
-          liked: false
+          liked: false,
         },
         {
           id: 'r6-2',
@@ -512,7 +509,7 @@ const generateDefaultComments = () => {
           time: '2024-05-21 13:50',
           content: '分析得很客观，没有带主观情绪',
           likeCount: 2,
-          liked: false
+          liked: false,
         },
         {
           id: 'r6-3',
@@ -520,9 +517,9 @@ const generateDefaultComments = () => {
           time: '2024-05-21 13:55',
           content: '希望媒体能多做这类深度报道',
           likeCount: 1,
-          liked: false
-        }
-      ]
+          liked: false,
+        },
+      ],
     },
     {
       id: 'c7',
@@ -539,7 +536,7 @@ const generateDefaultComments = () => {
           time: '2024-05-21 15:15',
           content: '确实，深度报道需要大量时间和精力',
           likeCount: 7,
-          liked: false
+          liked: false,
         },
         {
           id: 'r7-2',
@@ -547,7 +544,7 @@ const generateDefaultComments = () => {
           time: '2024-05-21 15:20',
           content: '支持真实、有价值的新闻报道',
           likeCount: 5,
-          liked: false
+          liked: false,
         },
         {
           id: 'r7-3',
@@ -555,7 +552,7 @@ const generateDefaultComments = () => {
           time: '2024-05-21 15:25',
           content: '现在这样的报道太少了',
           likeCount: 3,
-          liked: false
+          liked: false,
         },
         {
           id: 'r7-4',
@@ -563,9 +560,9 @@ const generateDefaultComments = () => {
           time: '2024-05-21 15:30',
           content: '致敬每一位坚守真相的记者',
           likeCount: 2,
-          liked: false
-        }
-      ]
+          liked: false,
+        },
+      ],
     },
     {
       id: 'c8',
@@ -582,10 +579,10 @@ const generateDefaultComments = () => {
           time: '2024-05-21 17:05',
           content: '多角度分析才是客观的',
           likeCount: 4,
-          liked: false
-        }
-      ]
-    }
+          liked: false,
+        },
+      ],
+    },
   ]
   return baseComments
 }
@@ -607,7 +604,7 @@ const generateMoreComments = () => {
         time: `2024-05-${22 + i} ${10 + r}:${10 + r * 5}`,
         content: `这是${commentId}的第${r + 1}条回复，随机生成的内容~`,
         likeCount: Math.floor(Math.random() * 10) + 1,
-        liked: false
+        liked: false,
       })
     }
 
@@ -619,7 +616,7 @@ const generateMoreComments = () => {
       likeCount: Math.floor(Math.random() * 20) + 5,
       liked: false,
       isReplyExpanded: false,
-      replies: replies
+      replies: replies,
     })
   }
   return moreComments
@@ -724,7 +721,7 @@ const publishComment = async () => {
       likeCount: 0,
       liked: false,
       isReplyExpanded: false,
-      replies: []
+      replies: [],
     }
 
     // 添加到评论列表头部
@@ -824,7 +821,7 @@ const publishReply = async () => {
       time: '刚刚',
       content: content,
       likeCount: 0,
-      liked: false
+      liked: false,
     }
 
     // 添加到对应评论的回复列表中
@@ -919,7 +916,6 @@ button:disabled {
 
 /* 回复框样式优化 */
 .reply-box {
-
   border-top: 2px solid #4b5563;
   width: 90%;
   max-width: 800px;
