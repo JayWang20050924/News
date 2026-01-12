@@ -1,7 +1,7 @@
 package com.news.backendproject.service.user;
 
 import com.news.backendproject.dao.Imp.UserDaoImp;
-import com.news.backendproject.dto.UserRegisterDto;
+import com.news.backendproject.dto.user.UserRegisterDto;
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDto;
 import com.news.backendproject.verify.EmailCaptchaVerify;

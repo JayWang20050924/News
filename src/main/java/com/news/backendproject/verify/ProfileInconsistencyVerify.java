@@ -1,6 +1,6 @@
 package com.news.backendproject.verify;
 
-import com.news.backendproject.dto.UserProfileDto;
+import com.news.backendproject.dto.user.UserProfileDto;
 import com.news.backendproject.entity.User;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package com.news.backendproject.dto;
+package com.news.backendproject.dto.user;
 
 public interface ExistenceVerifyDto {
     String getUsername();

@@ -1,6 +1,6 @@
 package com.news.backendproject.dao.Imp;
 
-import com.news.backendproject.dto.UserRegisterDto;
+import com.news.backendproject.dto.user.UserRegisterDto;
 import com.news.backendproject.entity.User;
 import com.news.backendproject.mapper.UserMapper;
 import com.news.backendproject.dao.UserDao;

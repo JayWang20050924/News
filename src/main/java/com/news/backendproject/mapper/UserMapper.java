@@ -1,9 +1,11 @@
 package com.news.backendproject.mapper;
 
-import com.news.backendproject.dto.UserRegisterDto;
+import com.news.backendproject.dto.user.UserRegisterDto;
 import com.news.backendproject.entity.User;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+@Mapper
 public interface UserMapper {
     // 新增用户
     int addUser(UserRegisterDto dto);

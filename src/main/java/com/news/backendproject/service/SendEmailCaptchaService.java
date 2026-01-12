@@ -2,7 +2,7 @@ package com.news.backendproject.service;
 
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDto;
-import com.news.backendproject.dto.SendEmailCaptchaDTO;
+import com.news.backendproject.dto.user.SendEmailCaptchaDTO;
 import com.news.backendproject.utils.RadomCaptchaUtil;
 import com.news.backendproject.verify.ExistenceVerify;
 import lombok.RequiredArgsConstructor;

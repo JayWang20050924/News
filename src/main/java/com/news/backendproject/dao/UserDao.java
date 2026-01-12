@@ -1,6 +1,6 @@
 package com.news.backendproject.dao;
 
-import com.news.backendproject.dto.UserRegisterDto;
+import com.news.backendproject.dto.user.UserRegisterDto;
 import com.news.backendproject.entity.User;
 
 public interface UserDao {

@@ -1,10 +1,8 @@
-package com.news.backendproject.dto;
+package com.news.backendproject.dto.user;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.ToString;
-
-import java.io.Serializable;
 
 @Data
 @ToString(of = {"username","toEmail","operationType"})

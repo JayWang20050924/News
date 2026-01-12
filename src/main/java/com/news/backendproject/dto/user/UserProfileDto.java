@@ -1,4 +1,4 @@
-package com.news.backendproject.dto;
+package com.news.backendproject.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;

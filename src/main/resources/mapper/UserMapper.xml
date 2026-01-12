@@ -7,7 +7,7 @@
 <mapper namespace="com.news.backendproject.mapper.UserMapper">
 
     <!--  新增用户（对应addUser） -->
-    <insert id="addUser" parameterType="com.news.backendproject.dto.UserRegisterDto">
+    <insert id="addUser" parameterType="com.news.backendproject.dto.user.UserRegisterDto">
         INSERT INTO user(username, password, email,status)
         VALUES(#{username}, #{password}, #{email},1)
     </insert>
