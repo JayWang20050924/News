@@ -68,8 +68,18 @@
             <version>${mysql-connector.version}</version>
             <scope>runtime</scope>
         </dependency>
-
-        <!-- Jackson（用户指定2.15.2，支持JSON处理和Java 8时间类型） -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.5.5.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>1.5.5.Final</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Jackson（支持JSON处理和Java 8时间类型） -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>

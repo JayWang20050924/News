@@ -15,7 +15,7 @@ public class News {
      * 主键ID
      */
     @TableId(value = "id", type = IdType.AUTO) // 主键字段映射，type=AUTO适配MySQL自增主键
-    private Long id;
+    private int id;
 
     /**
      * 新闻标题
@@ -69,41 +69,41 @@ public class News {
      * 阅读量
      */
     @TableField("view_count")
-    private Integer viewCount;
+    private int viewCount;
 
     /**
      * 点赞数
      */
     @TableField("like_count")
-    private Integer likeCount;
+    private int likeCount;
 
     /**
      * 评论数
      */
     @TableField("comment_count")
-    private Integer commentCount;
+    private int commentCount;
 
     /**
      * 状态：1=已发布，0=未发布，-1=软删除
      */
     @TableField("status")
-    private Integer status;
+    private int status;
 
 
     /**
      * 头条状态：1=头条，0=普通新闻
      */
     @TableField("headline_status")
-    private Integer headlineStatus;
+    private int headlineStatus;
     /**
-     * 创建时间（MP自动填充，需配置填充处理器）
+     * 创建时间（MySQL自动填充）
      */
-    @TableField(value = "created_at", fill = FieldFill.INSERT)
+    @TableField(value = "created_at")
     private LocalDateTime createdAt;
 
     /**
-     * 更新时间（MP自动填充）
+     * 更新时间（MySQL自动填充）
      */
-    @TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "updated_at")
     private LocalDateTime updatedAt;
 }
