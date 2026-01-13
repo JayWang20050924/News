@@ -20,9 +20,9 @@
               {{ topNews.summary }}
             </p>
             <div class="flex items-center text-gray-300 text-sm">
-              <span><i class="fa fa-clock-o mr-1"></i> {{ topNews.time }}</span>
+              <span><i class="fa fa-clock-o mr-1"></i> {{ topNews.publishTime }}</span>
               <span class="mx-3">|</span>
-              <span><i class="fa fa-thumbs-up mr-1"></i> {{ topNews.likes }}点赞</span>
+              <span><i class="fa fa-thumbs-up mr-1"></i> {{ topNews.likeCount }}点赞</span>
             </div>
           </div>
         </div>
@@ -74,7 +74,7 @@
                   {{ item.summary }}
                 </p>
                 <div class="flex justify-between items-center text-gray-500 text-xs">
-                  <span>{{ item.time }}</span>
+                  <span>{{ item.publishTime }}</span>
                   <span><i class="fa fa-eye mr-1"></i> {{ item.viewCount }}</span>
                 </div>
               </div>
@@ -126,7 +126,7 @@
                   </p>
                 </div>
                 <div class="flex justify-between items-center text-gray-500 text-xs">
-                  <span>{{ item.time }}</span>
+                  <span>{{ item.publishTime }}</span>
                   <span><i class="fa fa-eye mr-1"></i> {{ item.viewCount }}</span>
                   <span><i class="fa fa-comment mr-1"></i> {{ item.commentCount }}</span>
                 </div>
@@ -208,7 +208,7 @@
                   :src="sponsor.cover"
                   :alt="sponsor.name"
                   class="w-full h-24 object-contain rounded-lg hover:opacity-90 transition-opacity"
-                />  
+                />
               </a>
             </div>
           </div>
@@ -289,6 +289,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { newsApi } from '@/api/newsApi'
+import { ElMessage } from 'element-plus'
 
 // 定义响应式数据
 const topNews = ref({})
@@ -301,7 +302,14 @@ const sponsors = ref([])
 const loadHomepageNews = async () => {
   try {
     const response = await newsApi.getHomepageNews()
-    //API返回的数据结构为 { topNews, hotNews, latestNews, rankedNews, sponsors }
+     ElMessage({
+      message: "首页新闻获取成功",
+      type: 'success',
+      customClass: 'custom-message',
+      duration: 1500,
+    })
+    console.log('response:', response)
+    //request返回的数据结构为 { topNews, hotNews, latestNews, rankedNews, sponsors }
     topNews.value = response.topNews || {}
     hotNews.value = response.hotNews || []
     latestNews.value = response.latestNews || []
@@ -323,8 +331,8 @@ const setDefaultData = () => {
     category: '头条',
     categoryColor: 'red',
     cover: '/img/5.jpg',
-    time: '2小时前',
-    likes: '328'
+    publishTime: '2小时前',
+    likeCount: '328'
   }
 
   hotNews.value = [
@@ -335,7 +343,7 @@ const setDefaultData = () => {
       category: '科技',
       categoryColor: 'blue',
       cover: '/img/1.jpg',
-      time: '3小时前',
+      publishTime: '3小时前',
       viewCount: '1.2万',
       commentCount: '42'
     },
@@ -346,7 +354,7 @@ const setDefaultData = () => {
       category: '财经',
       categoryColor: 'green',
       cover: '/img/3.jpg',
-      time: '5小时前',
+      publishTime: '5小时前',
       viewCount: '8500',
       commentCount: '28'
     },
@@ -357,7 +365,7 @@ const setDefaultData = () => {
       category: '汽车',
       categoryColor: 'purple',
       cover: '/img/4.jpg',
-      time: '7小时前',
+      publishTime: '7小时前',
       viewCount: '9200',
       commentCount: '31'
     },
@@ -368,7 +376,7 @@ const setDefaultData = () => {
       category: '体育',
       categoryColor: 'red',
       cover: '/img/2.jpg',
-      time: '1天前',
+      publishTime: '1天前',
       viewCount: '1.5万',
       commentCount: '56'
     },
@@ -382,7 +390,7 @@ const setDefaultData = () => {
       category: '教育',
       categoryColor: 'yellow',
       cover: '/img/6.jpg',
-      time: '1小时前',
+      publishTime: '1小时前',
       viewCount: '3200',
       commentCount: '42',
     },
@@ -393,7 +401,7 @@ const setDefaultData = () => {
       category: '环保',
       categoryColor: 'emerald',
       cover: '/img/7.jpg',
-      time: '2小时前',
+      publishTime: '2小时前',
       viewCount: '2800',
       commentCount: '31',
     },
@@ -404,7 +412,7 @@ const setDefaultData = () => {
       category: '健康',
       categoryColor: 'pink',
       cover: '/img/8.jpg',
-      time: '4小时前',
+      publishTime: '4小时前',
       viewCount: '4500',
       commentCount: '28',
     },
@@ -415,7 +423,7 @@ const setDefaultData = () => {
       category: '科技',
       categoryColor: 'blue',
       cover: '/img/9.jpg',
-      time: '6小时前',
+      publishTime: '6小时前',
       viewCount: '5600',
       commentCount: '67',
     },
@@ -426,7 +434,7 @@ const setDefaultData = () => {
       category: '文化',
       categoryColor: 'indigo',
       cover: '/img/10.jpg',
-      time: '8小时前',
+      publishTime: '8小时前',
       viewCount: '3700',
       commentCount: '19',
     },
@@ -437,7 +445,7 @@ const setDefaultData = () => {
       category: '旅游',
       categoryColor: 'teal',
       cover: '/img/3.jpg',
-      time: '10小时前',
+      publishTime: '10小时前',
       viewCount: '6200',
       commentCount: '54',
     },

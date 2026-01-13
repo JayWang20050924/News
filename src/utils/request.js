@@ -53,7 +53,6 @@ service.interceptors.response.use(
     if (code === 200) {
       return data
     }
-    // 业务码非200，抛出业务错误信息
     return Promise.reject(msg || '请求失败，请稍后重试')
   },
   (error) => {
