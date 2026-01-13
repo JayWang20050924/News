@@ -288,6 +288,7 @@
 </template>
 
 <script setup>
+//todo:git排除图片上传
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { newsApi } from '@/api/newsApi'
