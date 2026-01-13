@@ -15,7 +15,7 @@ public class News {
      * 主键ID
      */
     @TableId(value = "id", type = IdType.AUTO) // 主键字段映射，type=AUTO适配MySQL自增主键
-    private int id;
+    private Integer id;
 
     /**
      * 新闻标题

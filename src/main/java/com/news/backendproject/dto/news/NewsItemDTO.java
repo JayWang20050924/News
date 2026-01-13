@@ -1,13 +1,8 @@
 package com.news.backendproject.dto.news;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.news.backendproject.dto.AbstractNewsGeneralDTO;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.news.backendproject.dto.NewsGeneralDTO;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
@@ -17,13 +12,13 @@ import java.time.LocalDateTime;
  * 适配前端hotNews、latestNews数据结构
  */
 @EqualsAndHashCode(callSuper = true)
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class NewsItemDTO extends AbstractNewsGeneralDTO {
+@ToString(callSuper = false)
+public class NewsItemDTO extends NewsGeneralDTO {
     /** 新闻ID */
-    private int id;
+    private Integer id;
     /** 新闻标题 */
     private String title;
     /** 新闻摘要 */
@@ -38,7 +33,7 @@ public class NewsItemDTO extends AbstractNewsGeneralDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime time;
     /** 浏览量 */
-    private int viewCount;
+    private Integer viewCount;
     /** 评论数- 最新新闻专属 */
-    private int commentCount;
+    private Integer commentCount;
 }

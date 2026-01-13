@@ -2,6 +2,7 @@ package com.news.backendproject.controller.news;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.news.backendproject.annotation.AccessRestriction;
+import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.news.HomepageNewsResponseDTO;
 import com.news.backendproject.entity.News;
 import com.news.backendproject.mapper.NewsMapper;
@@ -21,9 +22,11 @@ public class NewsController {
     @Resource
     private NewsMapper newsMapper;
     private final HomepageNewsService homepageNewsService;
+
+
     @AccessRestriction(limit = 40, period = 60, message = "请稍后再试", limitKey = false)
     @GetMapping("/homepage")
-    public HomepageNewsResponseDTO homepage() {
+    public ApiResponse<HomepageNewsResponseDTO> homepage() {
         return homepageNewsService.getHomepageNews();
     }
 }
