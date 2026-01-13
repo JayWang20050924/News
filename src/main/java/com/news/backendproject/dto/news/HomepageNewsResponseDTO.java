@@ -22,7 +22,7 @@ public class HomepageNewsResponseDTO {
     /** 最新资讯列表 */
     private List<NewsItemDTO> latestNews;
     /** 热门排行列表 */
-    private List<RankedNewsDTO> rankedNews;
+    private List<NewsRankedListDto> rankedNews;
     /** 赞助商列表 */
     private List<SponsorDTO> sponsors;
 }

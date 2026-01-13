@@ -2,10 +2,11 @@ package com.news.backendproject.mapper;
 
 import com.news.backendproject.dto.AbstractNewsGeneralDTO;
 import com.news.backendproject.dto.news.NewsItemDTO; // 示例子类DTO
-import com.news.backendproject.dto.news.RankedNewsDTO;  // 示例子类DTO
+import com.news.backendproject.dto.news.NewsRankedListDto;  // 示例子类DTO
 import com.news.backendproject.dto.news.TopNewsDTO;
 import com.news.backendproject.entity.News;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -23,17 +24,29 @@ public interface NewsDtoMapper {
     AbstractNewsGeneralDTO toAbstractNewsDTO(News news);
 
     // ------------------------ 各子类DTO的映射方法 ------------------------
-    NewsItemDTO toDetailNewsDTO(News news);
-
-    RankedNewsDTO toListNewsDTO(News news);
-
     TopNewsDTO toTopNewsDTO(News news);
+
+    NewsItemDTO toNewsItemDTO(News news);
+
+    @Mapping(target = "rank", ignore = true)
+    NewsRankedListDto toNewsRankedListDto(News news);
+    default NewsRankedListDto toNewsRankedListDto(News news, int rank) {
+        NewsRankedListDto dto = toNewsRankedListDto(news);
+        dto.setRank(rank);
+        return dto;
+    }
+
+
 
 
     //批量映射
-    List<NewsItemDTO> toDetailNewsDTOList(List<News> newsList);
-    List<RankedNewsDTO> toListNewsDTOList(List<News> newsList);
     List<TopNewsDTO> toTopNewsDTOList(List<News> newsList);
+
+    List<NewsItemDTO> toNewsItemDTOList(List<News> newsList);
+
+    List<NewsRankedListDto> toNewsRankedListDtoList(List<News> newsList);
+
+
     // 有额外字段的DTO
     // @Mapping(source = "实体字段名", target = "DTO额外字段名") // 字段不匹配时添加
     // SpecialNewsDTO toSpecialNewsDTO(News news);

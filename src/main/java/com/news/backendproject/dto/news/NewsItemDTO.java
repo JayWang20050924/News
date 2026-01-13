@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Valid
 @SuperBuilder
 public class NewsItemDTO extends AbstractNewsGeneralDTO {
     /** 新闻ID */
@@ -40,6 +39,6 @@ public class NewsItemDTO extends AbstractNewsGeneralDTO {
     private LocalDateTime time;
     /** 浏览量 */
     private int viewCount;
-    /** 评论数（如：42、28）- 最新新闻专属，可选 */
+    /** 评论数- 最新新闻专属 */
     private int commentCount;
 }
