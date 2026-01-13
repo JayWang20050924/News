@@ -7,7 +7,7 @@
         <div
           class="relative rounded-2xl overflow-hidden shadow-2xl shadow-gray-900/50 h-[50vh] min-h-[400px]"
         >
-          <img :src="topNews.image || '/img/gta6.jpg'" alt="头条新闻图片" class="w-full h-full object-cover" />
+          <img :src="topNews.cover || '/img/gta6.jpg'" alt="头条新闻图片" class="w-full h-full object-cover" />
           <div class="absolute inset-0 news-card-overlay flex flex-col justify-end p-6 md:p-10">
             <span
               class="inline-block bg-red-600 text-white text-xs px-3 py-1 rounded-full mb-4 w-max"
@@ -54,7 +54,7 @@
             >
               <div class="relative h-48 overflow-hidden">
                 <img
-                  :src="item.image || '/img/default-news.jpg'"
+                  :src="item.cover || '/img/default-news.jpg'"
                   :alt="item.title"
                   class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                 />
@@ -106,7 +106,7 @@
             >
               <div class="md:w-1/3 h-48 md:h-auto relative">
                 <img
-                  :src="item.image || '/img/default-news.jpg'"
+                  :src="item.cover || '/img/default-news.jpg'"
                   :alt="item.title"
                   class="w-full h-full object-cover"
                 />
@@ -128,7 +128,7 @@
                 <div class="flex justify-between items-center text-gray-500 text-xs">
                   <span>{{ item.time }}</span>
                   <span><i class="fa fa-eye mr-1"></i> {{ item.viewCount }}</span>
-                  <span><i class="fa fa-comment mr-1"></i> {{ item.comments }}</span>
+                  <span><i class="fa fa-comment mr-1"></i> {{ item.commentCount }}</span>
                 </div>
               </div>
             </article>
@@ -141,7 +141,6 @@
 
       <!-- 侧边栏 -->
       <div class="lg:w-1/3 space-y-8" style="margin-top: 3.5rem">
-                <!-- ========== 新增：网站介绍区域 ========== -->
         <div class="bg-gray-900 rounded-xl p-5 shadow-lg">
           <h3 class="text-lg font-bold mb-4 text-gray-100 flex items-center">
             <i class="fa fa-info-circle text-blue-500 mr-2"></i> 关于我们
@@ -160,7 +159,6 @@
             </a>
           </div>
         </div>
-        <!-- ========== 结束：网站介绍区域 ========== -->
         <!-- 热门排行 - 动态渲染 -->
         <div class="bg-gray-900 rounded-xl p-5 shadow-lg" v-if="rankedNews.length">
           <h3 class="text-lg font-bold mb-4 text-gray-100 flex items-center">
@@ -207,10 +205,10 @@
             <div v-for="sponsor in sponsors" :key="sponsor.id" class="mb-4 last:mb-0">
               <a :href="sponsor.link" target="_blank" rel="noopener noreferrer">
                 <img
-                  :src="sponsor.image"
+                  :src="sponsor.cover"
                   :alt="sponsor.name"
                   class="w-full h-24 object-contain rounded-lg hover:opacity-90 transition-opacity"
-                />
+                />  
               </a>
             </div>
           </div>
@@ -303,7 +301,7 @@ const sponsors = ref([])
 const loadHomepageNews = async () => {
   try {
     const response = await newsApi.getHomepageNews()
-    // 假设API返回的数据结构为 { topNews, hotNews, latestNews, rankedNews, sponsors }
+    //API返回的数据结构为 { topNews, hotNews, latestNews, rankedNews, sponsors }
     topNews.value = response.topNews || {}
     hotNews.value = response.hotNews || []
     latestNews.value = response.latestNews || []
@@ -324,7 +322,7 @@ const setDefaultData = () => {
     summary: '在最新的游戏开发者大会上,R星Rock Star游戏工作室正式宣布GTA6预计发售日期',
     category: '头条',
     categoryColor: 'red',
-    image: '/img/5.jpg',
+    cover: '/img/5.jpg',
     time: '2小时前',
     likes: '328'
   }
@@ -336,10 +334,10 @@ const setDefaultData = () => {
       summary: '在最近的科技峰会上，多家知名科技公司展示了其在人工智能领域的最新研究成果，标志着AI技术进入新的发展阶段。',
       category: '科技',
       categoryColor: 'blue',
-      image: '/img/1.jpg',
+      cover: '/img/1.jpg',
       time: '3小时前',
       viewCount: '1.2万',
-      comments: '42'
+      commentCount: '42'
     },
     {
       id: '2',
@@ -347,10 +345,10 @@ const setDefaultData = () => {
       summary: '受经济数据向好和政策利好消息影响，全球主要股市今日大幅上涨，投资者信心显著回升。',
       category: '财经',
       categoryColor: 'green',
-      image: '/img/3.jpg',
+      cover: '/img/3.jpg',
       time: '5小时前',
       viewCount: '8500',
-      comments: '28'
+      commentCount: '28'
     },
     {
       id: '3',
@@ -358,10 +356,10 @@ const setDefaultData = () => {
       summary: '最新数据显示，新能源汽车销量持续攀升，市场份额创下历史新高，传统燃油车面临转型压力。',
       category: '汽车',
       categoryColor: 'purple',
-      image: '/img/4.jpg',
+      cover: '/img/4.jpg',
       time: '7小时前',
       viewCount: '9200',
-      comments: '31'
+      commentCount: '31'
     },
     {
       id: '4',
@@ -369,10 +367,10 @@ const setDefaultData = () => {
       summary: '经过激烈角逐，国际足球联赛决赛圆满落幕，新科冠军诞生，为球迷们奉献了一场精彩绝伦的比赛。',
       category: '体育',
       categoryColor: 'red',
-      image: '/img/2.jpg',
+      cover: '/img/2.jpg',
       time: '1天前',
       viewCount: '1.5万',
-      comments: '56'
+      commentCount: '56'
     },
   ]
 
@@ -383,10 +381,10 @@ const setDefaultData = () => {
       summary: '教育部今日发布新政策，旨在进一步推动教育公平发展，缩小城乡教育差距，提高教育质量。',
       category: '教育',
       categoryColor: 'yellow',
-      image: '/img/6.jpg',
+      cover: '/img/6.jpg',
       time: '1小时前',
       viewCount: '3200',
-      comments: '42',
+      commentCount: '42',
     },
     {
       id: '6',
@@ -394,10 +392,10 @@ const setDefaultData = () => {
       summary: '全球环保组织联合发出呼吁，要求各国政府采取更严格措施减少海洋塑料污染，保护海洋生态。',
       category: '环保',
       categoryColor: 'emerald',
-      image: '/img/7.jpg',
+      cover: '/img/7.jpg',
       time: '2小时前',
       viewCount: '2800',
-      comments: '31',
+      commentCount: '31',
     },
     {
       id: '7',
@@ -405,10 +403,10 @@ const setDefaultData = () => {
       summary: '最新医学研究表明，特定的饮食习惯和生活方式可以有效预防多种常见疾病，为公众健康提供新指导。',
       category: '健康',
       categoryColor: 'pink',
-      image: '/img/8.jpg',
+      cover: '/img/8.jpg',
       time: '4小时前',
       viewCount: '4500',
-      comments: '28',
+      commentCount: '28',
     },
     {
       id: '8',
@@ -416,10 +414,10 @@ const setDefaultData = () => {
       summary: '随着5G基础设施建设的加速推进，5G网络覆盖范围进一步扩大，用户连接速度得到显著提升。',
       category: '科技',
       categoryColor: 'blue',
-      image: '/img/9.jpg',
+      cover: '/img/9.jpg',
       time: '6小时前',
       viewCount: '5600',
-      comments: '67',
+      commentCount: '67',
     },
     {
       id: '9',
@@ -427,10 +425,10 @@ const setDefaultData = () => {
       summary: '文化产业在数字化转型中迎来新机遇，数字文化产品和服务成为行业发展的重要趋势。',
       category: '文化',
       categoryColor: 'indigo',
-      image: '/img/10.jpg',
+      cover: '/img/10.jpg',
       time: '8小时前',
       viewCount: '3700',
-      comments: '19',
+      commentCount: '19',
     },
     {
       id: '10',
@@ -438,10 +436,10 @@ const setDefaultData = () => {
       summary: '随着疫情后限制的逐步解除，旅游业复苏势头强劲，出境游预订量出现大幅增长。',
       category: '旅游',
       categoryColor: 'teal',
-      image: '/img/3.jpg',
+      cover: '/img/3.jpg',
       time: '10小时前',
       viewCount: '6200',
-      comments: '54',
+      commentCount: '54',
     },
   ]
 

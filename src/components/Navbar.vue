@@ -152,7 +152,7 @@
 
           <!-- 桌面端搜索框 -->
           <div
-            class="search-container-pc hidden custom:flex items-center bg-gray-800 border-2 border-gray-400 rounded-lg overflow-hidden"
+            class="search-container-pc hidden custom:flex items-center bg-gray-800 border-2 border-gray-500 focus-within:border-gray-300 transition-colors rounded-lg overflow-hidden"
             :class="{
               'ml-4 lg:ml-8 xl:ml-20': true,
               'w-auto flex-1': true,
