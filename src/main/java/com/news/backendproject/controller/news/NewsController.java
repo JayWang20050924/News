@@ -1,9 +1,11 @@
 package com.news.backendproject.controller.news;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.news.backendproject.annotation.AccessRestriction;
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.news.HomepageNewsResponseDTO;
+import com.news.backendproject.dto.news.NewsView;
 import com.news.backendproject.entity.News;
 import com.news.backendproject.mapper.NewsMapper;
 import com.news.backendproject.service.news.HomepageNewsService;
@@ -26,7 +28,10 @@ public class NewsController {
 
     @AccessRestriction(limit = 40, period = 60, message = "请稍后再试", limitKey = false)
     @GetMapping("/homepage")
+    @JsonView(NewsView.HomepageView.class)
     public ApiResponse<HomepageNewsResponseDTO> homepage() {
-        return homepageNewsService.getHomepageNews();
+        ApiResponse<HomepageNewsResponseDTO> homepageNews = homepageNewsService.getHomepageNews();
+        System.err.println(homepageNews);
+        return homepageNews;
     }
 }

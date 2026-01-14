@@ -1,5 +1,6 @@
 package com.news.backendproject.dto.news;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.news.backendproject.dto.sponsor.SponsorDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,10 +17,13 @@ import java.util.List;
 @AllArgsConstructor
 public class HomepageNewsResponseDTO {
     /** 头条新闻 */
+    @JsonView(NewsView.TopNewsView.class)
     private TopNewsDTO topNews;
     /** 热门新闻列表 */
+    @JsonView(NewsView.NewsItemView.class)
     private List<NewsItemDTO> hotNews;
     /** 最新资讯列表 */
+    @JsonView(NewsView.NewsItemView.class)
     private List<NewsItemDTO> latestNews;
     /** 热门排行列表 */
     private List<NewsRankedListDto> rankedNews;

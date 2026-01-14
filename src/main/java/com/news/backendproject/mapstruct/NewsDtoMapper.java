@@ -7,6 +7,7 @@ import com.news.backendproject.dto.news.TopNewsDTO;
 import com.news.backendproject.entity.News;
 import org.mapstruct.Mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,13 +34,6 @@ public interface NewsDtoMapper {
      */
     NewsItemDTO toNewsItemDTO(News news);
 
-    /**
-     * NewsRankedListDto映射：rank字段手动赋值，先忽略自动映射
-     */
-    NewsRankedListDto toNewsRankedListDto(News news);
-
     // ------------------------ 批量映射 ------------------------
-    List<NewsItemDTO> toNewsItemDTOList(List<News> newsList);
-    List<NewsRankedListDto> toNewsRankedListDtoList(List<News> newsList);
-
+    ArrayList<NewsItemDTO> toNewsItemDTOList(ArrayList<News> newsList);
 }
