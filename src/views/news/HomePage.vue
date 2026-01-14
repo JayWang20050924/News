@@ -7,10 +7,14 @@
         <div
           class="relative rounded-2xl overflow-hidden shadow-2xl shadow-gray-900/50 h-[50vh] min-h-[400px]"
         >
-          <img :src="topNews.cover || '/img/gta6.jpg'" alt="头条新闻图片" class="w-full h-full object-cover" />
+          <img
+            :src="topNews.cover || '/img/gta6.jpg'"
+            alt="头条新闻图片"
+            class="w-full h-full object-cover"
+          />
           <div class="absolute inset-0 news-card-overlay flex flex-col justify-end p-6 md:p-10">
             <span
-              class="inline-block bg-red-600 text-white text-xs px-3 py-1 rounded-full mb-4 w-max"
+              :class="`inline-block bg-${topNews.categoryColor}-600 text-white text-xs px-3 py-1 rounded-full mb-4 w-max`"
               >{{ topNews.category }}</span
             >
             <h2 class="text-[clamp(1.5rem,5vw,2.5rem)] font-bold text-white mb-3 leading-tight">
@@ -75,7 +79,12 @@
                 </p>
                 <div class="flex justify-between items-center text-gray-500 text-xs">
                   <span>{{ item.publishTime }}</span>
+                  <span class="mx-3">|</span>
                   <span><i class="fa fa-eye mr-1"></i> {{ item.viewCount }}</span>
+                  <span class="mx-3">|</span>
+                  <span><i class="fa fa-thumbs-up mr-1"></i> {{ item.likeCount }}点赞</span>
+                  <span class="mx-3">|</span>
+                  <span><i class="fa fa-comment mr-1"></i> {{ item.commentCount }}</span>
                 </div>
               </div>
             </article>
@@ -127,7 +136,11 @@
                 </div>
                 <div class="flex justify-between items-center text-gray-500 text-xs">
                   <span>{{ item.publishTime }}</span>
+                  <span class="mx-3">|</span>
                   <span><i class="fa fa-eye mr-1"></i> {{ item.viewCount }}</span>
+                  <span class="mx-3">|</span>
+                  <span><i class="fa fa-thumbs-up mr-1"></i> {{ item.likeCount }}点赞</span>
+                  <span class="mx-3">|</span>
                   <span><i class="fa fa-comment mr-1"></i> {{ item.commentCount }}</span>
                 </div>
               </div>
@@ -146,8 +159,12 @@
             <i class="fa fa-info-circle text-blue-500 mr-2"></i> 关于我们
           </h3>
           <div class="space-y-3 text-sm text-gray-300">
-            <p>环球新闻是一家专注于提供实时、全面、客观的综合新闻资讯平台，涵盖科技、财经、体育、健康、教育等多个领域。</p>
-            <p>我们致力于第一时间传递全球热点事件，挖掘新闻背后的价值，为用户打造高质量的资讯阅读体验。</p>
+            <p>
+              环球新闻是一家专注于提供实时、全面、客观的综合新闻资讯平台，涵盖科技、财经、体育、健康、教育等多个领域。
+            </p>
+            <p>
+              我们致力于第一时间传递全球热点事件，挖掘新闻背后的价值，为用户打造高质量的资讯阅读体验。
+            </p>
             <p>成立至今，已累计服务数量可观用户，成为用户获取权威资讯的首选平台之一。</p>
           </div>
           <div class="mt-4 flex gap-3">
@@ -302,8 +319,8 @@ const sponsors = ref([])
 const loadHomepageNews = async () => {
   try {
     const response = await newsApi.getHomepageNews()
-     ElMessage({
-      message: "首页新闻获取成功",
+    ElMessage({
+      message: '首页新闻获取成功',
       type: 'success',
       customClass: 'custom-message',
       duration: 1500,
@@ -332,20 +349,22 @@ const setDefaultData = () => {
     categoryColor: 'red',
     cover: '/img/5.jpg',
     publishTime: '2小时前',
-    likeCount: '328'
+    likeCount: '328',
   }
 
   hotNews.value = [
     {
       id: '1',
       title: '人工智能技术取得重大突破，多家公司发布最新研究成果',
-      summary: '在最近的科技峰会上，多家知名科技公司展示了其在人工智能领域的最新研究成果，标志着AI技术进入新的发展阶段。',
+      summary:
+        '在最近的科技峰会上，多家知名科技公司展示了其在人工智能领域的最新研究成果，标志着AI技术进入新的发展阶段。',
       category: '科技',
       categoryColor: 'blue',
       cover: '/img/1.jpg',
       publishTime: '3小时前',
       viewCount: '1.2万',
-      commentCount: '42'
+      likeCount: '328',
+      commentCount: '42',
     },
     {
       id: '2',
@@ -356,29 +375,34 @@ const setDefaultData = () => {
       cover: '/img/3.jpg',
       publishTime: '5小时前',
       viewCount: '8500',
-      commentCount: '28'
+      likeCount: '328',
+      commentCount: '28',
     },
     {
       id: '3',
       title: '新能源汽车销量持续攀升，市场份额创新高',
-      summary: '最新数据显示，新能源汽车销量持续攀升，市场份额创下历史新高，传统燃油车面临转型压力。',
+      summary:
+        '最新数据显示，新能源汽车销量持续攀升，市场份额创下历史新高，传统燃油车面临转型压力。',
       category: '汽车',
       categoryColor: 'purple',
       cover: '/img/4.jpg',
       publishTime: '7小时前',
       viewCount: '9200',
-      commentCount: '31'
+      likeCount: '280',
+      commentCount: '31',
     },
     {
       id: '4',
       title: '体育界盛事：国际足球联赛决赛圆满落幕',
-      summary: '经过激烈角逐，国际足球联赛决赛圆满落幕，新科冠军诞生，为球迷们奉献了一场精彩绝伦的比赛。',
+      summary:
+        '经过激烈角逐，国际足球联赛决赛圆满落幕，新科冠军诞生，为球迷们奉献了一场精彩绝伦的比赛。',
       category: '体育',
       categoryColor: 'red',
       cover: '/img/2.jpg',
       publishTime: '1天前',
       viewCount: '1.5万',
-      commentCount: '56'
+      likeCount: '328',
+      commentCount: '56',
     },
   ]
 
@@ -392,28 +416,33 @@ const setDefaultData = () => {
       cover: '/img/6.jpg',
       publishTime: '1小时前',
       viewCount: '3200',
+      likeCount: '328',
       commentCount: '42',
     },
     {
       id: '6',
       title: '环保组织呼吁加强海洋保护，减少塑料污染',
-      summary: '全球环保组织联合发出呼吁，要求各国政府采取更严格措施减少海洋塑料污染，保护海洋生态。',
+      summary:
+        '全球环保组织联合发出呼吁，要求各国政府采取更严格措施减少海洋塑料污染，保护海洋生态。',
       category: '环保',
       categoryColor: 'emerald',
       cover: '/img/7.jpg',
       publishTime: '2小时前',
       viewCount: '2800',
+      likeCount: '328',
       commentCount: '31',
     },
     {
       id: '7',
       title: '医学研究新发现：特定饮食习惯可有效预防疾病',
-      summary: '最新医学研究表明，特定的饮食习惯和生活方式可以有效预防多种常见疾病，为公众健康提供新指导。',
+      summary:
+        '最新医学研究表明，特定的饮食习惯和生活方式可以有效预防多种常见疾病，为公众健康提供新指导。',
       category: '健康',
       categoryColor: 'pink',
       cover: '/img/8.jpg',
       publishTime: '4小时前',
       viewCount: '4500',
+      likeCount: '328',
       commentCount: '28',
     },
     {
@@ -425,6 +454,7 @@ const setDefaultData = () => {
       cover: '/img/9.jpg',
       publishTime: '6小时前',
       viewCount: '5600',
+      likeCount: '328',
       commentCount: '67',
     },
     {
@@ -436,6 +466,7 @@ const setDefaultData = () => {
       cover: '/img/10.jpg',
       publishTime: '8小时前',
       viewCount: '3700',
+      likeCount: '328',
       commentCount: '19',
     },
     {
@@ -447,6 +478,7 @@ const setDefaultData = () => {
       cover: '/img/3.jpg',
       publishTime: '10小时前',
       viewCount: '6200',
+      likeCount: '328',
       commentCount: '54',
     },
   ]

@@ -33,7 +33,7 @@
           </span>
 
           <div class="flex flex-wrap items-center gap-3 text-gray-300 text-sm">
-            <span><i class="fa fa-clock-o mr-1"></i> {{ news.time }}</span>
+            <span><i class="fa fa-clock-o mr-1"></i> {{ news.publishTime }}</span>
             <span><i class="fa fa-building-o mr-1"></i> {{ news.author }}</span>
             <span><i class="fa fa-eye mr-1"></i> {{ news.views }} 浏览</span>
           </div>
@@ -105,7 +105,7 @@
               {{ relatedItem.summary }}
             </p>
             <div class="flex justify-between items-center text-gray-500 text-xs">
-              <span>{{ relatedItem.time }}</span>
+              <span>{{ relatedItem.publishTime }}</span>
               <span><i class="fa fa-eye mr-1"></i> {{ relatedItem.views }}</span>
             </div>
           </div>
@@ -119,7 +119,7 @@
         <!-- 评论区标题 -->
         <h2 class="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-2">
           <i class="fa fa-comments-o"></i>
-          评论区 ({{ comments.length }})
+          评论区 ({{ news.commentCount }})
         </h2>
 
         <!-- 评论输入框 - 移除固定相关逻辑 -->
@@ -160,7 +160,7 @@
               <i class="fa fa-user-circle"></i>
               <div>
                 <h3 class="text-white font-medium">用户_{{ comment.username }}</h3>
-                <p class="text-xs text-gray-500">{{ comment.time }}</p>
+                <p class="text-xs text-gray-500">{{ comment.publishTime }}</p>
               </div>
             </div>
 
@@ -213,7 +213,7 @@
                 <div class="flex items-center gap-2 mb-2">
                   <i class="fa fa-user-circle text-xs"></i>
                   <h4 class="text-white text-sm font-medium">用户_{{ reply.username }}</h4>
-                  <span class="text-xs text-gray-500">{{ reply.time }}</span>
+                  <span class="text-xs text-gray-500">{{ reply.publishTime }}</span>
                 </div>
                 <p class="text-gray-300 text-sm">{{ reply.content }}</p>
                 <button
@@ -288,7 +288,6 @@
 </template>
 
 <script setup>
-//todo:git排除图片上传
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { newsApi } from '@/api/newsApi'
@@ -306,17 +305,18 @@ const loadingMore = ref(false) // 加载更多按钮的加载状态
 
 // 新闻详情数据（统一数据结构）
 const news = ref({
-  id: '', // 新闻唯一标识符
-  title: '', // 新闻标题
-  summary: '', // 新闻摘要
+   id: '', // 新闻唯一标识符
+   title: '', // 新闻标题
+   summary: '', // 新闻摘要
   content: [], // 新闻正文内容数组
-  category: '', // 分类名称
-  categoryColor: '', // 分类颜色（用于标签背景色）
-  cover: '/img/5.jpg', // 新闻封面图片URL
-  time: '', // 发布时间
+   category: '', // 分类名称
+   categoryColor: '', // 分类颜色（用于标签背景色）
+   cover: '/img/5.jpg', // 新闻封面图片URL
+   publishTime: '', // 发布时间
   author: '', // 新闻来源
   viewCount: 0, // 浏览量
-  likeCount: 0, // 点赞数
+   likeCount: 0, // 点赞数
+   commentCount: 0, // 评论数
 })
 
 // 相关新闻推荐（使用统一的新闻数据结构）
@@ -338,7 +338,7 @@ const generateDefaultComments = () => {
     {
       id: 'c1',
       username: '1001',
-      time: '2024-05-20 10:30',
+      publishTime: '2024-05-20 10:30',
       content: '这篇新闻内容很有深度，分析得很到位！',
       likeCount: 12,
       liked: false,
@@ -347,7 +347,7 @@ const generateDefaultComments = () => {
         {
           id: 'r1-1',
           username: '2001',
-          time: '2024-05-20 11:00',
+          publishTime: '2024-05-20 11:00',
           content: '确实，作者的视角很独特',
           likeCount: 3,
           liked: false,
@@ -357,7 +357,7 @@ const generateDefaultComments = () => {
     {
       id: 'c2',
       username: '1002',
-      time: '2024-05-20 14:15',
+      publishTime: '2024-05-20 14:15',
       content: '有不同的看法，我觉得这个事件还有另一面值得探讨',
       likeCount: 8,
       liked: false,
@@ -366,7 +366,7 @@ const generateDefaultComments = () => {
         {
           id: 'r2-1',
           username: '2002',
-          time: '2024-05-20 14:20',
+          publishTime: '2024-05-20 14:20',
           content: '愿闻其详，说说你的看法？',
           likeCount: 2,
           liked: false,
@@ -374,7 +374,7 @@ const generateDefaultComments = () => {
         {
           id: 'r2-2',
           username: '2003',
-          time: '2024-05-20 14:30',
+          publishTime: '2024-05-20 14:30',
           content: '我也觉得，不能只看表面',
           likeCount: 1,
           liked: false,
@@ -384,7 +384,7 @@ const generateDefaultComments = () => {
     {
       id: 'c3',
       username: '1003',
-      time: '2024-05-20 16:40',
+      publishTime: '2024-05-20 16:40',
       content: '感谢分享，学到了很多新知识',
       likeCount: 15,
       liked: false,
@@ -393,7 +393,7 @@ const generateDefaultComments = () => {
         {
           id: 'r3-1',
           username: '2004',
-          time: '2024-05-20 16:45',
+          publishTime: '2024-05-20 16:45',
           content: '+1，确实涨知识了',
           likeCount: 5,
           liked: false,
@@ -401,7 +401,7 @@ const generateDefaultComments = () => {
         {
           id: 'r3-2',
           username: '2005',
-          time: '2024-05-20 16:50',
+          publishTime: '2024-05-20 16:50',
           content: '哪里可以找到更多相关资料？',
           likeCount: 2,
           liked: false,
@@ -409,7 +409,7 @@ const generateDefaultComments = () => {
         {
           id: 'r3-3',
           username: '2006',
-          time: '2024-05-20 17:00',
+          publishTime: '2024-05-20 17:00',
           content: '同求，想深入了解下',
           likeCount: 1,
           liked: false,
@@ -419,7 +419,7 @@ const generateDefaultComments = () => {
     {
       id: 'c4',
       username: '1004',
-      time: '2024-05-21 09:10',
+      publishTime: '2024-05-21 09:10',
       content: '这个新闻的时效性很强，点赞！',
       likeCount: 20,
       liked: false,
@@ -428,7 +428,7 @@ const generateDefaultComments = () => {
         {
           id: 'r4-1',
           username: '2007',
-          time: '2024-05-21 09:15',
+          publishTime: '2024-05-21 09:15',
           content: '确实，第一时间报道很重要',
           likeCount: 4,
           liked: false,
@@ -436,7 +436,7 @@ const generateDefaultComments = () => {
         {
           id: 'r4-2',
           username: '2008',
-          time: '2024-05-21 09:20',
+          publishTime: '2024-05-21 09:20',
           content: '希望能多些这样的优质内容',
           likeCount: 3,
           liked: false,
@@ -444,7 +444,7 @@ const generateDefaultComments = () => {
         {
           id: 'r4-3',
           username: '2009',
-          time: '2024-05-21 09:25',
+          publishTime: '2024-05-21 09:25',
           content: '同意，支持原创！',
           likeCount: 2,
           liked: false,
@@ -452,7 +452,7 @@ const generateDefaultComments = () => {
         {
           id: 'r4-4',
           username: '2010',
-          time: '2024-05-21 09:30',
+          publishTime: '2024-05-21 09:30',
           content: '已转发给朋友，一起讨论',
           likeCount: 1,
           liked: false,
@@ -463,7 +463,7 @@ const generateDefaultComments = () => {
     {
       id: 'c5',
       username: '1005',
-      time: '2024-05-21 11:20',
+      publishTime: '2024-05-21 11:20',
       content: '看完这篇新闻，对这个领域有了新的认识！',
       likeCount: 18,
       liked: false,
@@ -472,7 +472,7 @@ const generateDefaultComments = () => {
         {
           id: 'r5-1',
           username: '2011',
-          time: '2024-05-21 11:25',
+          publishTime: '2024-05-21 11:25',
           content: '我也是，原来还有这么多细节',
           likeCount: 6,
           liked: false,
@@ -480,7 +480,7 @@ const generateDefaultComments = () => {
         {
           id: 'r5-2',
           username: '2012',
-          time: '2024-05-21 11:30',
+          publishTime: '2024-05-21 11:30',
           content: '推荐大家看看相关的纪录片，更全面',
           likeCount: 4,
           liked: false,
@@ -490,7 +490,7 @@ const generateDefaultComments = () => {
     {
       id: 'c6',
       username: '1006',
-      time: '2024-05-21 13:40',
+      publishTime: '2024-05-21 13:40',
       content: '这个事件的影响可能比想象的更大',
       likeCount: 14,
       liked: false,
@@ -499,7 +499,7 @@ const generateDefaultComments = () => {
         {
           id: 'r6-1',
           username: '2013',
-          time: '2024-05-21 13:45',
+          publishTime: '2024-05-21 13:45',
           content: '确实，后续可能会有更多相关政策出台',
           likeCount: 3,
           liked: false,
@@ -507,7 +507,7 @@ const generateDefaultComments = () => {
         {
           id: 'r6-2',
           username: '2014',
-          time: '2024-05-21 13:50',
+          publishTime: '2024-05-21 13:50',
           content: '分析得很客观，没有带主观情绪',
           likeCount: 2,
           liked: false,
@@ -515,7 +515,7 @@ const generateDefaultComments = () => {
         {
           id: 'r6-3',
           username: '2015',
-          time: '2024-05-21 13:55',
+          publishTime: '2024-05-21 13:55',
           content: '希望媒体能多做这类深度报道',
           likeCount: 1,
           liked: false,
@@ -525,7 +525,7 @@ const generateDefaultComments = () => {
     {
       id: 'c7',
       username: '1007',
-      time: '2024-05-21 15:10',
+      publishTime: '2024-05-21 15:10',
       content: '为记者的深入调查点赞，不容易！',
       likeCount: 22,
       liked: false,
@@ -534,7 +534,7 @@ const generateDefaultComments = () => {
         {
           id: 'r7-1',
           username: '2016',
-          time: '2024-05-21 15:15',
+          publishTime: '2024-05-21 15:15',
           content: '确实，深度报道需要大量时间和精力',
           likeCount: 7,
           liked: false,
@@ -542,7 +542,7 @@ const generateDefaultComments = () => {
         {
           id: 'r7-2',
           username: '2017',
-          time: '2024-05-21 15:20',
+          publishTime: '2024-05-21 15:20',
           content: '支持真实、有价值的新闻报道',
           likeCount: 5,
           liked: false,
@@ -550,7 +550,7 @@ const generateDefaultComments = () => {
         {
           id: 'r7-3',
           username: '2018',
-          time: '2024-05-21 15:25',
+          publishTime: '2024-05-21 15:25',
           content: '现在这样的报道太少了',
           likeCount: 3,
           liked: false,
@@ -558,7 +558,7 @@ const generateDefaultComments = () => {
         {
           id: 'r7-4',
           username: '2019',
-          time: '2024-05-21 15:30',
+          publishTime: '2024-05-21 15:30',
           content: '致敬每一位坚守真相的记者',
           likeCount: 2,
           liked: false,
@@ -568,7 +568,7 @@ const generateDefaultComments = () => {
     {
       id: 'c8',
       username: '1008',
-      time: '2024-05-21 17:00',
+      publishTime: '2024-05-21 17:00',
       content: '从不同角度看这个问题，收获很多',
       likeCount: 16,
       liked: false,
@@ -577,7 +577,7 @@ const generateDefaultComments = () => {
         {
           id: 'r8-1',
           username: '2020',
-          time: '2024-05-21 17:05',
+          publishTime: '2024-05-21 17:05',
           content: '多角度分析才是客观的',
           likeCount: 4,
           liked: false,
@@ -602,7 +602,7 @@ const generateMoreComments = () => {
       replies.push({
         id: `${commentId}-r${r}`,
         username: `${3000 + i * 10 + r}`,
-        time: `2024-05-${22 + i} ${10 + r}:${10 + r * 5}`,
+        publishTime: `2024-05-${22 + i} ${10 + r}:${10 + r * 5}`,
         content: `这是${commentId}的第${r + 1}条回复，随机生成的内容~`,
         likeCount: Math.floor(Math.random() * 10) + 1,
         liked: false,
@@ -612,7 +612,7 @@ const generateMoreComments = () => {
     moreComments.push({
       id: commentId,
       username: `${1008 + i}`,
-      time: `2024-05-${22 + i} 09:${20 + i * 5}`,
+      publishTime: `2024-05-${22 + i} 09:${20 + i * 5}`,
       content: `这是加载更多的第${i + 1}条评论，随机生成的内容，包含${replyCount}条回复~`,
       likeCount: Math.floor(Math.random() * 20) + 5,
       liked: false,
@@ -717,7 +717,7 @@ const publishComment = async () => {
     const comment = {
       id: `c${Date.now()}`,
       username: '我',
-      time: '刚刚',
+      publishTime: '刚刚',
       content: content,
       likeCount: 0,
       liked: false,
@@ -819,7 +819,7 @@ const publishReply = async () => {
     const newReply = {
       id: `r${Date.now()}`,
       username: '我', // 实际项目中替换为真实用户名
-      time: '刚刚',
+      publishTime: '刚刚',
       content: content,
       likeCount: 0,
       liked: false,

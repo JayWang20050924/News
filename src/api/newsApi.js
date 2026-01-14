@@ -51,18 +51,6 @@ export const newsApi = {
       params: {},
     })
   },
-
-  /**
-   * 获取新闻排行榜
-   */
-  getRankingNews: () => {
-    return request({
-      url: '/news/ranking',
-      method: 'get',
-      params: {},
-    })
-  },
-
   /**
    * 获取相关新闻
    */
@@ -95,6 +83,19 @@ export const newsApi = {
   likeNews: (id) => {
     return request({
       url: `/news/like`,
+      method: 'post',
+      params: {
+        id: id,
+      },
+    })
+  },
+  /**
+   * 点踩新闻
+   * @param {String|Number} id - 新闻ID
+   */
+  dislikeNews: (id) => {
+    return request({
+      url: `/news/dislike`,
       method: 'post',
       params: {
         id: id,
