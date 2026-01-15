@@ -1,6 +1,7 @@
 package com.news.backendproject.dto.news;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.news.backendproject.dto.NewsView;
 import com.news.backendproject.dto.sponsor.SponsorDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;

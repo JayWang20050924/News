@@ -1,4 +1,4 @@
-package com.news.backendproject.dto.news;
+package com.news.backendproject.dto;
 
 /**
  * 视图控制字段（恢复适度继承，明确字段范围）
@@ -9,8 +9,8 @@ public class NewsView {
 
     // 列表字段：继承头条 + 额外字段（viewCount/commentCount）
     public interface NewsItemView extends TopNewsView {}
+    public interface DetailedNewsView extends NewsItemView {}
 
-    // 详情/后台视图（不变）
-    public interface NewsDetailView extends TopNewsView {}
+    // 后台视图
     public interface AdminFullView extends TopNewsView {}
 }

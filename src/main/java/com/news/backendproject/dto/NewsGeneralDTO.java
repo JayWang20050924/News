@@ -2,12 +2,12 @@ package com.news.backendproject.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.news.backendproject.dto.news.NewsView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Data
 @NoArgsConstructor
@@ -26,8 +26,8 @@ public class NewsGeneralDTO {
     protected String summary;
 
     /** 新闻正文（仅详情视图） */
-    @JsonView(NewsView.NewsDetailView.class)
-    protected String content;
+    @JsonView(NewsView.DetailedNewsView.class)
+    protected ArrayList<String> content;
 
     /** 新闻分类（头条基础字段） */
     @JsonView(NewsView.TopNewsView.class)
@@ -42,7 +42,7 @@ public class NewsGeneralDTO {
     protected String cover;
 
     /** 新闻作者（仅详情视图） */
-    @JsonView(NewsView.NewsDetailView.class)
+    @JsonView(NewsView.DetailedNewsView.class)
     protected String author;
 
     /** 发布时间（头条基础字段） */

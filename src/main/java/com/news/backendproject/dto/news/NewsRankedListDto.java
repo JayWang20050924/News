@@ -10,7 +10,6 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @NoArgsConstructor
-@SuperBuilder
 public class NewsRankedListDto {
     private Integer id;
     private String title;

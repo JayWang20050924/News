@@ -1,6 +1,7 @@
 package com.news.backendproject.mapstruct;
 
 import com.news.backendproject.dto.NewsGeneralDTO;
+import com.news.backendproject.dto.news.DetailedNewsDto;
 import com.news.backendproject.dto.news.NewsItemDTO;
 import com.news.backendproject.dto.news.NewsRankedListDto;
 import com.news.backendproject.dto.news.TopNewsDTO;
@@ -33,6 +34,8 @@ public interface NewsDtoMapper {
      * NewsItemDTO映射：前端字段已匹配，无需任何映射规则
      */
     NewsItemDTO toNewsItemDTO(News news);
+
+    DetailedNewsDto toDetailedNewsDto(News news);
     /**
      * NewsRankedListDto映射：前端字段已匹配，无需任何映射规则
      */

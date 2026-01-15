@@ -1,14 +1,16 @@
 package com.news.backendproject.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 /**
  * 新闻表实体类
  */
 @Data
-@TableName("news") // MyBatis-Plus：指定对应数据库表名（替换为实际表名）
+@TableName(value = "news", autoResultMap = true)
 public class News {
 
     /**
@@ -32,8 +34,8 @@ public class News {
     /**
      * 新闻正文
      */
-    @TableField("content")
-    private String content;
+    @TableField(value = "content", typeHandler = JacksonTypeHandler.class)
+    private ArrayList<String> content;
 
     /**
      * 新闻分类
