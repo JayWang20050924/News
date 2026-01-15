@@ -7,14 +7,12 @@
         <div
           class="relative rounded-2xl overflow-hidden shadow-2xl shadow-gray-900/50 h-[50vh] min-h-[400px]"
         >
-          <img
-            :src="topNews.cover || '/img/gta6.jpg'"
-            alt="头条新闻图片"
-            class="w-full h-full object-cover"
-          />
+          <img v-if="topNews.id" :src="topNews.cover" class="w-full h-full object-cover" />
+          <img v-else class="w-full h-full object-cover" />
           <div class="absolute inset-0 news-card-overlay flex flex-col justify-end p-6 md:p-10">
             <span
-              :class="`inline-block bg-${topNews.categoryColor}-600 text-white text-xs px-3 py-1 rounded-full mb-4 w-max`"
+              :style="`background-color: ${topNews.categoryColor};`"
+              :class="`inline-block text-white text-xs px-3 py-1 rounded-full mb-4 w-max`"
               >{{ topNews.category }}</span
             >
             <h2 class="text-[clamp(1.5rem,5vw,2.5rem)] font-bold text-white mb-3 leading-tight">
@@ -42,7 +40,7 @@
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-100">热门新闻</h2>
             <router-link
-              to="/category/hot"
+              to="/BrowseMorePage"
               class="text-gray-300 hover:text-white transition-colors text-sm flex items-center"
             >
               查看更多 <i class="fa fa-angle-right ml-1"></i>
@@ -63,7 +61,8 @@
                   class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                 />
                 <span
-                  :class="`absolute top-3 left-3 bg-${item.categoryColor}-600 text-white text-xs px-2 py-1 rounded`"
+                  :style="`background-color: ${item.categoryColor};`"
+                  :class="`absolute top-3 left-3 text-white text-xs px-2 py-1 rounded`"
                 >
                   {{ item.category }}
                 </span>
@@ -99,7 +98,7 @@
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-100">最新资讯</h2>
             <router-link
-              to="/category/latest"
+              to="/BrowseMorePage"
               class="text-gray-300 hover:text-white transition-colors text-sm flex items-center"
             >
               查看更多 <i class="fa fa-angle-right ml-1"></i>
@@ -109,7 +108,7 @@
           <div class="space-y-6">
             <!-- 动态渲染最新资讯条目 -->
             <article
-              v-for="item in latestNews.slice(0, 4)"
+              v-for="item in latestNews"
               :key="item.id"
               class="bg-gray-900 rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row card-hover"
             >
@@ -120,7 +119,8 @@
                   class="w-full h-full object-cover"
                 />
                 <span
-                  :class="`absolute top-3 left-3 bg-${item.categoryColor}-600 text-white text-xs px-2 py-1 rounded`"
+                  :style="`background-color: ${item.categoryColor};`"
+                  :class="`absolute top-3 left-3 text-white text-xs px-2 py-1 rounded`"
                 >
                   {{ item.category }}
                 </span>
@@ -176,6 +176,8 @@
             </a>
           </div>
         </div>
+
+
         <!-- 热门排行 - 动态渲染 -->
         <div class="bg-gray-900 rounded-xl p-5 shadow-lg" v-if="rankedNews.length">
           <h3 class="text-lg font-bold mb-4 text-gray-100 flex items-center">
@@ -183,7 +185,7 @@
           </h3>
           <div class="space-y-4">
             <!-- 动态渲染排行条目 -->
-            <div v-for="item in rankedNews.slice(0, 10)" :key="item.id" class="flex gap-3">
+            <div v-for="item in rankedNews" :key="item.id" class="flex gap-3">
               <span
                 :class="[
                   'w-6 h-6 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0',
@@ -192,20 +194,22 @@
               >
                 {{ item.rank }}
               </span>
-              <div>
+              <div :class="[item.rank <= 3
+                      ? 'text-gray-100 '
+                      : 'text-gray-300 hover:text-gray-200',]">
                 <router-link
                   :to="`/DetailedNewsPage/${item.id}`"
                   :class="[
                     'text-sm font-medium line-clamp-2 transition-colors',
-                    item.rank <= 3
-                      ? 'text-gray-100 hover:text-gray-300'
-                      : 'text-gray-300 hover:text-gray-100',
+
                   ]"
                 >
                   {{ item.title }}
                 </router-link>
                 <p class="text-gray-500 text-xs mt-1">
                   <i class="fa fa-eye mr-1"></i> {{ item.viewCount }}
+                  <span class="mx-3">|</span>
+                  <span><i class="fa fa-thumbs-up mr-1"></i> {{ item.likeCount }}点赞</span>
                 </p>
               </div>
             </div>
@@ -235,7 +239,7 @@
             >
               <i class="fa fa-image text-gray-600 text-xl"></i>
             </div>
-            <p class="text-gray-400 text-sm text-center">本网站期待您的赞助</p>
+            <p class="text-gray-400 text-sm text-center">期待与您的合作</p>
             <p class="text-gray-500 text-xs text-center mt-1">联系我们: global_news@163.com</p>
           </div>
         </div>
@@ -246,40 +250,41 @@
           <div class="grid grid-cols-2 gap-2">
             <!--分类按钮 -->
             <router-link
-              to="/category/tech"
+              to="/BrowseMorePage"
+              class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm py-2 px-3 rounded-lg transition-colors flex items-center justify-center"
+            >
+              <i class="fa fa-newspaper-o mr-2"></i> 今日要闻
+            </router-link>
+            <router-link
+              to="/InternationalNewsPage"
+              class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm py-2 px-3 rounded-lg transition-colors flex items-center justify-center"
+            >
+              <i class="fa fa-graduation-cap mr-2"></i> 国际新闻
+            </router-link>
+            <router-link
+              to="/TechNewsPage"
               class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm py-2 px-3 rounded-lg transition-colors flex items-center justify-center"
             >
               <i class="fa fa-laptop mr-2"></i> 科技前沿
             </router-link>
             <router-link
-              to="/category/finance"
+              to="/FinancialNewsPage"
               class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm py-2 px-3 rounded-lg transition-colors flex items-center justify-center"
             >
-              <i class="fa fa-chart-line mr-2"></i> 财经资讯
+              <i class="fa fa-usd mr-2"></i> 财经资讯
             </router-link>
+
             <router-link
-              to="/category/health"
-              class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm py-2 px-3 rounded-lg transition-colors flex items-center justify-center"
-            >
-              <i class="fa fa-heart mr-2"></i> 健康生活
-            </router-link>
-            <router-link
-              to="/category/sports"
+              to="/SportsNewsPage"
               class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm py-2 px-3 rounded-lg transition-colors flex items-center justify-center"
             >
               <i class="fa fa-futbol-o mr-2"></i> 体育赛事
             </router-link>
             <router-link
-              to="/category/entertainment"
+              to="/EntertainmentNewsPage"
               class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm py-2 px-3 rounded-lg transition-colors flex items-center justify-center"
             >
               <i class="fa fa-music mr-2"></i> 文化娱乐
-            </router-link>
-            <router-link
-              to="/category/education"
-              class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm py-2 px-3 rounded-lg transition-colors flex items-center justify-center"
-            >
-              <i class="fa fa-graduation-cap mr-2"></i> 教育动态
             </router-link>
           </div>
         </div>
@@ -304,7 +309,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { newsApi } from '@/api/newsApi'
 import { ElMessage } from 'element-plus'
 
@@ -319,238 +324,43 @@ const sponsors = ref([])
 const loadHomepageNews = async () => {
   try {
     const response = await newsApi.getHomepageNews()
+    //request返回的数据结构为 { topNews, hotNews, latestNews, rankedNews, sponsors }
+    setTimeout(() => {
+      topNews.value = response.topNews || {}
+    }, 100);
+    setTimeout(() => {
+      hotNews.value = response.hotNews || []
+    }, 100);
+    setTimeout(() => {
+      latestNews.value = response.latestNews || []
+    }, 100);
+    setTimeout(() => {
+      rankedNews.value = response.rankedNews || []
+    }, 300);
+    setTimeout(() => {
+      sponsors.value = response.sponsors || []
+    }, 300);
+  } catch (error) {
     ElMessage({
-      message: '首页新闻获取成功',
-      type: 'success',
+      message: error,
+      type: 'error',
       customClass: 'custom-message',
       duration: 1500,
     })
-    console.log('response:', response)
-    //request返回的数据结构为 { topNews, hotNews, latestNews, rankedNews, sponsors }
-    topNews.value = response.topNews || {}
-    hotNews.value = response.hotNews || []
-    latestNews.value = response.latestNews || []
-    rankedNews.value = response.rankedNews || []
-    sponsors.value = response.sponsors || []
-  } catch (error) {
-    console.error('加载首页新闻数据失败:', error)
-    // 设置默认数据作为后备方案
-    setDefaultData()
   }
 }
-
-// 设置默认数据
-const setDefaultData = () => {
-  topNews.value = {
-    id: '666',
-    title: 'R星游戏工作室旗下GTA6,最快2026年上线',
-    summary: '在最新的游戏开发者大会上,R星Rock Star游戏工作室正式宣布GTA6预计发售日期',
-    category: '头条',
-    categoryColor: 'red',
-    cover: '/img/5.jpg',
-    publishTime: '2小时前',
-    likeCount: '328',
-  }
-
-  hotNews.value = [
-    {
-      id: '1',
-      title: '人工智能技术取得重大突破，多家公司发布最新研究成果',
-      summary:
-        '在最近的科技峰会上，多家知名科技公司展示了其在人工智能领域的最新研究成果，标志着AI技术进入新的发展阶段。',
-      category: '科技',
-      categoryColor: 'blue',
-      cover: '/img/1.jpg',
-      publishTime: '3小时前',
-      viewCount: '1.2万',
-      likeCount: '328',
-      commentCount: '42',
-    },
-    {
-      id: '2',
-      title: '全球股市大幅上涨，投资者信心显著回升',
-      summary: '受经济数据向好和政策利好消息影响，全球主要股市今日大幅上涨，投资者信心显著回升。',
-      category: '财经',
-      categoryColor: 'green',
-      cover: '/img/3.jpg',
-      publishTime: '5小时前',
-      viewCount: '8500',
-      likeCount: '328',
-      commentCount: '28',
-    },
-    {
-      id: '3',
-      title: '新能源汽车销量持续攀升，市场份额创新高',
-      summary:
-        '最新数据显示，新能源汽车销量持续攀升，市场份额创下历史新高，传统燃油车面临转型压力。',
-      category: '汽车',
-      categoryColor: 'purple',
-      cover: '/img/4.jpg',
-      publishTime: '7小时前',
-      viewCount: '9200',
-      likeCount: '280',
-      commentCount: '31',
-    },
-    {
-      id: '4',
-      title: '体育界盛事：国际足球联赛决赛圆满落幕',
-      summary:
-        '经过激烈角逐，国际足球联赛决赛圆满落幕，新科冠军诞生，为球迷们奉献了一场精彩绝伦的比赛。',
-      category: '体育',
-      categoryColor: 'red',
-      cover: '/img/2.jpg',
-      publishTime: '1天前',
-      viewCount: '1.5万',
-      likeCount: '328',
-      commentCount: '56',
-    },
-  ]
-
-  latestNews.value = [
-    {
-      id: '5',
-      title: '教育部发布新政策，推动教育公平发展',
-      summary: '教育部今日发布新政策，旨在进一步推动教育公平发展，缩小城乡教育差距，提高教育质量。',
-      category: '教育',
-      categoryColor: 'yellow',
-      cover: '/img/6.jpg',
-      publishTime: '1小时前',
-      viewCount: '3200',
-      likeCount: '328',
-      commentCount: '42',
-    },
-    {
-      id: '6',
-      title: '环保组织呼吁加强海洋保护，减少塑料污染',
-      summary:
-        '全球环保组织联合发出呼吁，要求各国政府采取更严格措施减少海洋塑料污染，保护海洋生态。',
-      category: '环保',
-      categoryColor: 'emerald',
-      cover: '/img/7.jpg',
-      publishTime: '2小时前',
-      viewCount: '2800',
-      likeCount: '328',
-      commentCount: '31',
-    },
-    {
-      id: '7',
-      title: '医学研究新发现：特定饮食习惯可有效预防疾病',
-      summary:
-        '最新医学研究表明，特定的饮食习惯和生活方式可以有效预防多种常见疾病，为公众健康提供新指导。',
-      category: '健康',
-      categoryColor: 'pink',
-      cover: '/img/8.jpg',
-      publishTime: '4小时前',
-      viewCount: '4500',
-      likeCount: '328',
-      commentCount: '28',
-    },
-    {
-      id: '8',
-      title: '5G网络覆盖范围进一步扩大，连接速度大幅提升',
-      summary: '随着5G基础设施建设的加速推进，5G网络覆盖范围进一步扩大，用户连接速度得到显著提升。',
-      category: '科技',
-      categoryColor: 'blue',
-      cover: '/img/9.jpg',
-      publishTime: '6小时前',
-      viewCount: '5600',
-      likeCount: '328',
-      commentCount: '67',
-    },
-    {
-      id: '9',
-      title: '文化产业发展迎来新机遇，数字文化成趋势',
-      summary: '文化产业在数字化转型中迎来新机遇，数字文化产品和服务成为行业发展的重要趋势。',
-      category: '文化',
-      categoryColor: 'indigo',
-      cover: '/img/10.jpg',
-      publishTime: '8小时前',
-      viewCount: '3700',
-      likeCount: '328',
-      commentCount: '19',
-    },
-    {
-      id: '10',
-      title: '旅游业复苏势头强劲，出境游预订量大幅增长',
-      summary: '随着疫情后限制的逐步解除，旅游业复苏势头强劲，出境游预订量出现大幅增长。',
-      category: '旅游',
-      categoryColor: 'teal',
-      cover: '/img/3.jpg',
-      publishTime: '10小时前',
-      viewCount: '6200',
-      likeCount: '328',
-      commentCount: '54',
-    },
-  ]
-
-  rankedNews.value = [
-    {
-      id: '1',
-      title: '人工智能技术取得重大突破，多家公司发布最新研究成果',
-      viewCount: '12500',
-      rank: 1,
-    },
-    {
-      id: '5',
-      title: '教育部发布新政策，推动教育公平发展',
-      viewCount: '10200',
-      rank: 2,
-    },
-    {
-      id: '2',
-      title: '全球股市大幅上涨，投资者信心显著回升',
-      viewCount: '9800',
-      rank: 3,
-    },
-    {
-      id: '7',
-      title: '医学研究新发现：特定饮食习惯可有效预防疾病',
-      viewCount: '8700',
-      rank: 4,
-    },
-    {
-      id: '4',
-      title: '体育界盛事：国际足球联赛决赛圆满落幕',
-      viewCount: '8200',
-      rank: 5,
-    },
-    {
-      id: '8',
-      title: '5G网络覆盖范围进一步扩大，连接速度大幅提升',
-      viewCount: '7600',
-      rank: 6,
-    },
-    {
-      id: '3',
-      title: '新能源汽车销量持续攀升，市场份额创新高',
-      viewCount: '7100',
-      rank: 7,
-    },
-    {
-      id: '9',
-      title: '文化产业发展迎来新机遇，数字文化成趋势',
-      viewCount: '6800',
-      rank: 8,
-    },
-    {
-      id: '6',
-      title: '环保组织呼吁加强海洋保护，减少塑料污染',
-      viewCount: '6500',
-      rank: 9,
-    },
-    {
-      id: '10',
-      title: '旅游业复苏势头强劲，出境游预订量大幅增长',
-      viewCount: '6200',
-      rank: 10,
-    },
-  ]
-
-  sponsors.value = []
-}
-
 // 组件挂载后加载数据
 onMounted(() => {
-  loadHomepageNews()
+  setTimeout(() => {
+    loadHomepageNews()
+  }, 500)
+})
+onUnmounted(() => {
+  clearTimeout()
+  topNews.value = {}
+  hotNews.value = []
+  latestNews.value = []
+  rankedNews.value = []
+  sponsors.value = []
 })
 </script>

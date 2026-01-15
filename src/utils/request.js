@@ -53,6 +53,7 @@ service.interceptors.response.use(
     if (code === 200) {
       return data
     }
+    return Promise.reject(msg)
   },
   (error) => {
     // HTTP错误类型处理

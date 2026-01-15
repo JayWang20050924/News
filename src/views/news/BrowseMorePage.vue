@@ -1,9 +1,5 @@
 <template>
-<div></div>
+ <center><div style="height: 40vh"><h1>BrowseMore News</h1></div></center>
 </template>
-
-<script lang="js">
+<script setup >
 </script>
-<style>
-
-</style>

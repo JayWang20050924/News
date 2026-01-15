@@ -30,21 +30,21 @@
                 <h4 class="text-gray-100 font-bold mb-4">快速链接</h4>
                 <ul class="space-y-2 text-sm">
                     <li><router-link to="/" class="text-gray-400 hover:text-white transition-colors">首页</router-link></li>
-                    <li><router-link to="/InternationPage" class="text-gray-400 hover:text-white transition-colors">国际新闻</router-link></li>
-                    <li><router-link to="/TechnologyPage" class="text-gray-400 hover:text-white transition-colors">科技资讯</router-link></li>
-                    <li><router-link to="/BrowseMorePage" class="text-gray-400 hover:text-white transition-colors">财经市场</router-link></li>
-                    <li><router-link to="/BrowseMorePage" class="text-gray-400 hover:text-white transition-colors">体育赛事</router-link></li>
+                    <li><router-link to="/InternationalNewsPage" class="text-gray-400 hover:text-white transition-colors">国际新闻</router-link></li>
+                    <li><router-link to="/TechNewsPage" class="text-gray-400 hover:text-white transition-colors">科技资讯</router-link></li>
+                    <li><router-link to="/FinancialNewsPage" class="text-gray-400 hover:text-white transition-colors">财经市场</router-link></li>
+                    <li><router-link to="/SportsNewsPage" class="text-gray-400 hover:text-white transition-colors">体育赛事</router-link></li>
                 </ul>
             </div>
 
             <div>
                 <h4 class="text-gray-100 font-bold mb-4">支持与服务</h4>
                 <ul class="space-y-2 text-sm">
-                    <li><router-link to="/BrowseMorePage" class="text-gray-400 hover:text-white transition-colors">关于我们</router-link></li>
-                    <li><router-link to="/BrowseMorePage" class="text-gray-400 hover:text-white transition-colors">联系方式</router-link></li>
-                    <li><router-link to="/BrowseMorePage" class="text-gray-400 hover:text-white transition-colors">广告服务</router-link></li>
-                    <li><router-link to="/BrowseMorePage" class="text-gray-400 hover:text-white transition-colors">用户反馈</router-link></li>
-                    <li><router-link to="/news/NeedLoginController" class="text-gray-400 hover:text-white transition-colors">资源下载</router-link></li>
+                    <li><router-link to="#" class="text-gray-400 hover:text-white transition-colors">关于我们</router-link></li>
+                    <li><router-link to="#" class="text-gray-400 hover:text-white transition-colors">联系方式</router-link></li>
+                    <li><router-link to="#" class="text-gray-400 hover:text-white transition-colors">广告服务</router-link></li>
+                    <li><router-link to="#" class="text-gray-400 hover:text-white transition-colors">用户反馈</router-link></li>
+                    <li><router-link to="#" class="text-gray-400 hover:text-white transition-colors">资源下载</router-link></li>
                 </ul>
             </div>
 

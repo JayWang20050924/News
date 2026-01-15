@@ -49,6 +49,11 @@ const routes = [
     meta: { requireAuth: false },
   },
   {
+    path:'/BrowseMorePage',
+    name:'BrowseMorePage',
+    component: () => import('@/views/news/BrowseMorePage.vue'), // 懒加载浏览更多页面组件
+  },
+  {
     path: '/InternationalNewsPage',
     name: 'InternationalNewsPage',
     component: () => import('@/views/news/InternationalNewsPage.vue'), // 懒加载国际新闻页面组件
