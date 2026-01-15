@@ -35,7 +35,7 @@
           <div class="flex flex-wrap items-center gap-3 text-gray-300 text-sm">
             <span><i class="fa fa-clock-o mr-1"></i> {{ news.publishTime }}</span>
             <span><i class="fa fa-building-o mr-1"></i> {{ news.author }}</span>
-            <span><i class="fa fa-eye mr-1"></i> {{ news.views }} 浏览</span>
+            <span><i class="fa fa-eye mr-1"></i> {{ news.viewCount }} 浏览</span>
           </div>
         </div>
       </div>
@@ -305,18 +305,18 @@ const loadingMore = ref(false) // 加载更多按钮的加载状态
 
 // 新闻详情数据（统一数据结构）
 const news = ref({
-   id: '', // 新闻唯一标识符
-   title: '', // 新闻标题
-   summary: '', // 新闻摘要
+  id: '', // 新闻唯一标识符
+  title: '', // 新闻标题
+  summary: '', // 新闻摘要
   content: [], // 新闻正文内容数组
-   category: '', // 分类名称
-   categoryColor: '', // 分类颜色（用于标签背景色）
-   cover: '/img/5.jpg', // 新闻封面图片URL
-   publishTime: '', // 发布时间
+  category: '', // 分类名称
+  categoryColor: '', // 分类颜色（用于标签背景色）
+  cover: '/img/5.jpg', // 新闻封面图片URL
+  publishTime: '', // 发布时间
   author: '', // 新闻来源
   viewCount: 0, // 浏览量
-   likeCount: 0, // 点赞数
-   commentCount: 0, // 评论数
+  likeCount: 0, // 点赞数
+  commentCount: 0, // 评论数
 })
 
 // 相关新闻推荐（使用统一的新闻数据结构）
@@ -647,21 +647,21 @@ const loadMoreComments = () => {
 }
 
 // 根据路由参数加载新闻详情
-const loadNewsDetail = async () => {
-  const newsId = route.params.id || route.query.id || '10086'
+const loadDetailedNews = async () => {
+  const newsId = route.params.newsId || route.query.newsId || '1'
 
   try {
     // 获取新闻详情
-    const newsDetail = await newsApi.getNewsDetail(newsId)
-    news.value = newsDetail
+    const DetailedNews = await newsApi.getDetailedNews(newsId)
+    news.value = DetailedNews
 
     // 获取相关新闻
-    const related = await newsApi.getRelatedNews(newsId)
-    relatedNews.value = related
+    // const related = await newsApi.getRelatedNews(newsId)
+    // relatedNews.value = related
 
     // 获取评论（如果接口返回空则使用默认数据）
-    const commentList = await newsApi.getComments(newsId)
-    comments.value = commentList.length > 0 ? commentList : generateDefaultComments()
+    // const commentList = await newsApi.getComments(newsId)
+    // comments.value = commentList.length > 0 ? commentList : generateDefaultComments()
   } catch (error) {
     console.error('加载新闻详情失败:', error)
     // 加载失败时使用默认评论数据
@@ -847,7 +847,7 @@ const publishReply = async () => {
 }
 
 onMounted(() => {
-  loadNewsDetail()
+  loadDetailedNews()
 })
 
 onUnmounted(() => {

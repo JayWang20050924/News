@@ -20,12 +20,12 @@ export const newsApi = {
    * 获取新闻详情
    * @param {String|Number} id - 新闻ID
    */
-  getNewsDetail: (id) => {
+  getDetailedNews: (id) => {
     return request({
-      url: `/news/detail`,
-      method: 'get',
+      url: `/news/detailed`,
+      method: 'post',
       params: {
-        id: id,
+        newsId: id,
       },
     })
   },
