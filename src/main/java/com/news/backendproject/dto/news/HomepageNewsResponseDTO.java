@@ -18,12 +18,12 @@ public class HomepageNewsResponseDTO {
     @JsonView(NewsView.TopNewsView.class)
     private TopNewsDTO topNews;
 
-    /** 热门新闻列表（序列化HomepageView字段） */
-    @JsonView(NewsView.HomepageView.class)
+    /** 热门新闻列表*/
+    @JsonView(NewsView.NewsItemView.class)
     private List<NewsItemDTO> hotNews;
 
-    /** 最新资讯列表（序列化HomepageView字段） */
-    @JsonView(NewsView.HomepageView.class)
+    /** 最新资讯列表 */
+    @JsonView(NewsView.NewsItemView.class)
     private List<NewsItemDTO> latestNews;
 
     /** 热门排行列表 */

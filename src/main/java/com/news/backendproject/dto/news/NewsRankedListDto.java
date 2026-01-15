@@ -15,5 +15,6 @@ public class NewsRankedListDto {
     private Integer id;
     private String title;
     private Integer viewCount;
+    private Integer likeCount;
     private Integer rank;
 }

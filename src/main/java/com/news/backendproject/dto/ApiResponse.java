@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor  // 无参构造（Spring序列化必需）
 @AllArgsConstructor // 全参构造
 public class ApiResponse<T> {
-    private int code;       // 状态码（如200）
-    private String msg;     // 消息（如"success"）
-    private T data;         // 业务数据（泛型，可适配不同类型）
+    private int code;       // 状态码
+    private String msg;     // 消息
+    private T data;         // 业务数据
 }

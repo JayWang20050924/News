@@ -26,7 +26,7 @@ public class NewsController {
     private final HomepageNewsService homepageNewsService;
 
 
-    @AccessRestriction(limit = 40, period = 60, message = "请稍后再试", limitKey = false)
+    @AccessRestriction(limit = 15, message = "请稍后再试", limitKey = false)
     @GetMapping("/homepage")
     public ApiResponse<HomepageNewsResponseDTO> homepage() {
         ApiResponse<HomepageNewsResponseDTO> homepageNews = homepageNewsService.getHomepageNews();

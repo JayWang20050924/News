@@ -33,7 +33,12 @@ public interface NewsDtoMapper {
      * NewsItemDTO映射：前端字段已匹配，无需任何映射规则
      */
     NewsItemDTO toNewsItemDTO(News news);
-
+    /**
+     * NewsRankedListDto映射：前端字段已匹配，无需任何映射规则
+     */
+    ArrayList<NewsRankedListDto> toNewsRankedListDtoList(List<News> newsList);
     // ------------------------ 批量映射 ------------------------
     ArrayList<NewsItemDTO> toNewsItemDTOList(ArrayList<News> newsList);
+    NewsRankedListDto toNewsRankedListDto(News news);
+
 }

@@ -10,9 +10,6 @@ public class NewsView {
     // 列表字段：继承头条 + 额外字段（viewCount/commentCount）
     public interface NewsItemView extends TopNewsView {}
 
-    // 首页字段：继承列表（包含头条+列表所有字段）
-    public interface HomepageView extends NewsItemView {}
-
     // 详情/后台视图（不变）
     public interface NewsDetailView extends TopNewsView {}
     public interface AdminFullView extends TopNewsView {}
