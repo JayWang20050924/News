@@ -1,10 +1,7 @@
 package com.news.backendproject.mapstruct;
 
 import com.news.backendproject.dto.NewsGeneralDTO;
-import com.news.backendproject.dto.news.DetailedNewsDto;
-import com.news.backendproject.dto.news.NewsItemDTO;
-import com.news.backendproject.dto.news.NewsRankedListDto;
-import com.news.backendproject.dto.news.TopNewsDTO;
+import com.news.backendproject.dto.news.*;
 import com.news.backendproject.entity.News;
 import org.mapstruct.Mapper;
 
@@ -23,21 +20,21 @@ public interface NewsDtoMapper {
      * 基础映射：字段名/类型完全匹配，无需@Mapping注解
      */
     NewsGeneralDTO toNewsGeneralDTO (News news);
-
+    AdminNewsDto toAdminNewsDto(News news);
     // ------------------------ 子类DTO映射（无额外映射，直接匹配） ------------------------
     /**
-     * TopNewsDTO映射：前端字段已匹配，无需任何映射规则
+     * TopNewsDTO映射
      */
     TopNewsDTO toTopNewsDTO(News news);
 
     /**
-     * NewsItemDTO映射：前端字段已匹配，无需任何映射规则
+     * NewsItemDTO映射
      */
     NewsItemDTO toNewsItemDTO(News news);
 
     DetailedNewsDto toDetailedNewsDto(News news);
     /**
-     * NewsRankedListDto映射：前端字段已匹配，无需任何映射规则
+     * NewsRankedListDto映射
      */
     ArrayList<NewsRankedListDto> toNewsRankedListDtoList(List<News> newsList);
     // ------------------------ 批量映射 ------------------------
