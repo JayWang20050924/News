@@ -1,4 +1,5 @@
 import axios from 'axios'
+import DOMPurify from 'dompurify'
 
 // 创建Axios实例
 const service = axios.create({
@@ -7,6 +8,48 @@ const service = axios.create({
   timeout: 5000, // 请求超时时间
   withCredentials: true, // 跨域请求时发送Cookie
 })
+
+const sanitizeResponseData = (data) => {
+  // 跳过无需过滤的类型：null/undefined/数字/布尔/Blob
+  if (
+    data === null ||
+    data === undefined ||
+    typeof data === 'number' ||
+    typeof data === 'boolean' ||
+    data instanceof Blob
+  ) {
+    return data
+  }
+
+  // 字符串类型：直接用DOMPurify转义HTML特殊字符
+  if (typeof data === 'string') {
+    // DOMPurify.sanitize会转义<>&等字符，同时过滤恶意标签/属性
+    return DOMPurify.sanitize(data, {
+      ALLOWED_TAGS: ['em', 'strong'],
+      ALLOWED_ATTR: [],
+      RETURN_TRUSTED_TYPE: false,
+    })
+  }
+
+  // 数组类型：递归过滤每个元素
+  if (Array.isArray(data)) {
+    return data.map((item) => sanitizeResponseData(item))
+  }
+
+  // 对象类型：递归过滤每个属性值
+  if (typeof data === 'object') {
+    const sanitizedObj = {}
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        sanitizedObj[key] = sanitizeResponseData(data[key])
+      }
+    }
+    return sanitizedObj
+  }
+
+  // 其他类型（如Date）：直接返回
+  return data
+}
 
 // 请求拦截器：统一添加请求头、处理加载状态等
 service.interceptors.request.use(
@@ -49,11 +92,14 @@ service.interceptors.response.use(
 
     // 接口返回格式为 { code, msg, data }
     const { code, msg, data } = response.data
+    const sanitizedCode = sanitizeResponseData(code);
+    const sanitizedMsg = sanitizeResponseData(msg)
+    const sanitizedData = sanitizeResponseData(data)
     // 业务码200表示成功
-    if (code === 200) {
-      return data
+    if (sanitizedCode === 200) {
+      return sanitizedData
     }
-    return Promise.reject(msg)
+    return Promise.reject(sanitizedMsg)
   },
   (error) => {
     // HTTP错误类型处理
@@ -81,7 +127,6 @@ service.interceptors.response.use(
           break
         case 401:
           errorInfo.msg = '登录状态失效，请重新登录（401）'
-          // 可在此处添加登出逻辑，比如清空token
           localStorage.removeItem('jwtAuth')
           break
         case 403:

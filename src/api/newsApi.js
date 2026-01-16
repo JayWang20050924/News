@@ -16,6 +16,14 @@ export const newsApi = {
     })
   },
 
+  getAboutUsMsg: () => {
+    return request({
+      url: '/news/aboutUs',
+      method: 'get',
+      params: {},
+    })
+  },
+
   /**
    * 获取新闻详情
    * @param {String|Number} id - 新闻ID
@@ -57,6 +65,13 @@ export const newsApi = {
   getRelatedNews: () => {
     return request({
       url: `/news/related`,
+      method: 'get',
+      params: {},
+    })
+  },
+  getBrowseMoreNews: ()=>{
+    return request({
+      url: `/news/browseMore`,
       method: 'get',
       params: {},
     })

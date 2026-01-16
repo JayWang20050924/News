@@ -2,7 +2,7 @@
   <main class="container mx-auto px-4 pt-28 pb-16">
     <!-- 新闻详情主区域 -->
     <section class="mb-12">
-      <!-- 原有新闻详情内容不变 -->
+      <!-- 新闻详情 -->
       <div
         class="relative rounded-2xl overflow-hidden shadow-2xl shadow-gray-900/50 h-[40vh] min-h-[300px] mb-8"
       >
@@ -20,18 +20,21 @@
         <div
           class="absolute inset-0 bg-gradient-to-t from-gray-900/90 to-transparent flex flex-col justify-end p-6 md:p-10"
         >
+        <!-- 标题 -->
           <h1 class="text-[clamp(1.8rem,6vw,3rem)] font-bold text-white mb-4 leading-tight">
             {{ news.title }}
           </h1>
+          <!-- 摘要 -->
           <p class="text-gray-200 text-sm md:text-base mb-4 max-w-3xl">
             {{ news.summary }}
           </p>
+          <!-- 分类 -->
           <span
             :class="`inline-block bg-${news.categoryColor}-600 text-white text-xs px-3 py-1 rounded-full mb-4 w-max`"
           >
             {{ news.category }}
           </span>
-
+          <!-- 时间、作者、浏览次数 -->
           <div class="flex flex-wrap items-center gap-3 text-gray-300 text-sm">
             <span><i class="fa fa-clock-o mr-1"></i> {{ news.publishTime }}</span>
             <span><i class="fa fa-building-o mr-1"></i> {{ news.author }}</span>
@@ -39,7 +42,7 @@
           </div>
         </div>
       </div>
-
+      <!-- 详情内容 -->
       <div class="bg-gray-900 rounded-xl shadow-lg p-6 md:p-8 border-t-2 border-gray-400">
         <div class="prose prose-invert max-w-[80%] mx-auto text-gray-300 leading-relaxed text-left">
           <p
@@ -69,7 +72,7 @@
           >
             <i class="fa fa-thumbs-down text-lg"></i>
             <span></span>
-          </button>
+          </button> 
         </div>
       </div>
     </section>

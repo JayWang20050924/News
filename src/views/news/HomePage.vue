@@ -54,9 +54,9 @@
               :key="item.id"
               class="bg-gray-900 rounded-xl overflow-hidden shadow-lg card-hover"
             >
-              <div class="relative h-48 overflow-hidden">
+              <div class="relative h-48 overflow-hidden cursor-pointer">
                 <img
-                  :src="item.cover || '/img/default-news.jpg'"
+                  :src="item.cover"
                   :alt="item.title"
                   class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                 />
@@ -177,7 +177,6 @@
           </div>
         </div>
 
-
         <!-- 热门排行 - 动态渲染 -->
         <div class="bg-gray-900 rounded-xl p-5 shadow-lg" v-if="rankedNews.length">
           <h3 class="text-lg font-bold mb-4 text-gray-100 flex items-center">
@@ -194,15 +193,12 @@
               >
                 {{ item.rank }}
               </span>
-              <div :class="[item.rank <= 3
-                      ? 'text-gray-100 '
-                      : 'text-gray-300 hover:text-gray-200',]">
+              <div
+                :class="[item.rank <= 3 ? 'text-gray-100 ' : 'text-gray-300 hover:text-gray-200']"
+              >
                 <router-link
                   :to="`/DetailedNewsPage/${item.id}`"
-                  :class="[
-                    'text-sm font-medium line-clamp-2 transition-colors',
-
-                  ]"
+                  :class="['text-sm font-medium line-clamp-2 transition-colors']"
                 >
                   {{ item.title }}
                 </router-link>
@@ -327,19 +323,19 @@ const loadHomepageNews = async () => {
     //request返回的数据结构为 { topNews, hotNews, latestNews, rankedNews, sponsors }
     setTimeout(() => {
       topNews.value = response.topNews || {}
-    }, 100);
+    }, 100)
     setTimeout(() => {
       hotNews.value = response.hotNews || []
-    }, 100);
+    }, 100)
     setTimeout(() => {
       latestNews.value = response.latestNews || []
-    }, 100);
+    }, 100)
     setTimeout(() => {
       rankedNews.value = response.rankedNews || []
-    }, 300);
+    }, 300)
     setTimeout(() => {
       sponsors.value = response.sponsors || []
-    }, 300);
+    }, 300)
   } catch (error) {
     ElMessage({
       message: error,
