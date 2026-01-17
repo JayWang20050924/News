@@ -1,7 +1,7 @@
 package com.news.backendproject.dao;
 
 import com.news.backendproject.dto.user.UserRegisterDto;
-import com.news.backendproject.entity.User;
+import com.news.backendproject.po.User;
 
 public interface UserDao {
     //添加用户

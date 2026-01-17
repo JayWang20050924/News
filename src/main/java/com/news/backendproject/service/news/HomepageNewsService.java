@@ -7,7 +7,7 @@ import com.news.backendproject.dto.news.HomepageNewsResponseDTO;
 import com.news.backendproject.dto.news.NewsItemDTO;
 import com.news.backendproject.dto.news.NewsRankedListDto;
 import com.news.backendproject.dto.news.TopNewsDTO;
-import com.news.backendproject.entity.News;
+import com.news.backendproject.po.News;
 import com.news.backendproject.mapstruct.NewsDtoMapper;
 import com.news.backendproject.mapper.NewsMapper;
 import jakarta.annotation.Resource;

@@ -3,9 +3,12 @@ package com.news.backendproject.exception;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDto;
+import com.news.backendproject.utils.GetClientIp;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.RedisConnectionFailureException;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import jakarta.mail.MessagingException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.format.DateTimeParseException;
@@ -26,7 +31,15 @@ import java.util.stream.Collectors;
  */
 @Slf4j // 用于日志记录
 @RestControllerAdvice // 作用于所有@RestController
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+    private final GetClientIp getClientIp;
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ApiResponse<GeneralDto> handleNoResourceFoundException(NoResourceFoundException e,HttpServletRequest request){
+        log.error("试图访问不存在的接口,ip:"+getClientIp.get(request));
+        return new ApiResponse<>(400, "非法请求", new GeneralDto(false, null));
+    }
     // 处理JSON解析异常
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ApiResponse<GeneralDto> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {

@@ -1,7 +1,6 @@
 package com.news.backendproject.dto.news;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.news.backendproject.dto.NewsGeneralDTO;
 import lombok.EqualsAndHashCode;
 import lombok.Data;
 import lombok.NoArgsConstructor;

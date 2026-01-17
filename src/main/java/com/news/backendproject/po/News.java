@@ -1,4 +1,4 @@
-package com.news.backendproject.entity;
+package com.news.backendproject.po;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;

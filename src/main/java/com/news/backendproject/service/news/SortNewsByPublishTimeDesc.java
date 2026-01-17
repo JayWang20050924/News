@@ -2,7 +2,7 @@ package com.news.backendproject.service.news;
 
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.news.backendproject.entity.News;
+import com.news.backendproject.po.News;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

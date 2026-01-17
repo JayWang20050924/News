@@ -1,7 +1,7 @@
 package com.news.backendproject.verify;
 
 import com.news.backendproject.dao.Imp.UserDaoImp;
-import com.news.backendproject.entity.User;
+import com.news.backendproject.po.User;
 import com.news.backendproject.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

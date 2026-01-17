@@ -2,7 +2,7 @@ package com.news.backendproject.verify;
 
 import com.news.backendproject.dao.Imp.UserDaoImp;
 import com.news.backendproject.dto.user.ExistenceVerifyDto;
-import com.news.backendproject.entity.User;
+import com.news.backendproject.po.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

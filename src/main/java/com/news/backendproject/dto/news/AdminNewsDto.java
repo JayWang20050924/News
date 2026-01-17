@@ -1,6 +1,5 @@
 package com.news.backendproject.dto.news;
 
-import com.news.backendproject.dto.NewsGeneralDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

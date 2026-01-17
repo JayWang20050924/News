@@ -1,8 +1,8 @@
 package com.news.backendproject.mapstruct;
 
-import com.news.backendproject.dto.NewsGeneralDTO;
+import com.news.backendproject.dto.news.NewsGeneralDTO;
 import com.news.backendproject.dto.news.*;
-import com.news.backendproject.entity.News;
+import com.news.backendproject.po.News;
 import org.mapstruct.Mapper;
 
 import java.util.ArrayList;

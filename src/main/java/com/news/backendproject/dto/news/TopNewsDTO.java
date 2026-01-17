@@ -1,15 +1,10 @@
 package com.news.backendproject.dto.news;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.news.backendproject.dto.NewsGeneralDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 /**
  * 头条新闻DTO：适配前端topNews数据结构

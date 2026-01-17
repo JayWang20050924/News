@@ -5,7 +5,7 @@ import com.news.backendproject.annotation.AccessRestriction;
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.news.DetailedNewsDto;
 import com.news.backendproject.dto.news.HomepageNewsResponseDTO;
-import com.news.backendproject.entity.News;
+import com.news.backendproject.po.News;
 import com.news.backendproject.mapper.NewsMapper;
 import com.news.backendproject.mapstruct.NewsDtoMapper;
 import com.news.backendproject.service.news.HomepageNewsService;

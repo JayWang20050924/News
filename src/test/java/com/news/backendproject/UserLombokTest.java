@@ -1,6 +1,6 @@
 package com.news.backendproject;
 
-import com.news.backendproject.entity.User;
+import com.news.backendproject.po.User;
 import com.news.backendproject.dto.user.UserProfileDto;
 import org.junit.jupiter.api.Test;
 

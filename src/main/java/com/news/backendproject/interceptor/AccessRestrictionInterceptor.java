@@ -3,6 +3,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.news.backendproject.annotation.AccessRestriction;
 import com.news.backendproject.dto.ApiResponse;
 import com.news.backendproject.dto.GeneralDto;
+import com.news.backendproject.utils.GetClientIp;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class AccessRestrictionInterceptor implements HandlerInterceptor {
     // Redis 模板：用于存储访问计数
     private final StringRedisTemplate stringRedisTemplate;
     private final ObjectMapper objectMapper;
+    private final GetClientIp getClientIp;
     /**
      * 接口调用前执行：判断是否超限
      */
@@ -48,7 +50,7 @@ public class AccessRestrictionInterceptor implements HandlerInterceptor {
         String redisKey =null;
         // 生成唯一key：区分不同接口 + 不同访问者（用 IP或sessionid [true|false]作为访问者标识）
         if (limitKey){
-            String  ip = getClientIp(request); // 获取客户端IP
+            String  ip = getClientIp.get(request); // 获取客户端IP
             String methodName = handlerMethod.getMethod().getName(); // 接口方法名
             redisKey = "access_limit:" + methodName + ":" + ip;
         }else {
@@ -80,24 +82,6 @@ public class AccessRestrictionInterceptor implements HandlerInterceptor {
 
         // 未超限：放行
         return true;
-    }
-
-    /**
-     * 获取客户端真实IP（处理反向代理场景）
-     */
-    private String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        // 处理多IP场景（X-Forwarded-For可能返回多个IP，取第一个）
-        return ip != null ? ip.split(",")[0].trim() : "unknown";
     }
     private void buildErrorResponse(HttpServletResponse response, int code, String message) throws Exception {
         // 设置响应头（JSON格式+UTF-8编码）

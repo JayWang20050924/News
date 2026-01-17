@@ -9,7 +9,7 @@ import com.news.backendproject.dto.user.SendEmailCaptchaDTO;
 import com.news.backendproject.dto.user.UserForgotDto;
 import com.news.backendproject.dto.user.UserProfileDto;
 import com.news.backendproject.dto.user.UserRegisterDto;
-import com.news.backendproject.entity.User;
+import com.news.backendproject.po.User;
 import com.news.backendproject.service.*;
 import com.news.backendproject.service.user.*;
 import com.news.backendproject.utils.JwtUtil;

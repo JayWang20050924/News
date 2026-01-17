@@ -1,7 +1,7 @@
 package com.news.backendproject.mapper;
 
 import com.news.backendproject.dto.user.UserRegisterDto;
-import com.news.backendproject.entity.User;
+import com.news.backendproject.po.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

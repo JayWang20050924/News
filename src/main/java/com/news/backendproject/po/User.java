@@ -1,4 +1,4 @@
-package com.news.backendproject.entity;
+package com.news.backendproject.po;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

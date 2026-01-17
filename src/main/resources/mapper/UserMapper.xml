@@ -40,7 +40,7 @@
 
     <!--  查询用户信息 -->
     <!-- 结果映射：处理数据库字段与实体属性的映射（如birthday字段类型） -->
-    <resultMap id="UserResultMap" type="com.news.backendproject.entity.User">
+    <resultMap id="UserResultMap" type="com.news.backendproject.po.User">
         <result column="username" property="username"/>
         <result column="email" property="email"/>
         <result column="gender" property="gender"/>
@@ -52,7 +52,7 @@
     </select>
 
     <!--  更新用户信息 -->
-    <update id="updateBasicInforByUsernameAndEmail" parameterType="com.news.backendproject.entity.User">
+    <update id="updateBasicInforByUsernameAndEmail" parameterType="com.news.backendproject.po.User">
         UPDATE user
         SET gender = #{gender},
         birthday = #{birthday},
@@ -60,7 +60,7 @@
         WHERE username = #{username} AND status = 1
     </update>
     <!-- 更新用户密码 -->
-    <update id="updatePasswordInforByUsernameAndEmail" parameterType="com.news.backendproject.entity.User">
+    <update id="updatePasswordInforByUsernameAndEmail" parameterType="com.news.backendproject.po.User">
         UPDATE user
         SET password = #{password}
         WHERE username = #{username} AND email= #{email}  AND status = 1 ANd password !=#{password};

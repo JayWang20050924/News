@@ -3,7 +3,7 @@ package com.news.backendproject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.news.backendproject.entity.News;
+import com.news.backendproject.po.News;
 import com.news.backendproject.mapper.NewsMapper;
 import com.news.backendproject.mapstruct.NewsDtoMapper;
 import jakarta.annotation.Resource;
