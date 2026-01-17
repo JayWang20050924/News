@@ -115,7 +115,12 @@ const loadBrowseMoreNews = async () => {
     const response = await newsApi.getBrowseMoreNews()
     console.log('response:', response)
   } catch (error) {
-    ElMessage.error('获取资讯失败：' + error)
+    ElMessage({
+      message: error,
+      type: 'error',
+      customClass: 'custom-message',
+      duration: 1500,
+    })
   }
 }
 onMounted(() => {
