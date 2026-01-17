@@ -35,6 +35,15 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     private final GetClientIp getClientIp;
 
+    // 处理日期解析异常
+    @ExceptionHandler(DateTimeParseException.class)
+    public ApiResponse<GeneralDto> handleDateTimeParseException(DateTimeParseException e, HttpServletRequest request) {
+        log.error("日期解析/校验异常（IP：{}）：", getClientIp.get(request), e);
+        // 直接返回异常的自定义消息
+        return new ApiResponse<>(400, e.getMessage(), new GeneralDto(false, null));
+    }
+
+    // 处理试图访问不存在的接口
     @ExceptionHandler(NoResourceFoundException.class)
     public ApiResponse<GeneralDto> handleNoResourceFoundException(NoResourceFoundException e,HttpServletRequest request){
         log.error("试图访问不存在的接口,ip:"+getClientIp.get(request));
