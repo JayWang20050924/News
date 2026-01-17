@@ -1,4 +1,5 @@
 <template>
+  <!-- 模板部分无修改，保持原样 -->
   <div class="min-h-screen flex items-center justify-center p-4">
     <!-- 用户中心卡片容器 -->
     <div
@@ -251,6 +252,39 @@ const hasChanges = computed(() => {
     profile.value.birthday !== originalProfile.value.birthday
   )
 })
+
+//生日日期校验函数
+const validateBirthday = () => {
+  // 生日为空时无需校验
+  if (!profile.value.birthday) {
+    return { valid: true, message: '' }
+  }
+
+  try {
+    // 将生日字符串转为Date对象
+    const birthdayDate = new Date(profile.value.birthday)
+    // 获取当前日期（重置时分秒为0，只比较年月日）
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    // 检查生日是否为未来日期
+    if (birthdayDate > today) {
+      return {
+        valid: false,
+        message: '生日不能晚于今天'
+      }
+    }
+    return { valid: true, message: '' }
+  } catch (error) {
+    // 极端情况：日期格式异常（input为date类型时基本不会触发）
+    console.error('日期格式异常：', error)
+    return {
+      valid: false,
+      message: '生日日期格式异常，请重新选择'
+    }
+  }
+}
+
 // 获取用户个人信息
 const getUserProfile = async () => {
   try {
@@ -306,6 +340,19 @@ const handleSubmit = async () => {
     })
     return
   }
+
+  // 校验生日日期是否合规
+  const birthdayValidation = validateBirthday()
+  if (!birthdayValidation.valid) {
+    ElMessage({
+      message: birthdayValidation.message,
+      type: 'error',
+      customClass: 'custom-message',
+      duration: MESSAGE_DURATION,
+    })
+    return
+  }
+
   isSaving.value = true
   // 用户名和邮箱不可修改，若被修改则提示并返回
   if (
@@ -390,7 +437,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* 复用原有样式，适配新组件 */
 .profile-card {
   animation: fadeIn 0.6s ease-out forwards;
   opacity: 0;
