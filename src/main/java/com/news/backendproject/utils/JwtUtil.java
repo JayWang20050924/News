@@ -33,7 +33,7 @@ public class JwtUtil {
     }
 
     // 生成唯一JWT令牌
-    public String generateToken(String username) {
+    public  String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
                 .setClaims(claims)

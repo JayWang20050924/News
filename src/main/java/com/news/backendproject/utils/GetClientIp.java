@@ -1,11 +1,13 @@
 package com.news.backendproject.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.stereotype.Component;
 
-@Component
+
 public class GetClientIp {
-    public String get(HttpServletRequest request) {
+    private GetClientIp(){
+        throw new UnsupportedOperationException("工具类不能实例化");
+    }
+    public static String get(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");

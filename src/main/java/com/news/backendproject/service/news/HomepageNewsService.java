@@ -10,33 +10,47 @@ import com.news.backendproject.dto.news.TopNewsDTO;
 import com.news.backendproject.po.News;
 import com.news.backendproject.mapstruct.NewsDtoMapper;
 import com.news.backendproject.mapper.NewsMapper;
+import com.news.backendproject.utils.NewsFilterUtil;
 import jakarta.annotation.Resource;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class HomepageNewsService {
     private final SortNewsByPublishTimeDesc sortNewsByPublishTimeDesc;
+    private final GetOrSetBrowsedNewsService getOrSetBrowsedNewsService;
     @Resource
     private NewsMapper newsMapper;
     @Resource
     private NewsDtoMapper newsDtoMapper;
+    // session超时标识
+    private static final String SESSION_TIMEOUT_SET_FLAG = "SESSION_TIMEOUT_SET_FLAG";
+
     //获取首页所需的数据
-    public ApiResponse<HomepageNewsResponseDTO> getHomepageNews() {
+    public ApiResponse<HomepageNewsResponseDTO> getHomepageNews(HttpServletRequest request) {
         HomepageNewsResponseDTO homepageDto = new HomepageNewsResponseDTO();
+        HttpSession session = request.getSession(true);
+        if (session.getAttribute(SESSION_TIMEOUT_SET_FLAG) == null) {
+            // 设置Session过期时间（24小时）
+            session.setMaxInactiveInterval(86400);
+            // 添加标记
+            session.setAttribute(SESSION_TIMEOUT_SET_FLAG, Boolean.TRUE);
+        }
+        String sessionId = session.getId();
         //调用获取头条新闻方法
         TopNewsDTO topNews = getTopNews();
+        //调用获取最热门新闻方法
+        ArrayList<NewsItemDTO> hotNews = getHotNews(sessionId);
         //调用获取最新新闻方法
-        ArrayList<NewsItemDTO> latestNews = getLatestNews();
-        ArrayList<NewsItemDTO> hotNews = getHotNews();
+        ArrayList<NewsItemDTO> latestNews = getLatestNews(sessionId);
+        //调用获取新闻排行榜方法
         ArrayList<NewsRankedListDto> rankedNews = getRankedNews();
         homepageDto.setTopNews(topNews);
         homepageDto.setHotNews(hotNews);
@@ -60,7 +74,7 @@ public class HomepageNewsService {
     }
 
     //获取最热门新闻
-    public ArrayList<NewsItemDTO> getHotNews() {
+    public ArrayList<NewsItemDTO> getHotNews(String sessionId) {
         LambdaQueryWrapper<News> queryWrapper = new LambdaQueryWrapper<News>()
                 .orderByDesc(News::getViewCount)
                 .orderByDesc(News::getLikeCount)
@@ -70,7 +84,9 @@ public class HomepageNewsService {
         Page<News> page = new Page<>(1, 100);
         Page<News> resultPage = newsMapper.selectPage(page, queryWrapper);
         List<News> latest100News = resultPage.getRecords();
-
+        //获取用户已浏览新闻的id
+        Set<String> browsedNewsIds = getOrSetBrowsedNewsService.getBrowsedNewsIds(sessionId);
+        List<News> unreadNews = NewsFilterUtil.filterUnreadNews(latest100News, browsedNewsIds);
         // 初始化存储随机4条数据的集合
         ArrayList<News> random4News = new ArrayList<>();
         int needCount = 4;
@@ -109,38 +125,38 @@ public class HomepageNewsService {
     }
 
     //获取最新新闻
-    public ArrayList<NewsItemDTO>  getLatestNews() {
+    public ArrayList<NewsItemDTO>  getLatestNews(String sessionId) {
         LambdaQueryWrapper<News> queryWrapper = new LambdaQueryWrapper<News>()
                 .orderByDesc(News::getPublishTime);
         Page<News> page =new Page<>(1,50);
         Page<News> resultPage = newsMapper.selectPage(page, queryWrapper);
         List<News> latest100News = resultPage.getRecords();
-        ArrayList<News> random6News = new ArrayList<>();
+        ArrayList<News> random4News = new ArrayList<>();
         if (CollectionUtils.isEmpty(latest100News)) {
             // 无数据时返回空集合
-            return newsDtoMapper.toNewsItemDTOList(random6News);
+            return newsDtoMapper.toNewsItemDTOList(random4News);
         }
         int total = latest100News.size();
         int needCount = 4;
         // 若所有数据<=4条，直接返回所有数据
         if (total <= needCount) {
-            random6News.addAll(latest100News);
-            sortNewsByPublishTimeDesc.sort(random6News);
-            return newsDtoMapper.toNewsItemDTOList(random6News);
+            random4News.addAll(latest100News);
+            sortNewsByPublishTimeDesc.sort(random4News);
+            return newsDtoMapper.toNewsItemDTOList(random4News);
         }
 
-        // 数据足够时，随机抽取6条（避免重复抽取）
+        // 数据足够时，随机抽取4条（避免重复抽取）
         Random random = new Random();
         //while终止条件:随机六条新闻数组的长度大于等于需要的长度
-        while (random6News.size() < needCount) {
+        while (random4News.size() < needCount) {
             int randomIndex = random.nextInt(total); // 生成0~total-1的随机索引
             News news = latest100News.get(randomIndex);
-            if (!random6News.contains(news)) { // 确保不重复
-                random6News.add(news);
+            if (!random4News.contains(news)) { // 确保不重复
+                random4News.add(news);
             }
         }
-        sortNewsByPublishTimeDesc.sort(random6News);
-        return newsDtoMapper.toNewsItemDTOList(random6News);
+        sortNewsByPublishTimeDesc.sort(random4News);
+        return newsDtoMapper.toNewsItemDTOList(random4News);
     }
     //获取新闻排行榜
     public ArrayList<NewsRankedListDto> getRankedNews() {

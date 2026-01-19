@@ -25,7 +25,6 @@ public class AccessRestrictionInterceptor implements HandlerInterceptor {
     // Redis 模板：用于存储访问计数
     private final StringRedisTemplate stringRedisTemplate;
     private final ObjectMapper objectMapper;
-    private final GetClientIp getClientIp;
     /**
      * 接口调用前执行：判断是否超限
      */
@@ -50,7 +49,7 @@ public class AccessRestrictionInterceptor implements HandlerInterceptor {
         String redisKey =null;
         // 生成唯一key：区分不同接口 + 不同访问者（用 IP或sessionid [true|false]作为访问者标识）
         if (limitKey){
-            String  ip = getClientIp.get(request); // 获取客户端IP
+            String  ip = GetClientIp.get(request); // 获取客户端IP
             String methodName = handlerMethod.getMethod().getName(); // 接口方法名
             redisKey = "access_limit:" + methodName + ":" + ip;
         }else {

@@ -33,12 +33,11 @@ import java.util.stream.Collectors;
 @RestControllerAdvice // 作用于所有@RestController
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
-    private final GetClientIp getClientIp;
 
     // 处理日期解析异常
     @ExceptionHandler(DateTimeParseException.class)
     public ApiResponse<GeneralDto> handleDateTimeParseException(DateTimeParseException e, HttpServletRequest request) {
-        log.error("日期解析/校验异常（IP：{}）：", getClientIp.get(request), e);
+        log.error("日期解析/校验异常（IP：{}）：", GetClientIp.get(request), e);
         // 直接返回异常的自定义消息
         return new ApiResponse<>(400, e.getMessage(), new GeneralDto(false, null));
     }
@@ -46,7 +45,7 @@ public class GlobalExceptionHandler {
     // 处理试图访问不存在的接口
     @ExceptionHandler(NoResourceFoundException.class)
     public ApiResponse<GeneralDto> handleNoResourceFoundException(NoResourceFoundException e,HttpServletRequest request){
-        log.error("试图访问不存在的接口,ip:"+getClientIp.get(request));
+        log.error("试图访问不存在的接口,ip:"+GetClientIp.get(request));
         return new ApiResponse<>(400, "非法请求", new GeneralDto(false, null));
     }
     // 处理JSON解析异常

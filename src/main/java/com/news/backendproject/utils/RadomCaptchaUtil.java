@@ -2,9 +2,13 @@ package com.news.backendproject.utils;
 import java.util.Random;
 
 public class RadomCaptchaUtil {
+    private RadomCaptchaUtil(){
+        throw new UnsupportedOperationException("工具类不能实例化");
+    }
     /**
      * 生成6位数字验证码（常用）
      */
+
     public static String generate8DigitCaptcha() {
         Random random = new Random();
         // 生成100000~999999的随机数，确保是6位
