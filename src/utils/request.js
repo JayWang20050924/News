@@ -3,14 +3,53 @@ import DOMPurify from 'dompurify'
 
 // 创建Axios实例
 const service = axios.create({
-  // 统一的基础 URL（接口前缀）
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
-  timeout: 5000, // 请求超时时间
-  withCredentials: true, // 跨域请求时发送Cookie
+  timeout: 5000,
+  withCredentials: true,
 })
 
-const sanitizeResponseData = (data) => {
-  // 跳过无需过滤的类型：null/undefined/数字/布尔/Blob
+// ========== 时间格式化函数 ==========
+const formatRelativeTime = (timeStr) => {
+  if (!timeStr) return timeStr // 为空则直接返回
+  try {
+    //转换为通用时间格式
+    const publishTime = new Date(timeStr.replace(/-/g, '/'))
+    const now = new Date()
+    // 计算时间差
+    const diffTime = now.getTime() - publishTime.getTime()
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+    if (diffDays === 0) return ' 今 天 '
+    if (diffDays === 1) return ' 1 天 前 '
+    if (diffDays < 30) return ` ${diffDays} 天 前 `
+    const month = Math.floor(diffDays / 30)
+    return ` ${month} 个 月 前 `
+  } catch (e) {
+    console.error('时间格式化失败:', e)
+    return timeStr // 解析失败则返回原字符串
+  }
+}
+
+// ========== 数值格式化函数（转k/w） ==========
+const formatNumber = (num) => {
+  if (num === null || num === undefined) return num
+  // 确保是数字类型
+  const number = Number(num)
+  if (isNaN(number)) return num
+
+  // 小于1000直接返回原数
+  if (number < 1000) return number
+  // 1000-9999 显示x.k
+  if (number < 10000) {
+    return (number / 1000).toFixed(1) + ' k '
+  }
+  // 10000+ 显示x.w
+  return (number / 10000).toFixed(1) + '  w '
+}
+
+// ========== 递归处理数据转换 ==========
+const transformData = (data) => {
+  // 跳过无需处理的类型
   if (
     data === null ||
     data === undefined ||
@@ -21,9 +60,52 @@ const sanitizeResponseData = (data) => {
     return data
   }
 
-  // 字符串类型：直接用DOMPurify转义HTML特殊字符
+  // 数组类型：递归处理每个元素
+  if (Array.isArray(data)) {
+    return data.map((item) => transformData(item))
+  }
+
+  // 对象类型：处理指定字段，其余字段递归
+  if (typeof data === 'object') {
+    const transformedObj = {}
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        const value = data[key]
+        switch (key) {
+          case 'publishTime':
+            transformedObj[key] = formatRelativeTime(value)
+            break
+          case 'viewCount':
+          case 'likeCount':
+          case 'commentCount':
+            transformedObj[key] = formatNumber(value)
+            break
+          default:
+            // 其他字段继续递归
+            transformedObj[key] = transformData(value)
+            break
+        }
+      }
+    }
+    return transformedObj
+  }
+
+  // 其他类型（字符串等）直接返回
+  return data
+}
+
+const sanitizeResponseData = (data) => {
+  if (
+    data === null ||
+    data === undefined ||
+    typeof data === 'number' ||
+    typeof data === 'boolean' ||
+    data instanceof Blob
+  ) {
+    return data
+  }
+
   if (typeof data === 'string') {
-    // DOMPurify.sanitize会转义<>&等字符，同时过滤恶意标签/属性
     return DOMPurify.sanitize(data, {
       ALLOWED_TAGS: ['em', 'strong'],
       ALLOWED_ATTR: [],
@@ -31,12 +113,10 @@ const sanitizeResponseData = (data) => {
     })
   }
 
-  // 数组类型：递归过滤每个元素
   if (Array.isArray(data)) {
     return data.map((item) => sanitizeResponseData(item))
   }
 
-  // 对象类型：递归过滤每个属性值
   if (typeof data === 'object') {
     const sanitizedObj = {}
     for (const key in data) {
@@ -47,22 +127,18 @@ const sanitizeResponseData = (data) => {
     return sanitizedObj
   }
 
-  // 其他类型（如Date）：直接返回
   return data
 }
 
-// 请求拦截器：统一添加请求头、处理加载状态等
+// 请求拦截器（原逻辑不变）
 service.interceptors.request.use(
   (config) => {
-    // 生成时间戳
     const timestamp = Date.now()
-    // 如果已有params,直接添加时间戳=>否则初始化并添加时间戳params
     if (config.params) {
       config.params.timestamp = timestamp
     } else {
       config.params = { timestamp: timestamp }
     }
-    //添加token到请求头
     const token = localStorage.getItem('jwtAuth')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
@@ -78,9 +154,7 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   async (response) => {
-    // 处理blob类型响应（如验证码、文件等）
     if (response.config.responseType === 'blob') {
-      // 通过响应头判断是否是限流错误
       const isError = response.headers['x-error-type'] === 'rate-limit'
       if (isError) {
         const blobText = await new Response(response.data).text()
@@ -90,32 +164,31 @@ service.interceptors.response.use(
       return response
     }
 
-    // 接口返回格式为 { code, msg, data }
     const { code, msg, data } = response.data
-    const sanitizedCode = sanitizeResponseData(code);
+    const sanitizedCode = sanitizeResponseData(code)
     const sanitizedMsg = sanitizeResponseData(msg)
     const sanitizedData = sanitizeResponseData(data)
-    // 业务码200表示成功
+
+    // ========== 数据转换 ==========
+    const transformedData = transformData(sanitizedData)
+
     if (sanitizedCode === 200) {
-      return sanitizedData
+      return transformedData // 返回转换后的数据
     }
     return Promise.reject(sanitizedMsg)
   },
   (error) => {
-    // HTTP错误类型处理
+    // 原错误处理逻辑保持不变
     let errorInfo = {
-      type: 'network', // 为网络/服务器错误
+      type: 'network',
       msg: '服务器开小差了,请稍后再试~',
-      status: null, // 存储HTTP状态码
+      status: null,
     }
 
-    // 超时错误
     if (error.code === 'ECONNABORTED') {
       errorInfo.msg = '请求超时，请检查网络或稍后重试'
       console.error('【响应拦截器】请求超时:', error.config.url)
-    }
-    // 有响应的HTTP错误
-    else if (error.response) {
+    } else if (error.response) {
       const status = error.response.status
       errorInfo.status = status
       switch (status) {
@@ -136,13 +209,10 @@ service.interceptors.response.use(
           errorInfo.msg = `请求失败（${status}）：${error.response.statusText}`
       }
       console.error(`【响应拦截器】HTTP错误 ${status}:`, error.config.url)
-    }
-    // 无响应的网络错误（如断网）
-    else {
+    } else {
       errorInfo.msg = '网络连接失败，请检查网络设置'
       console.error('【响应拦截器】网络错误:', error.message)
     }
-    // 抛出错误信息，方便页面层判断处理
     return Promise.reject(errorInfo.msg)
   },
 )

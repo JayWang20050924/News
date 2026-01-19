@@ -113,18 +113,23 @@ const BrowseMoreNews = ref([
 const loadBrowseMoreNews = async () => {
   try {
     const response = await newsApi.getBrowseMoreNews()
+    return response;
     console.log('response:', response)
   } catch (error) {
     ElMessage({
-      message: error,
+      message: error||'加载更多资讯数据失败',
       type: 'error',
       customClass: 'custom-message',
       duration: 1500,
     })
   }
 }
-onMounted(() => {
-  loadBrowseMoreNews()
+onMounted(async () => {
+  const response=await loadBrowseMoreNews();
+  if(response!=null){
+    BrowseMoreNews.value=response;
+    console.log('BrowseMoreNews:', BrowseMoreNews.value)
+  }
 })
 
 onUnmounted(() => {
