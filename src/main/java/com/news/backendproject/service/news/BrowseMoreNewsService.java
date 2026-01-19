@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BrowseMoreNewsService {
-    @Value("${maxTryPages}")
+    @Value("${pagenumber.max}")
     private int maxTryPages;
     private final SortNewsByPublishTimeDesc sortNewsByPublishTimeDesc;
     private final OperateBrowsedNewsService operateBrowsedNewsService;
@@ -51,7 +51,7 @@ public class BrowseMoreNewsService {
                 //赋值前端传入pageNumStr
                 pageNum = Integer.parseInt(pageNumStr.trim());
                 // 页码不能小于1
-                pageNum = pageNum < 1 ? 1 : pageNum;
+                pageNum = Math.min(pageNum, 1);
             }
             if (pageSizeStr != null && !pageSizeStr.trim().isEmpty()) {
                 //赋值前端传入pageSizeStr
