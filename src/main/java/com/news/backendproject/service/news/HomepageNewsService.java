@@ -11,6 +11,7 @@ import com.news.backendproject.po.News;
 import com.news.backendproject.mapstruct.NewsDtoMapper;
 import com.news.backendproject.mapper.NewsMapper;
 import com.news.backendproject.utils.NewsFilterUtil;
+import com.news.backendproject.utils.SessionSetTimeoutPeriodUtil;
 import jakarta.annotation.Resource;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,31 +26,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HomepageNewsService {
     private final SortNewsByPublishTimeDesc sortNewsByPublishTimeDesc;
-    private final GetOrSetBrowsedNewsService getOrSetBrowsedNewsService;
+    private final OperateBrowsedNewsService operateBrowsedNewsService;
     @Resource
     private NewsMapper newsMapper;
     @Resource
     private NewsDtoMapper newsDtoMapper;
-    // session超时标识
-    private static final String SESSION_TIMEOUT_SET_FLAG = "SESSION_TIMEOUT_SET_FLAG";
 
     //获取首页所需的数据
-    public ApiResponse<HomepageNewsResponseDTO> getHomepageNews(HttpServletRequest request) {
+    public ApiResponse<HomepageNewsResponseDTO> getHomepageNews() {
         HomepageNewsResponseDTO homepageDto = new HomepageNewsResponseDTO();
-        HttpSession session = request.getSession(true);
-        if (session.getAttribute(SESSION_TIMEOUT_SET_FLAG) == null) {
-            // 设置Session过期时间（24小时）
-            session.setMaxInactiveInterval(86400);
-            // 添加标记
-            session.setAttribute(SESSION_TIMEOUT_SET_FLAG, Boolean.TRUE);
-        }
-        String sessionId = session.getId();
         //调用获取头条新闻方法
         TopNewsDTO topNews = getTopNews();
         //调用获取最热门新闻方法
-        ArrayList<NewsItemDTO> hotNews = getHotNews(sessionId);
+        ArrayList<NewsItemDTO> hotNews = getHotNews();
         //调用获取最新新闻方法
-        ArrayList<NewsItemDTO> latestNews = getLatestNews(sessionId);
+        ArrayList<NewsItemDTO> latestNews = getLatestNews();
         //调用获取新闻排行榜方法
         ArrayList<NewsRankedListDto> rankedNews = getRankedNews();
         homepageDto.setTopNews(topNews);
@@ -74,7 +65,7 @@ public class HomepageNewsService {
     }
 
     //获取最热门新闻
-    public ArrayList<NewsItemDTO> getHotNews(String sessionId) {
+    public ArrayList<NewsItemDTO> getHotNews() {
         LambdaQueryWrapper<News> queryWrapper = new LambdaQueryWrapper<News>()
                 .orderByDesc(News::getViewCount)
                 .orderByDesc(News::getLikeCount)
@@ -84,9 +75,6 @@ public class HomepageNewsService {
         Page<News> page = new Page<>(1, 100);
         Page<News> resultPage = newsMapper.selectPage(page, queryWrapper);
         List<News> latest100News = resultPage.getRecords();
-        //获取用户已浏览新闻的id
-        Set<String> browsedNewsIds = getOrSetBrowsedNewsService.getBrowsedNewsIds(sessionId);
-        List<News> unreadNews = NewsFilterUtil.filterUnreadNews(latest100News, browsedNewsIds);
         // 初始化存储随机4条数据的集合
         ArrayList<News> random4News = new ArrayList<>();
         int needCount = 4;
@@ -125,7 +113,7 @@ public class HomepageNewsService {
     }
 
     //获取最新新闻
-    public ArrayList<NewsItemDTO>  getLatestNews(String sessionId) {
+    public ArrayList<NewsItemDTO>  getLatestNews() {
         LambdaQueryWrapper<News> queryWrapper = new LambdaQueryWrapper<News>()
                 .orderByDesc(News::getPublishTime);
         Page<News> page =new Page<>(1,50);

@@ -18,6 +18,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,8 +36,8 @@ public class NewsController {
 
     @AccessRestriction(limit = 15, message = "请稍后再试", limitKey = false)
     @GetMapping("/homepage")
-    public ApiResponse<HomepageNewsResponseDTO> homepage(HttpServletRequest request) {
-        return homepageNewsService.getHomepageNews(request);
+    public ApiResponse<HomepageNewsResponseDTO> homepage() {
+        return homepageNewsService.getHomepageNews();
     }
 
     @AccessRestriction(message = "请稍后再试", limitKey = false)
@@ -50,8 +52,11 @@ public class NewsController {
     }
 
     @AccessRestriction(message = "请稍后再试", limitKey = false)
-    @GetMapping("/browseMore")
-        public ApiResponse<ArrayList<NewsItemDTO>> browseMore(HttpServletRequest request) {
-        return new ApiResponse<>(200, "success", browseMoreNewsService.getBrowseMoreNews(request));
+    @PostMapping("/browseMore")
+        public ApiResponse<Map<String, Object>> browseMore(
+                @RequestParam String pageNum,
+                @RequestParam String pageSize,
+                HttpServletRequest request) {
+        return new ApiResponse<>(200, "success", browseMoreNewsService.getBrowseMoreNews(request, pageNum, pageSize));
     }
 }
