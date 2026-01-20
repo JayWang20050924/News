@@ -65,14 +65,14 @@ public class BrowseMoreNewsService {
             pageSize = 10;
         }
 
-        // ========== 先查询总页数（关键：避免无效分页查询） ==========
+        // ========== 先查询总页数 ==========
         LambdaQueryWrapper<News> countWrapper = new LambdaQueryWrapper<News>()
                 .orderByDesc(News::getPublishTime);
         long totalNewsCount = newsMapper.selectCount(countWrapper);
         long totalPages = (long) Math.ceil((double) totalNewsCount / pageSize);
         System.err.println("总新闻数：" + totalNewsCount + "，总页数：" + totalPages + "，每页条数：" + pageSize);
 
-        // ========== 分页查询所有新闻（按发布时间降序） ==========
+        // ========== 分页查询所有新闻==========
         LambdaQueryWrapper<News> queryWrapper = new LambdaQueryWrapper<News>()
                 .orderByDesc(News::getPublishTime);
         Page<News> newsPage = new Page<>(pageNum, pageSize);
@@ -98,7 +98,7 @@ public class BrowseMoreNewsService {
         System.err.println("当前页过滤后未读新闻数：" + (unreadNews == null ? 0 : unreadNews.size()));
 
         // ==========  补充未读新闻逻辑==========
-        // 场景1：当前页有未读但数量不足 → 补充后续页
+        // 当前页有未读但数量不足 → 补充后续页
         if (CollectionUtils.isNotEmpty(unreadNews) && unreadNews.size() < pageSize) {
             int lackNum = pageSize - unreadNews.size();
             Page<News> supplementPage = new Page<>(pageNum + 1, lackNum);
@@ -112,7 +112,7 @@ public class BrowseMoreNewsService {
             }
             System.err.println("补充后未读新闻数：" + unreadNews.size());
         }
-        // 场景2：当前页过滤后为空 → 主动查询后续页找未读（核心优化）
+        // 当前页过滤后为空 → 主动查询后续页找未读（核心优化）
         else if (CollectionUtils.isEmpty(unreadNews)) {
             System.err.println("当前页全为已读，开始查询后续页找未读新闻...");
             int currentTryPage = pageNum + 1;
@@ -170,10 +170,9 @@ public class BrowseMoreNewsService {
         // 返回分页数据：列表 + 总条数 + 是否还有更多未读（新增）
         Map<String, Object> result = new HashMap<>();
         result.put("records", newsItemDTOS); // 当前页数据
-        result.put("total", total); // 总未过滤新闻数
-        // 新增：标记是否还有更多未读（前端可据此隐藏加载按钮/停止滚动加载）
-        result.put("hasMore", CollectionUtils.isNotEmpty(unreadNews));
-        // 新增：提示信息（便于前端展示）
+        // 标记是否还有更多未读（前端可据此隐藏加载按钮/停止滚动加载）
+        result.put("hasMoreResp", CollectionUtils.isNotEmpty(unreadNews));
+        // 提示信息（便于前端展示）
         result.put("message", CollectionUtils.isEmpty(unreadNews) ? "暂无更多未读新闻" : "获取未读新闻成功");
 
         System.err.println("最终返回结果：" + result);
