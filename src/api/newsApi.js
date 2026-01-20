@@ -69,11 +69,14 @@ export const newsApi = {
       params: {},
     })
   },
-  getBrowseMoreNews: ()=>{
+  getBrowseMoreNews: (pageNum,pageSize) => {
     return request({
       url: `/news/browseMore`,
-      method: 'get',
-      params: {},
+      method: 'post',
+      params: {
+        pageNum: pageNum,
+        pageSize: pageSize
+      },
     })
   },
 

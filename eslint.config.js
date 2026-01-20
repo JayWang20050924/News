@@ -12,7 +12,7 @@ import pluginCypress from 'eslint-plugin-cypress'
 import pluginOxlint from 'eslint-plugin-oxlint'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 
-// 关键修改1：允许 Vue 文件的 <script> 块使用 js/ts/tsx（默认只允许 ts/tsx）
+// 允许 Vue 文件的 <script> 块使用 js/ts/tsx（默认只允许 ts/tsx）
 configureVueProject({
   scriptLangs: ['ts', 'js', 'tsx'], // 新增 'js'，允许 JavaScript 语言
 })
@@ -20,7 +20,7 @@ configureVueProject({
 export default defineConfigWithVueTs(
   {
     name: 'app/files-to-lint',
-    files: ['**/*.{ts,mts,tsx,vue,js,mjs}'], // 可选：新增 js/mjs 后缀，确保 JS 文件被正确识别
+    files: ['**/*.{ts,mts,tsx,vue,js,mjs}'], // 新增 js/mjs 后缀，确保 JS 文件被正确识别
   },
 
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
@@ -38,7 +38,7 @@ export default defineConfigWithVueTs(
     files: ['cypress/e2e/**/*.{cy,spec}.{js,ts,jsx,tsx}', 'cypress/support/**/*.{js,ts,jsx,tsx}'],
   },
 
-  // 关键修改2：禁用/调整 vue/block-lang 规则（解决爆红核心）
+  // 禁用/调整 vue/block-lang 规则
   {
     rules: {
       // 完全禁用
