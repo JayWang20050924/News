@@ -11,7 +11,7 @@ public class RadomCaptchaUtil {
 
     public static String generate8DigitCaptcha() {
         Random random = new Random();
-        // 生成100000~999999的随机数，确保是6位
+        // 生成100000~999999的随机数，确保是8位
         return String.format("%08d", random.nextInt(900000) + 100000);
     }
 
